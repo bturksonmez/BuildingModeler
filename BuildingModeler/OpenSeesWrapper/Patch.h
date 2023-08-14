@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "Object.h"
+
 namespace opensees
 {
 	enum PatchType
@@ -11,7 +13,7 @@ namespace opensees
 		Circ
 	};
 
-	class Patch
+	class Patch : public Object
 	{
 	protected:
 		int m_materialTag;
@@ -20,11 +22,9 @@ namespace opensees
 		Patch(int materialTag) : m_materialTag(materialTag) {}
 
 	public:
-		virtual ~Patch() {}
+		~Patch() {}
 
 		int getMaterialTag() const;
 		PatchType getPatchType() const;
-
-		virtual std::string getOpenseesCommand() const = 0;
 	};
 }

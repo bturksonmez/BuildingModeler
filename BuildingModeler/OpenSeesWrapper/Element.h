@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 
+#include "Object.h"
+
 namespace opensees
 {
 	enum ElementType
@@ -11,7 +13,7 @@ namespace opensees
 		Area
 	};
 
-	class Element
+	class Element : Object
 	{
 	protected:
 		int m_elementTag;
@@ -20,12 +22,10 @@ namespace opensees
 		Element(int elementTag) : m_elementTag(elementTag) {}
 
 	public:
-		virtual ~Element() {}
+		~Element() {}
 
 		int getElementTag() const;
 		ElementType getElementType() const;
-
-		virtual std::string getOpenseesCommand() const = 0;
 	};
 }
 
