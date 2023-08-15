@@ -11,6 +11,8 @@ RectangularPatch::RectangularPatch(int materialTag, int numDivY, int numDivZ, do
 	m_zI = zI;
 	m_yJ = yJ;
 	m_zJ = zJ;
+
+	m_patchType = PatchType::Rect;
 }
 
 int RectangularPatch::getNumDivY() const

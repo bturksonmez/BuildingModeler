@@ -6,7 +6,7 @@
 
 namespace opensees
 {
-	enum PatchType
+	enum class PatchType
 	{
 		Quad,
 		Rect,

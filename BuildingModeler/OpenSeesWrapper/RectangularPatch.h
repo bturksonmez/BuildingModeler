@@ -2,6 +2,7 @@
 
 #include <string>
 #include "Patch.h"
+
 namespace opensees
 {
 	class RectangularPatch : public Patch

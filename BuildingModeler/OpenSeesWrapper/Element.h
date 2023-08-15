@@ -7,10 +7,11 @@
 
 namespace opensees
 {
-	enum ElementType
+	enum class ElementType
 	{
-		Frame,
-		Area
+		ZeroLength,
+		BeamColumn,
+		Quad
 	};
 
 	class Element : Object
