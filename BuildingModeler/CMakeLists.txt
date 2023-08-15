@@ -6,7 +6,7 @@ cmake_minimum_required (VERSION 3.10)
 project ("BuildingModeler")
 
 # Add source to this project's executable.
-add_executable (BuildingModeler "Main.cpp"  "OpenSeesWrapper/Element.h" "OpenSeesWrapper/Element.cpp" "OpenSeesWrapper/BeamColumnElement.h" "OpenSeesWrapper/BeamColumn.cpp" "OpenSeesWrapper/Patch.h" "OpenSeesWrapper/Patch.cpp" "OpenSeesWrapper/RectangularPatch.h" "OpenSeesWrapper/RectangularPatch.cpp" "OpenSeesWrapper/Node.h" "OpenSeesWrapper/Node.cpp" "OpenSeesWrapper/Object.h"  "OpenSeesWrapper/Material.h" "OpenSeesWrapper/Material.cpp" "OpenSeesWrapper/Mass.h" "OpenSeesWrapper/Mass.cpp")
+add_executable (BuildingModeler "Main.cpp"  "OpenSeesWrapper/Element.h" "OpenSeesWrapper/Element.cpp" "OpenSeesWrapper/BeamColumnElement.h" "OpenSeesWrapper/BeamColumnElement.cpp" "OpenSeesWrapper/Patch.h" "OpenSeesWrapper/Patch.cpp" "OpenSeesWrapper/RectangularPatch.h" "OpenSeesWrapper/RectangularPatch.cpp" "OpenSeesWrapper/Node.h" "OpenSeesWrapper/Node.cpp" "OpenSeesWrapper/Object.h"  "OpenSeesWrapper/Material.h" "OpenSeesWrapper/Material.cpp" "OpenSeesWrapper/Mass.h" "OpenSeesWrapper/Mass.cpp")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
