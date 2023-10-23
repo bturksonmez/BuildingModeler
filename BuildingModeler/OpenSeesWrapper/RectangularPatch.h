@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include "Patch.h"
 
 namespace opensees
