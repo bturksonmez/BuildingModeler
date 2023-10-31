@@ -1,9 +1,10 @@
 #include "Node.h"
+#include "Element.h"
 
 using namespace std;
 using namespace opensees;
 
-Node::Node(int nodeTag, std::vector<double> coords, std::vector<double> massValues) :
+Node::Node(int nodeTag, vector<double> coords, vector<double> massValues) :
 		m_nodeTag(nodeTag), m_coords(coords), m_massValues(massValues)
 {
 }
@@ -23,9 +24,19 @@ const vector<double>& Node::getMassValues() const
 	return m_massValues;
 }
 
+const unordered_set<shared_ptr<Element>>& Node::getConnectedElements() const
+{
+	return m_connectedElements;
+}
+
 void Node::setMassValues(vector<double> massValues)
 {
 	m_massValues = massValues;
+}
+
+void Node::addConnectedElements(shared_ptr<Element> element)
+{
+	m_connectedElements.insert(element);
 }
 
 string Node::getOpenseesCommand() const

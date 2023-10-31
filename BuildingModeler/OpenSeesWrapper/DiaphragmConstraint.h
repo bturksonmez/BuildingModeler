@@ -13,6 +13,7 @@ namespace opensees
 
 	public:
 		DiaphragmConstraint(int masterNodeTag, std::vector<int> slaveNodeTag, int planeDirection);
+		DiaphragmConstraint() = delete;
 		~DiaphragmConstraint() {}
 
 		int getMasterNodeTag() const;

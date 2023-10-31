@@ -19,6 +19,7 @@ namespace opensees
 		Material(int materialTag) : m_materialTag(materialTag) {}
 
 	public:
+		Material() = delete;
 		~Material() {}
 
 		int getMaterialTag() const;

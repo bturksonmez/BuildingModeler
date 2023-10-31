@@ -12,6 +12,7 @@ namespace opensees
 
 	public:
 		SingleConstraint(int nodeTag, int fixDOF1, int fixDOF2, int fixDOF3, int fixDOF4, int fixDOF5, int fixDOF6);
+		SingleConstraint() = delete;
 		~SingleConstraint() {}
 
 		int getNodeTag() const;

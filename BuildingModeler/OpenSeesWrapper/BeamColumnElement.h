@@ -1,31 +1,31 @@
 #pragma once
 
 #include "Element.h"
+#include "GeometricTransformation.h"
 
 namespace opensees
 {
 	enum class BeamColumnElementType
 	{
-		Elastic,
-		ElasticTimoshenko,
-		BeamWithHinges,
-		DispBased,
-		ForceBased
+		ELASTIC,
+		ELASTICTIMOSHENKO,
+		BEAMWITHHINGES,
+		DISPBASED,
+		FORCEBASED
 	};
 
 	class BeamColumnElement : public Element
 	{
 	protected:
-		int m_iNode;
-		int m_jNode;
-		int m_transfTag;
+		std::shared_ptr<GeometricTransformation> m_transf;
 
-		BeamColumnElement(int elementTag, int iNode, int jNode, int transfTag);
+		BeamColumnElement(int elementTag, std::vector<std::shared_ptr<Node>> nodes, std::shared_ptr<GeometricTransformation> transf);
 	public:
+		BeamColumnElement() = delete;
 		~BeamColumnElement() {}
 
-		int getINode() const;
-		int getJNode() const;
-		int getTransfTag() const;
+		const std::shared_ptr<Node> getINode() const;
+		const std::shared_ptr<Node> getJNode() const;
+		const std::shared_ptr<GeometricTransformation> getGeometricTransf() const;
 	};
 }

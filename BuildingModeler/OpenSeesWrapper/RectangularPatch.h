@@ -16,6 +16,7 @@ namespace opensees
 
 	public:
 		RectangularPatch(int materialTag, int numDivY, int numDivZ, double yI, double zI, double yJ, double yZ);
+		RectangularPatch() = delete;
 		~RectangularPatch() {}
 
 		int getNumDivY() const;
