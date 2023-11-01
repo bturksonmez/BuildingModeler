@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Object.h"
-#include "Node.h"
-#include "Section.h"
+#include "../Object.h"
+#include "../Node.h"
+#include "../Sections/Section.h"
 
 namespace opensees
 {

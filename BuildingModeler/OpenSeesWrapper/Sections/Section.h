@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Object.h"
-#include "Material.h"
+#include "../Object.h"
+#include "../Materials/Material.h"
 
 namespace opensees
 {

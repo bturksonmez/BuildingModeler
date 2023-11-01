@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Element.h"
-#include "GeometricTransformation.h"
+#include "../GeometricTransformations/GeometricTransformation.h"
 
 namespace opensees
 {

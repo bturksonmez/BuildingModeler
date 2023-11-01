@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Object.h"
-#include "Node.h"
+#include "../Object.h"
+#include "../Node.h"
 
 namespace opensees
 {
