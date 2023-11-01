@@ -2,6 +2,7 @@
 
 #include "Object.h"
 #include "Node.h"
+#include "Section.h"
 
 namespace opensees
 {
@@ -9,7 +10,7 @@ namespace opensees
 	{
 		ZEROLENGTH,
 		BEAMCOLUMN,
-		QUAD
+		QUADRILATERAL
 	};
 
 	class Element : Object
@@ -18,8 +19,9 @@ namespace opensees
 		int m_elementTag;
 		ElementType m_elementType;
 		std::vector<std::shared_ptr<Node>> m_nodes;
+		std::shared_ptr<Section> m_section;
 
-		Element(int elementTag, std::vector<std::shared_ptr<Node>> nodes);
+		Element(int elementTag, std::vector<std::shared_ptr<Node>> nodes, std::shared_ptr<Section> section);
 
 	public:
 		Element() = delete;
@@ -28,6 +30,7 @@ namespace opensees
 		int getElementTag() const;
 		ElementType getElementType() const;
 		const std::vector<std::shared_ptr<Node>>& getNodes() const;
+		const std::shared_ptr<Section> getSection() const;
 	};
 }
 

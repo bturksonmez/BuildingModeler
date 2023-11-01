@@ -3,7 +3,7 @@
 using namespace std;
 using namespace opensees;
 
-BeamColumnElement::BeamColumnElement(int elementTag, vector<shared_ptr<Node>> nodes, shared_ptr<GeometricTransformation> transf) : Element(elementTag, nodes)
+BeamColumnElement::BeamColumnElement(int elementTag, vector<shared_ptr<Node>> nodes, shared_ptr<Section> section, shared_ptr<GeometricTransformation> transf) : Element(elementTag, nodes, section)
 {
 	m_transf = transf;
 
@@ -23,4 +23,9 @@ const shared_ptr<Node> BeamColumnElement::getJNode() const
 const shared_ptr<GeometricTransformation> BeamColumnElement::getGeometricTransf() const
 {
 	return m_transf;
+}
+
+BeamColumnElementType BeamColumnElement::getBeamColumnElementType() const
+{
+	return m_beamColumnElementType;
 }

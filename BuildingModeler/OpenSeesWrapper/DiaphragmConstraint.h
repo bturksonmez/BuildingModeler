@@ -7,17 +7,17 @@ namespace opensees
 	class DiaphragmConstraint : public Constraint
 	{
 	private:
-		int m_masterNodeTag;
-		std::vector<int> m_slaveNodeTag;
+		std::shared_ptr<Node> m_masterNode;
+		std::vector<std::shared_ptr<Node>> m_slaveNodes;
 		int m_planeDirection;
 
 	public:
-		DiaphragmConstraint(int masterNodeTag, std::vector<int> slaveNodeTag, int planeDirection);
+		DiaphragmConstraint(std::shared_ptr<Node> masterNode, std::vector<std::shared_ptr<Node>> slaveNodes, int planeDirection);
 		DiaphragmConstraint() = delete;
 		~DiaphragmConstraint() {}
 
-		int getMasterNodeTag() const;
-		const std::vector<int>& getSlaveNodeTag() const;
+		const std::shared_ptr<Node> getMasterNode() const;
+		const std::vector<std::shared_ptr<Node>>& getSlaveNodes() const;
 		int getPlaneDirection() const;
 
 		std::string getOpenseesCommand() const override;

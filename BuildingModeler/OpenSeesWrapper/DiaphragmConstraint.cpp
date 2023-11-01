@@ -3,23 +3,20 @@
 using namespace std;
 using namespace opensees;
 
-DiaphragmConstraint::DiaphragmConstraint(int masterNodeTag, vector<int> slaveNodeTag, int planeDirection)
+DiaphragmConstraint::DiaphragmConstraint(shared_ptr<Node> masterNode, vector<shared_ptr<Node>> slaveNodes, int planeDirection)
+	: m_masterNode(masterNode), m_slaveNodes(slaveNodes), m_planeDirection(planeDirection)
 {
-	m_constraintType = ConstraintType::Diaphragm;
-
-	m_masterNodeTag = masterNodeTag;
-	m_slaveNodeTag = slaveNodeTag;
-	m_planeDirection = planeDirection;
+	m_constraintType = ConstraintType::DIAPHRAGM;
 }
 
-int DiaphragmConstraint::getMasterNodeTag() const
+const shared_ptr<Node> DiaphragmConstraint::getMasterNode() const
 {
-	return m_masterNodeTag;
+	return m_masterNode;
 }
 
-const vector<int>& DiaphragmConstraint::getSlaveNodeTag() const
+const vector<shared_ptr<Node>>& DiaphragmConstraint::getSlaveNodes() const
 {
-	return m_slaveNodeTag;
+	return m_slaveNodes;
 }
 
 int DiaphragmConstraint::getPlaneDirection() const
@@ -31,9 +28,9 @@ string DiaphragmConstraint::getOpenseesCommand() const
 {
 	string commandLine;
 
-	commandLine = "rigidDiaphragm " + to_string(m_planeDirection) + " " + to_string(m_masterNodeTag);
-	for (int i = 0; i < m_slaveNodeTag.size(); i++)
-		commandLine = commandLine + " " + to_string(m_slaveNodeTag[i]);
+	commandLine = "rigidDiaphragm " + to_string(m_planeDirection) + " " + to_string(m_masterNode->getNodeTag());
+	for (int i = 0; i < m_slaveNodes.size(); i++)
+		commandLine = commandLine + " " + to_string(m_slaveNodes[i]->getNodeTag());
 
 	commandLine = commandLine + "\n";
 

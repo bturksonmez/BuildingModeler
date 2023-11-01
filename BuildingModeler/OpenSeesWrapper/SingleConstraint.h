@@ -7,16 +7,16 @@ namespace opensees
 	class SingleConstraint : public Constraint
 	{
 	private:
-		int m_nodeTag;
-		std::vector<int> m_fixedDOF;
+		std::shared_ptr<Node> m_node;
+		std::vector<int> m_fixedDOFs;
 
 	public:
-		SingleConstraint(int nodeTag, int fixDOF1, int fixDOF2, int fixDOF3, int fixDOF4, int fixDOF5, int fixDOF6);
+		SingleConstraint(std::shared_ptr<Node> nodeTag, std::vector<int> fixedDOFs);
 		SingleConstraint() = delete;
 		~SingleConstraint() {}
 
-		int getNodeTag() const;
-		const std::vector<int>& getConstraintVector() const;
+		const std::shared_ptr<Node> getNode() const;
+		const std::vector<int>& getFixedDOFs() const;
 
 		std::string getOpenseesCommand() const override;
 	};

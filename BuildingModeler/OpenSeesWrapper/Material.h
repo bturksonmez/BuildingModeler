@@ -6,8 +6,14 @@ namespace opensees
 {
 	enum class MaterialType
 	{
-		Uniaxial,
-		Ndim
+		ELASTIC,
+		CONCRETE01,
+		CONCRETE02,
+		CONCRETE07,
+		CONCRETECM,
+		STEEL01,
+		STEEL02
+
 	};
 
 	class Material : Object
@@ -15,8 +21,11 @@ namespace opensees
 	protected:
 		int m_materialTag;
 		MaterialType m_materialType;
+		double m_E;
+		double m_G;
+		double m_rho;
 
-		Material(int materialTag) : m_materialTag(materialTag) {}
+		Material(int materialTag, double rho, double E = 0, double G = 0) : m_materialTag(materialTag), m_rho(rho), m_E(E), m_G(G) {}
 
 	public:
 		Material() = delete;
@@ -24,6 +33,9 @@ namespace opensees
 
 		int getMaterialTag() const;
 		MaterialType getMaterialType() const;
+		double getRho() const;
+		double getE() const;
+		double getG() const;
 	};
 }
 

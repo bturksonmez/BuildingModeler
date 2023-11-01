@@ -3,7 +3,7 @@
 using namespace std;
 using namespace opensees;
 
-Element::Element(int elementTag, vector<shared_ptr<Node>> nodes) : m_elementTag(elementTag), m_nodes(nodes)
+Element::Element(int elementTag, vector<shared_ptr<Node>> nodes, shared_ptr<Section> section) : m_elementTag(elementTag), m_nodes(nodes), m_section(section)
 {
 	for (auto node : nodes) {
 		node->addConnectedElements(shared_ptr<Element>(this));
@@ -23,4 +23,9 @@ ElementType Element::getElementType() const
 const vector<shared_ptr<Node>>& Element::getNodes() const
 {
 	return m_nodes;
+}
+
+const shared_ptr<Section> Element::getSection() const
+{
+	return m_section;
 }

@@ -1,16 +1,17 @@
 #pragma once
 
 #include "Object.h"
+#include "Node.h"
 
 namespace opensees
 {
 	enum class ConstraintType
 	{
-		Single,
-		EqualDOF,
-		Diaphragm,
-		RigidBar,
-		RigidBeam
+		SINGLE,
+		EQUALDOF,
+		DIAPHRAGM,
+		RIGIDBAR,
+		RIGIDBEAM
 	};
 
 	class Constraint : public Object

@@ -3,35 +3,27 @@
 using namespace std;
 using namespace opensees;
 
-SingleConstraint::SingleConstraint(int nodeTag, int fixDOF1, int fixDOF2, int fixDOF3, int fixDOF4, int fixDOF5, int fixDOF6)
+SingleConstraint::SingleConstraint(shared_ptr<Node> node, vector<int> fixedDOFs) : m_node(node), m_fixedDOFs(fixedDOFs)
 {
-	m_constraintType = ConstraintType::Single;
-
-	m_nodeTag = nodeTag;
-	m_fixedDOF.push_back(fixDOF1);
-	m_fixedDOF.push_back(fixDOF2);
-	m_fixedDOF.push_back(fixDOF3);
-	m_fixedDOF.push_back(fixDOF4);
-	m_fixedDOF.push_back(fixDOF5);
-	m_fixedDOF.push_back(fixDOF6);
+	m_constraintType = ConstraintType::SINGLE;
 }
 
-int SingleConstraint::getNodeTag() const
+const shared_ptr<Node> SingleConstraint::getNode() const
 {
-	return m_nodeTag;
+	return m_node;
 }
 
-const vector<int>& SingleConstraint::getConstraintVector() const
+const vector<int>& SingleConstraint::getFixedDOFs() const
 {
-	return m_fixedDOF;
+	return m_fixedDOFs;
 }
 
 string SingleConstraint::getOpenseesCommand() const
 {
 	string command;
 
-	command = "fix " + to_string(m_nodeTag) + " " + to_string(m_fixedDOF[0]) + " " + to_string(m_fixedDOF[1]) + " " + to_string(m_fixedDOF[2])
-		+ " " + to_string(m_fixedDOF[3]) + " " + to_string(m_fixedDOF[4]) + " " + to_string(m_fixedDOF[5]) + "\n";
+	command = "fix " + to_string(m_node->getNodeTag()) + " " + to_string(m_fixedDOFs[0]) + " " + to_string(m_fixedDOFs[1]) + " " + to_string(m_fixedDOFs[2])
+		+ " " + to_string(m_fixedDOFs[3]) + " " + to_string(m_fixedDOFs[4]) + " " + to_string(m_fixedDOFs[5]) + "\n";
 
 	return command;
 }
