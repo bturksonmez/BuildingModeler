@@ -3,7 +3,7 @@
 using namespace std;
 using namespace opensees;
 
-LinearGeometricTransformation::LinearGeometricTransformation(int transfTag, std::vector<int> m_vecXZ)
+LinearGeometricTransformation::LinearGeometricTransformation(int transfTag, vector<int> m_vecXZ)
 	: GeometricTransformation(transfTag, m_vecXZ)
 {
 	m_transfType = GeometricTransformationType::LINEAR;
