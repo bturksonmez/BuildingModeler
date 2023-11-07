@@ -5,7 +5,7 @@
 #include <string>
 #include <unordered_set>
 #include <memory>
-#include <optional>
+#include <algorithm>
 
 
 namespace opensees

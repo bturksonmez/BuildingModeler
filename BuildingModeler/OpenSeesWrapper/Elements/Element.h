@@ -18,8 +18,9 @@ namespace opensees
 	protected:
 		int m_elementTag;
 		ElementType m_elementType;
-		std::vector<std::shared_ptr<Node>> m_nodes;
+		std::vector<std::weak_ptr<Node>> m_nodes;
 		std::shared_ptr<Section> m_section;
+		std::vector<std::shared_ptr<Load>> m_elementLoads;
 
 		Element(int elementTag, std::vector<std::shared_ptr<Node>> nodes, std::shared_ptr<Section> section);
 
@@ -31,6 +32,8 @@ namespace opensees
 		ElementType getElementType() const;
 		const std::vector<std::shared_ptr<Node>>& getNodes() const;
 		const std::shared_ptr<Section> getSection() const;
+		const std::vector<std::shared_ptr<Load>>& getElementLoads() const;
+		void addElementLoad(std::shared_ptr<Load> elementLoad);
 	};
 }
 

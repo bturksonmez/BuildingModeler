@@ -33,8 +33,8 @@ string ShellElement::getOpenseesCommand() const
             shellType = "ShellDKGQ";
     }
 
-	command = "element " + shellType + " " + to_string(m_elementTag) + " " + to_string(m_nodes[0]->getNodeTag()) + " " + to_string(m_nodes[1]->getNodeTag())
-        + " " + to_string(m_nodes[2]->getNodeTag()) + " " + to_string(m_nodes[3]->getNodeTag()) + " " + to_string(m_section->getSectionTag());
+	command = "element " + shellType + " " + to_string(m_elementTag) + " " + to_string(m_nodes[0].lock()->getNodeTag()) + " " + to_string(m_nodes[1].lock()->getNodeTag())
+        + " " + to_string(m_nodes[2].lock()->getNodeTag()) + " " + to_string(m_nodes[3].lock()->getNodeTag()) + " " + to_string(m_section->getSectionTag());
 
 	command += ("\n");
 

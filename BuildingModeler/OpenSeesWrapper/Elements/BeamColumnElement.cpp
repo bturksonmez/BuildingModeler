@@ -12,12 +12,12 @@ BeamColumnElement::BeamColumnElement(int elementTag, vector<shared_ptr<Node>> no
 
 const shared_ptr<Node> BeamColumnElement::getINode() const
 {
-	return m_nodes[0];
+	return m_nodes[0].lock();
 }
 
 const shared_ptr<Node> BeamColumnElement::getJNode() const
 {
-	return m_nodes[1];
+	return m_nodes[1].lock();
 }
 
 const shared_ptr<GeometricTransformation> BeamColumnElement::getGeometricTransf() const

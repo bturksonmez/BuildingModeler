@@ -9,7 +9,7 @@ namespace opensees
 	class NodalLoad : Load
 	{
 	private:
-		std::shared_ptr<Node> m_node;
+		std::weak_ptr<Node> m_node;
 
 		NodalLoad(std::shared_ptr<Node> node, std::vector<double> loadVector);
 

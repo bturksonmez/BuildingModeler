@@ -10,22 +10,22 @@ QuadrilateralElement::QuadrilateralElement(int elementTag, vector<shared_ptr<Nod
 
 const shared_ptr<Node> QuadrilateralElement::getINode() const
 {
-	return m_nodes[0];
+	return m_nodes[0].lock();
 }
 
 const shared_ptr<Node> QuadrilateralElement::getJNode() const
 {
-	return m_nodes[1];
+	return m_nodes[1].lock();
 }
 
 const shared_ptr<Node> QuadrilateralElement::getKNode() const
 {
-	return m_nodes[2];
+	return m_nodes[2].lock();
 }
 
 const shared_ptr<Node> QuadrilateralElement::getLNode() const
 {
-	return m_nodes[3];
+	return m_nodes[3].lock();
 }
 
 QuadrilateralElementType QuadrilateralElement::getQuadrilateralElementType() const

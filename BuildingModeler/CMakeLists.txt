@@ -8,7 +8,6 @@ project ("BuildingModeler")
 # Add source to this project's executable.
 add_executable (BuildingModeler 
 				"Main.cpp"  
-				"OpenSeesWrapper/Elements/Element.h" 
 				"OpenSeesWrapper/Elements/Element.cpp" 
 				"OpenSeesWrapper/Elements/BeamColumnElement.h" 
 				"OpenSeesWrapper/Elements/BeamColumnElement.cpp" 
@@ -54,7 +53,9 @@ add_executable (BuildingModeler
 				"OpenSeesWrapper/Load/Load.h" 
 				"OpenSeesWrapper/Load/Load.cpp" 
 				"OpenSeesWrapper/Load/NodalLoad.h" 
-				"OpenSeesWrapper/Load/NodalLoad.cpp")
+				"OpenSeesWrapper/Load/NodalLoad.cpp"
+				"OpenSeesWrapper/Load/ElementLoad.h" 
+				"OpenSeesWrapper/Load/ElementLoad.cpp")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
