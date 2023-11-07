@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Object.h"
+#include "Load/Load.h"
 
 namespace opensees
 {
@@ -13,6 +14,7 @@ namespace opensees
 		std::vector<double> m_coords;
 		std::vector<double> m_massValues;
 		std::unordered_set<std::shared_ptr<Element>> m_connectedElements;
+		std::shared_ptr<Load> m_nodalLoad;
 
 	public:
 		Node(int nodeTag, std::vector<double> coords, std::vector<double> massValues = {});
@@ -23,8 +25,10 @@ namespace opensees
 		const std::vector<double>& getCoords() const;
 		const std::vector<double>& getMassValues() const;
 		const std::unordered_set<std::shared_ptr<Element>>& getConnectedElements() const;
+		const std::shared_ptr<Load>& getNodalLoad() const;
 		void setMassValues(std::vector<double> massValues);
 		void addConnectedElements(std::shared_ptr<Element> element);
+		void addNodalLoad(std::shared_ptr<Load> nodalLoad);
 
 		std::string getOpenseesCommand() const override;
 	};

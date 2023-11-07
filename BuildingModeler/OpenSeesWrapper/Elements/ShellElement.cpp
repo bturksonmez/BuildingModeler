@@ -34,7 +34,7 @@ string ShellElement::getOpenseesCommand() const
     }
 
 	command = "element " + shellType + " " + to_string(m_elementTag) + " " + to_string(m_nodes[0]->getNodeTag()) + " " + to_string(m_nodes[1]->getNodeTag())
-        + to_string(m_nodes[2]->getNodeTag()) + " " + to_string(m_nodes[3]->getNodeTag()) + " " + to_string(m_section->getSectionTag());
+        + " " + to_string(m_nodes[2]->getNodeTag()) + " " + to_string(m_nodes[3]->getNodeTag()) + " " + to_string(m_section->getSectionTag());
 
 	command += ("\n");
 

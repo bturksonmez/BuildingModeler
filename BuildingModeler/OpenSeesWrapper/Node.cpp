@@ -29,6 +29,11 @@ const unordered_set<shared_ptr<Element>>& Node::getConnectedElements() const
 	return m_connectedElements;
 }
 
+const shared_ptr<Load>& Node::getNodalLoad() const
+{
+	return m_nodalLoad;
+}
+
 void Node::setMassValues(vector<double> massValues)
 {
 	m_massValues = massValues;
@@ -37,6 +42,11 @@ void Node::setMassValues(vector<double> massValues)
 void Node::addConnectedElements(shared_ptr<Element> element)
 {
 	m_connectedElements.insert(element);
+}
+
+void Node::addNodalLoad(std::shared_ptr<Load> nodalLoad)
+{
+	m_nodalLoad = nodalLoad;
 }
 
 string Node::getOpenseesCommand() const

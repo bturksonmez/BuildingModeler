@@ -52,7 +52,9 @@ add_executable (BuildingModeler
 				"OpenSeesWrapper/GeometricTransformations/PDeltaGeometricTransformation.h" 
 				"OpenSeesWrapper/GeometricTransformations/PDeltaGeometricTransformation.cpp" 
 				"OpenSeesWrapper/Load/Load.h" 
-				"OpenSeesWrapper/Load/Load.cpp")
+				"OpenSeesWrapper/Load/Load.cpp" 
+				"OpenSeesWrapper/Load/NodalLoad.h" 
+				"OpenSeesWrapper/Load/NodalLoad.cpp")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
