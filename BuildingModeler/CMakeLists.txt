@@ -55,7 +55,9 @@ add_executable (BuildingModeler
 				"OpenSeesWrapper/Load/NodalLoad.h" 
 				"OpenSeesWrapper/Load/NodalLoad.cpp"
 				"OpenSeesWrapper/Load/ElementLoad.h" 
-				"OpenSeesWrapper/Load/ElementLoad.cpp")
+				"OpenSeesWrapper/Load/ElementLoad.cpp" 
+				"OpenSeesWrapper/Load/LoadPattern.h" 
+				"OpenSeesWrapper/Load/LoadPattern.cpp")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

@@ -10,7 +10,7 @@ namespace opensees
 		ELEMENTLOAD
 	};
 
-	class Load : Object
+	class Load : public Object
 	{
 	protected:
 		LoadType m_loadType;
