@@ -57,7 +57,23 @@ add_executable (BuildingModeler
 				"OpenSeesWrapper/Load/ElementLoad.h" 
 				"OpenSeesWrapper/Load/ElementLoad.cpp" 
 				"OpenSeesWrapper/Load/LoadPattern.h" 
-				"OpenSeesWrapper/Load/LoadPattern.cpp")
+				"OpenSeesWrapper/Load/LoadPattern.cpp" 
+				"PhysicalModel/Joint.h" 
+				"PhysicalModel/Joint.cpp" 
+				"PhysicalModel/Elements/LineElement.h" 
+				"PhysicalModel/Elements/LineElement.cpp" 
+				"PhysicalModel/Elements/AreaElement.h" 
+				"PhysicalModel/Elements/AreaElement.cpp"
+				"PhysicalModel/Materials/Material.h"
+				"PhysicalModel/Materials/Material.cpp"
+				"PhysicalModel/Materials/ElasticMaterial.h"
+				"PhysicalModel/Materials/ElasticMaterial.cpp"
+				"PhysicalModel/Sections/Section.h"
+				"PhysicalModel/Sections/Section.cpp"
+				"PhysicalModel/Sections/ElasticSection1D.h"
+				"PhysicalModel/Sections/ElasticSection1D.cpp"
+				"PhysicalModel/Sections/ElasticSection2D.h"
+				"PhysicalModel/Sections/ElasticSection2D.cpp")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
