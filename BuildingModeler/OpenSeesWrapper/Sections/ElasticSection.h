@@ -4,7 +4,7 @@
 
 namespace opensees
 {
-	class ElasticSection : Section
+	class ElasticSection : public Section
 	{
 	public:
 		ElasticSection(int sectionTag, std::shared_ptr<Material> material, double A, double Iyy, double Izz, double J);

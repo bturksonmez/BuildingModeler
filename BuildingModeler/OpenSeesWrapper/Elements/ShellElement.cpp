@@ -3,8 +3,8 @@
 using namespace std;
 using namespace opensees;
 
-ShellElement::ShellElement(int elementTag, vector<shared_ptr<Node>> nodes, shared_ptr<Section> section, ShellElementType type = ShellElementType::DKGQ) 
-	: QuadrilateralElement(elementTag, nodes, section)
+ShellElement::ShellElement(int elementTag, vector<int> nodeTags, shared_ptr<Section> section, ShellElementType type = ShellElementType::DKGQ) 
+	: QuadrilateralElement(elementTag, nodeTags, section)
 {
 	m_shellElementType = type;
 }
@@ -33,8 +33,8 @@ string ShellElement::getOpenseesCommand() const
             shellType = "ShellDKGQ";
     }
 
-	command = "element " + shellType + " " + to_string(m_elementTag) + " " + to_string(m_nodes[0].lock()->getNodeTag()) + " " + to_string(m_nodes[1].lock()->getNodeTag())
-        + " " + to_string(m_nodes[2].lock()->getNodeTag()) + " " + to_string(m_nodes[3].lock()->getNodeTag()) + " " + to_string(m_section->getSectionTag());
+	command = "element " + shellType + " " + to_string(m_elementTag) + " " + to_string(m_nodeTags[0]) + " " + to_string(m_nodeTags[1])
+        + " " + to_string(m_nodeTags[2]) + " " + to_string(m_nodeTags[3]) + " " + to_string(m_section->getSectionTag());
 
 	command += ("\n");
 

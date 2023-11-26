@@ -4,7 +4,7 @@
 
 namespace opensees
 {
-	class ElasticMembranePlateSection : Section
+	class ElasticMembranePlateSection : public Section
 	{
 	private:
 		double m_thickness;

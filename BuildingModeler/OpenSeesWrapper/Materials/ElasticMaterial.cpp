@@ -3,7 +3,7 @@
 using namespace std;
 using namespace opensees;
 
-ElasticMaterial::ElasticMaterial(int materialTag, double rho, double E, double G) : Material(materialTag, E, G, rho)
+ElasticMaterial::ElasticMaterial(int materialTag, double E, double G, double rho) : Material(materialTag, E, G, rho)
 {
 	m_materialType = MaterialType::ELASTIC;
 }

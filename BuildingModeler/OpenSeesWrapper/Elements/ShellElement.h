@@ -17,7 +17,7 @@ namespace opensees
         ShellElementType m_shellElementType;
 
 	public:
-		ShellElement(int elementTag, std::vector<std::shared_ptr<Node>> nodes, std::shared_ptr<Section> section, ShellElementType type);
+		ShellElement(int elementTag, std::vector<int> nodeTags, std::shared_ptr<Section> section, ShellElementType type);
 		ShellElement() = delete;
 		~ShellElement() {}
 

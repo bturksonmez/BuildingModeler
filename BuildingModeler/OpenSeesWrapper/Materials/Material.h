@@ -25,7 +25,7 @@ namespace opensees
 		double m_G;
 		double m_rho;
 
-		Material(int materialTag, double rho, double E = 0, double G = 0) : m_materialTag(materialTag), m_rho(rho), m_E(E), m_G(G) {}
+		Material(int materialTag, double E, double G = 0, double rho = 0) : m_materialTag(materialTag), m_E(E), m_G(G), m_rho(rho)  {}
 
 	public:
 		Material() = delete;

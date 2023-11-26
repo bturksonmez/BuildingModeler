@@ -4,10 +4,10 @@
 
 namespace opensees
 {
-	class ElasticMaterial : Material
+	class ElasticMaterial : public Material
 	{
 	public:
-		ElasticMaterial(int materialTag, double rho, double E, double G);
+		ElasticMaterial(int materialTag, double E, double G, double rho);
 		ElasticMaterial() = delete;
 		~ElasticMaterial() {}
 

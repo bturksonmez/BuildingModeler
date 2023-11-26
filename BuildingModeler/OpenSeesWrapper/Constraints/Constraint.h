@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../OpenseesObject.h"
-#include "../Node.h"
 
 namespace opensees
 {

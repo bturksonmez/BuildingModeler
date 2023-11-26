@@ -3,13 +3,13 @@
 using namespace std;
 using namespace opensees;
 
-Mass::Mass(shared_ptr<Node> node, vector<double> massValues) : m_node(node), m_massValues(massValues)
+Mass::Mass(int nodeTag, vector<double> massValues) : m_nodeTag(nodeTag), m_massValues(massValues)
 {
 }
 
-const shared_ptr<Node> Mass::getNode() const
+int Mass::getNodeTag() const
 {
-	return m_node;
+	return m_nodeTag;
 }
 
 const vector<double>& Mass::getMassValues() const
@@ -21,7 +21,7 @@ string Mass::getOpenseesCommand() const
 {
 	string command;
 
-	command = "mass " + to_string(m_node->getNodeTag());
+	command = "mass " + to_string(m_nodeTag);
 
 	for (auto val : m_massValues)
 		command += (" " + to_string(val));

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../OpenseesObject.h"
-#include "../Node.h"
 #include "../Sections/Section.h"
 
 namespace opensees
@@ -18,11 +17,10 @@ namespace opensees
 	protected:
 		int m_elementTag;
 		ElementType m_elementType;
-		std::vector<std::weak_ptr<Node>> m_nodes;
+		std::vector<int> m_nodeTags;
 		std::shared_ptr<Section> m_section;
-		std::vector<std::shared_ptr<Load>> m_elementLoads;
 
-		Element(int elementTag, std::vector<std::shared_ptr<Node>> nodes, std::shared_ptr<Section> section);
+		Element(int elementTag, std::vector<int> nodes, std::shared_ptr<Section> section);
 
 	public:
 		Element() = delete;
@@ -30,10 +28,8 @@ namespace opensees
 
 		int getElementTag() const;
 		ElementType getElementType() const;
-		const std::vector<std::shared_ptr<Node>>& getNodes() const;
+		const std::vector<int>& getNodeTags() const;
 		const std::shared_ptr<Section> getSection() const;
-		const std::vector<std::shared_ptr<Load>>& getElementLoads() const;
-		void addElementLoad(std::shared_ptr<Load> elementLoad);
 	};
 }
 

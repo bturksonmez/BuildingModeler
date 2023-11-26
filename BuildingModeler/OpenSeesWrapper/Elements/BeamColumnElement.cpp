@@ -3,21 +3,21 @@
 using namespace std;
 using namespace opensees;
 
-BeamColumnElement::BeamColumnElement(int elementTag, vector<shared_ptr<Node>> nodes, shared_ptr<Section> section, shared_ptr<GeometricTransformation> transf) : Element(elementTag, nodes, section)
+BeamColumnElement::BeamColumnElement(int elementTag, vector<int> nodeTags, shared_ptr<Section> section, shared_ptr<GeometricTransformation> transf) : Element(elementTag, nodeTags, section)
 {
 	m_transf = transf;
 
 	m_elementType = ElementType::BEAMCOLUMN;
 }
 
-const shared_ptr<Node> BeamColumnElement::getINode() const
+int BeamColumnElement::getINodeTag() const
 {
-	return m_nodes[0].lock();
+	return m_nodeTags[0];
 }
 
-const shared_ptr<Node> BeamColumnElement::getJNode() const
+int BeamColumnElement::getJNodeTag() const
 {
-	return m_nodes[1].lock();
+	return m_nodeTags[1];
 }
 
 const shared_ptr<GeometricTransformation> BeamColumnElement::getGeometricTransf() const

@@ -15,15 +15,15 @@ namespace opensees
 	protected:
 		QuadrilateralElementType m_quadrilateralElementType;
 
-		QuadrilateralElement(int elementTag, std::vector<std::shared_ptr<Node>> nodes, std::shared_ptr<Section> section);
+		QuadrilateralElement(int elementTag, std::vector<int> nodeTags, std::shared_ptr<Section> section);
 	public:
 		QuadrilateralElement() = delete;
 		~QuadrilateralElement() {}
 
-		const std::shared_ptr<Node> getINode() const;
-		const std::shared_ptr<Node> getJNode() const;
-        const std::shared_ptr<Node> getKNode() const;
-		const std::shared_ptr<Node> getLNode() const;
+		int getINodeTag() const;
+		int getJNodeTag() const;
+        int getKNodeTag() const;
+		int getLNodeTag() const;
 		QuadrilateralElementType getQuadrilateralElementType() const;
 	};
 }

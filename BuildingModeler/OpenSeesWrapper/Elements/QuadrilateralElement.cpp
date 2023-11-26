@@ -3,29 +3,29 @@
 using namespace std;
 using namespace opensees;
 
-QuadrilateralElement::QuadrilateralElement(int elementTag, vector<shared_ptr<Node>> nodes, shared_ptr<Section> section) : Element(elementTag, nodes, section)
+QuadrilateralElement::QuadrilateralElement(int elementTag, vector<int> nodeTags, shared_ptr<Section> section) : Element(elementTag, nodeTags, section)
 {
 	m_elementType = ElementType::QUADRILATERAL;
 }
 
-const shared_ptr<Node> QuadrilateralElement::getINode() const
+int QuadrilateralElement::getINodeTag() const
 {
-	return m_nodes[0].lock();
+	return m_nodeTags[0];
 }
 
-const shared_ptr<Node> QuadrilateralElement::getJNode() const
+int QuadrilateralElement::getJNodeTag() const
 {
-	return m_nodes[1].lock();
+	return m_nodeTags[1];
 }
 
-const shared_ptr<Node> QuadrilateralElement::getKNode() const
+int QuadrilateralElement::getKNodeTag() const
 {
-	return m_nodes[2].lock();
+	return m_nodeTags[2];
 }
 
-const shared_ptr<Node> QuadrilateralElement::getLNode() const
+int QuadrilateralElement::getLNodeTag() const
 {
-	return m_nodes[3].lock();
+	return m_nodeTags[3];
 }
 
 QuadrilateralElementType QuadrilateralElement::getQuadrilateralElementType() const
