@@ -10,13 +10,13 @@
 
 namespace opensees
 {
-	class Object
+	class OpenseesObject
 	{
 	protected:
-		Object() {}
+		OpenseesObject() {}
 
 	public:
-		virtual ~Object() {}
+		virtual ~OpenseesObject() {}
 
 		virtual std::string getOpenseesCommand() const = 0;
 	};

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Object.h"
+#include "../OpenseesObject.h"
 
 namespace opensees
 {
@@ -10,7 +10,7 @@ namespace opensees
 		ELEMENTLOAD
 	};
 
-	class Load : public Object
+	class Load : public OpenseesObject
 	{
 	protected:
 		LoadType m_loadType;

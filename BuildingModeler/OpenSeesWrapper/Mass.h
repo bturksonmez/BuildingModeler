@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Object.h"
+#include "OpenseesObject.h"
 #include "Node.h"
 
 namespace opensees
 {
-	class Mass : public Object
+	class Mass : public OpenseesObject
 	{
 	protected:
 		std::shared_ptr<Node> m_node;

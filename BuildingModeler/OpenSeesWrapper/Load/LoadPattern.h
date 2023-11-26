@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Object.h"
+#include "../OpenseesObject.h"
 #include "Load.h"
 
 namespace opensees
@@ -11,7 +11,7 @@ namespace opensees
 		LINEAR
 	};
 
-	class LoadPattern : Object
+	class LoadPattern : public OpenseesObject
 	{
 	protected:
 		int m_patternTag;

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Object.h"
+#include "OpenseesObject.h"
 #include "Load/Load.h"
 
 namespace opensees
 {
 	class Element;
 
-	class Node : public Object
+	class Node : public OpenseesObject
 	{
 	private:
 		int m_nodeTag;

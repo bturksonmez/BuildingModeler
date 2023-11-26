@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Object.h"
+#include "../OpenseesObject.h"
 
 namespace opensees
 {
@@ -16,7 +16,7 @@ namespace opensees
 
 	};
 
-	class Material : Object
+	class Material : public OpenseesObject
 	{
 	protected:
 		int m_materialTag;

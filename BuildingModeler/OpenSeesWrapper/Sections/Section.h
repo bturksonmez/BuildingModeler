@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Object.h"
+#include "../OpenseesObject.h"
 #include "../Materials/Material.h"
 
 namespace opensees
@@ -12,7 +12,7 @@ namespace opensees
 		ELASTICMEMBRANEPLATE
 	};
 
-	class Section : Object
+	class Section : public OpenseesObject
 	{
 	protected:
 		int m_sectionTag;

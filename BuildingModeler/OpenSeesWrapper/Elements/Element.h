@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Object.h"
+#include "../OpenseesObject.h"
 #include "../Node.h"
 #include "../Sections/Section.h"
 
@@ -13,7 +13,7 @@ namespace opensees
 		QUADRILATERAL
 	};
 
-	class Element : Object
+	class Element : public OpenseesObject
 	{
 	protected:
 		int m_elementTag;

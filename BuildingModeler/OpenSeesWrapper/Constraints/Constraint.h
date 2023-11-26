@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Object.h"
+#include "../OpenseesObject.h"
 #include "../Node.h"
 
 namespace opensees
@@ -14,7 +14,7 @@ namespace opensees
 		RIGIDBEAM
 	};
 
-	class Constraint : public Object
+	class Constraint : public OpenseesObject
 	{
 	protected:
 		ConstraintType m_constraintType;

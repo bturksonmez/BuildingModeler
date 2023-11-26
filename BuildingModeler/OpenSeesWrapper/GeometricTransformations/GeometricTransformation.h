@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Object.h"
+#include "../OpenseesObject.h"
 
 namespace opensees
 {
@@ -10,7 +10,7 @@ namespace opensees
 		PDELTA
 	};
 
-	class GeometricTransformation : public Object
+	class GeometricTransformation : public OpenseesObject
 	{
 	protected:
 		int m_transfTag;

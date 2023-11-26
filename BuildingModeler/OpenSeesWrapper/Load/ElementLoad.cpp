@@ -23,8 +23,8 @@ string ElementLoad::getOpenseesCommand() const
 {
 	string command;
 
-	command = "eleLoad -ele " + to_string(m_element.lock()->getElementTag()) + " -type -beamUniform " + to_string(m_loadVector[0]) 
-			+ " " + to_string(m_loadVector[1]) + " " + to_string(m_loadVector[2]);
+	command = "eleLoad -ele " + to_string(m_element.lock()->getElementTag()) + " -type -beamUniform " + to_string(m_loadVector[0])
+		+ " " + to_string(m_loadVector[1]) + ((m_loadVector.size() == 2) ? "" : (" " + to_string(m_loadVector[2])));
 
 	command += ("\n");
 

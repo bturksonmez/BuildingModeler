@@ -17,7 +17,7 @@ add_executable (BuildingModeler
 				"OpenSeesWrapper/Sections/RectangularPatch.cpp" 
 				"OpenSeesWrapper/Node.h" 
 				"OpenSeesWrapper/Node.cpp" 
-				"OpenSeesWrapper/Object.h"  
+				"OpenSeesWrapper/OpenseesObject.h"  
 				"OpenSeesWrapper/Materials/Material.h" 
 				"OpenSeesWrapper/Materials/Material.cpp" 
 				"OpenSeesWrapper/Mass.h" 
