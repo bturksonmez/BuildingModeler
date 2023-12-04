@@ -73,7 +73,13 @@ add_executable (BuildingModeler
 				"PhysicalModel/Sections/ElasticSection1D.h"
 				"PhysicalModel/Sections/ElasticSection1D.cpp"
 				"PhysicalModel/Sections/ElasticSection2D.h"
-				"PhysicalModel/Sections/ElasticSection2D.cpp")
+				"PhysicalModel/Sections/ElasticSection2D.cpp" 
+				"PhysicalModel/Elements/BeamElement.h" 
+				"PhysicalModel/Elements/BeamElement.cpp" 
+				"PhysicalModel/Elements/ColumnElement.h" 
+				"PhysicalModel/Elements/ColumnElement.cpp"
+				"PhysicalModel/Elements/ShearWallElement.h"
+				"PhysicalModel/Elements/ShearWallElement.cpp")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
