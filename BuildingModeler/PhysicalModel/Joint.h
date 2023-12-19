@@ -15,6 +15,7 @@ namespace physicalModel
 		std::vector<int> m_connectedColumnTags;
 		std::vector<int> m_connectedSlabElementTags;
 		std::vector<int> m_connectedWallTags;
+		std::vector<int> m_constraintVector;
 		int m_floorNo;
 
 	public:
@@ -29,12 +30,14 @@ namespace physicalModel
 		const std::vector<int>& getConnectedColumnTags() const;
 		const std::vector<int>& getConnectedSlabElementTags() const;
 		const std::vector<int>& getConnectedWallTags() const;
+		const std::vector<int>& getConstraintVector() const;
 		int getFloorNo() const;
 		void setMassValues(std::vector<double> massValues);
 		void addConnectedBeam(int elementTag);
 		void addConnectedColumn(int elementTag);
 		void addConnectedSlabElement(int elementTag);
 		void addConnectedWall(int elementTag);
+		void setConstraintVector(std::vector<int> constraintVector);
 		void setFloorNo(int floorNo);
 	};
 }

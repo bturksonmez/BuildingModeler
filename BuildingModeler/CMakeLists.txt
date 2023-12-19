@@ -79,7 +79,13 @@ add_executable (BuildingModeler
 				"PhysicalModel/Elements/ColumnElement.h" 
 				"PhysicalModel/Elements/ColumnElement.cpp"
 				"PhysicalModel/Elements/ShearWallElement.h"
-				"PhysicalModel/Elements/ShearWallElement.cpp")
+				"PhysicalModel/Elements/ShearWallElement.cpp"
+				"PhysicalModel/Load/Load.h"
+				"PhysicalModel/Load/Load.cpp"
+				"PhysicalModel/Load/PointLoad.h"
+				"PhysicalModel/Load/PointLoad.cpp"
+				"PhysicalModel/Load/DistributedLineLoad.h"
+				"PhysicalModel/Load/DistributedLineLoad.cpp")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

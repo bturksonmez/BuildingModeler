@@ -6,7 +6,7 @@ using namespace opensees;
 ElementLoad::ElementLoad(int elementTag, vector<double> loadVector) : Load(loadVector)
 {
 	m_elementTag = elementTag;
-	m_loadType = LoadType::NODALLOAD;
+	m_loadType = LoadType::ELEMENT_LOAD;
 }
 
 int ElementLoad::getElementTag() const

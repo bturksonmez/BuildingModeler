@@ -43,6 +43,11 @@ const vector<int>& Joint::getConnectedWallTags() const
 	return m_connectedWallTags;
 }
 
+const std::vector<int>& Joint::getConstraintVector() const
+{
+	return m_constraintVector;
+}
+
 int Joint::getFloorNo() const
 {
 	return m_floorNo;
@@ -71,6 +76,11 @@ void Joint::addConnectedSlabElement(int elementTag)
 void Joint::addConnectedWall(int elementTag)
 {
 	m_connectedWallTags.push_back(elementTag);
+}
+
+void Joint::setConstraintVector(std::vector<int> constraintVector)
+{
+	m_constraintVector = constraintVector;
 }
 
 void Joint::setFloorNo(int floorNo)

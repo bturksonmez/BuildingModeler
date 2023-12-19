@@ -1,25 +1,26 @@
 #pragma once
 
-#include "../OpenseesObject.h"
+#include <iostream>
+#include <vector>
 
-namespace opensees
+namespace physicalModel
 {
 	enum class LoadType
 	{
-		NODAL_LOAD,
-		ELEMENT_LOAD
+		POINT_LOAD,
+		DISTRIBUTED_LINE_LOAD,
+		DISTRIBUTED_AREA_LOAD
 	};
 
-	class Load : public OpenseesObject
+	class Load
 	{
 	protected:
 		LoadType m_loadType;
 		std::vector<double> m_loadVector;
 
-		Load(std::vector<double> loadVector) : m_loadVector(loadVector) {}
+		Load() {}
 
 	public:
-		Load() = delete;
 		~Load() {}
 
 		LoadType getLoadType() const;

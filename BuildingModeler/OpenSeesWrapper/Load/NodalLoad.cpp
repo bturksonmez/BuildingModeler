@@ -6,7 +6,7 @@ using namespace opensees;
 NodalLoad::NodalLoad(int nodeTag, vector<double> loadVector) : Load(loadVector)
 {
 	m_nodeTag = nodeTag;
-	m_loadType = LoadType::NODALLOAD;
+	m_loadType = LoadType::NODAL_LOAD;
 }
 
 int NodalLoad::getNodeTag() const
