@@ -85,7 +85,9 @@ add_executable (BuildingModeler
 				"PhysicalModel/Load/PointLoad.h"
 				"PhysicalModel/Load/PointLoad.cpp"
 				"PhysicalModel/Load/DistributedLineLoad.h"
-				"PhysicalModel/Load/DistributedLineLoad.cpp"  "PhysicalModel/FloorPlan.h" "PhysicalModel/FloorPlan.cpp")
+				"PhysicalModel/Load/DistributedLineLoad.cpp"
+				"PhysicalModel/FloorPlan.h"
+				"PhysicalModel/FloorPlan.cpp")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

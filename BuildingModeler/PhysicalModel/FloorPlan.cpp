@@ -3,7 +3,7 @@
 using namespace std;
 using namespace physicalModel;
 
-FloorPlan::FloorPlan(vector<double> xAxes, vector<double> yAxes, vector<vector<bool>> activeJoints = {}, vector<vector<bool>> disabledColumns = {})
+FloorPlan::FloorPlan(vector<double> xAxes, vector<double> yAxes, vector<vector<bool>> activeJoints, vector<vector<bool>> disabledColumns)
 {
 	if (activeJoints.empty()) {
 		activeJoints.resize(yAxes.size() + 1);
