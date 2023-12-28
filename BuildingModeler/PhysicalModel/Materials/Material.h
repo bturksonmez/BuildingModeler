@@ -26,7 +26,7 @@ namespace physicalModel
 
 	public:
 		Material() = delete;
-		~Material() {}
+		virtual ~Material() {}
 
 		int getMaterialTag() const;
 		MaterialType getMaterialType() const;

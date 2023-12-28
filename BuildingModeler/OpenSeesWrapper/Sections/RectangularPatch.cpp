@@ -1,6 +1,5 @@
 #include "RectangularPatch.h"
 
-using namespace std;
 using namespace opensees;
 
 RectangularPatch::RectangularPatch(int materialTag, int numDivY, int numDivZ, double yI, double zI, double yJ, double zJ) : Patch(materialTag)
@@ -45,12 +44,12 @@ double RectangularPatch::getZJ() const
 	return m_zJ;
 }
 
-string RectangularPatch::getOpenseesCommand() const
+std::string RectangularPatch::getOpenseesCommand() const
 {
-	string command;
+	std::string command;
 
-	command = "patch rect " + to_string(m_materialTag) + " " + to_string(m_numDivY) + " " + to_string(m_numDivZ) + " " + to_string(m_yI)
-			   + " " + to_string(m_zI) + " " + to_string(m_yJ) + " " + to_string(m_zJ) + "\n";
+	command = "patch rect " + std::to_string(m_materialTag) + " " + std::to_string(m_numDivY) + " " + std::to_string(m_numDivZ) + " " + std::to_string(m_yI)
+			   + " " + std::to_string(m_zI) + " " + std::to_string(m_yJ) + " " + std::to_string(m_zJ) + "\n";
 
 	return command;
 }

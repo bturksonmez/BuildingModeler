@@ -1,6 +1,5 @@
 #include "AreaElement.h"
 
-using namespace std;
 using namespace physicalModel;
 
 AreaElement::AreaElement(int elementTag, std::vector<int> jointTags, std::shared_ptr<Section> section, AreaElementFormulation areaElementFormulation)

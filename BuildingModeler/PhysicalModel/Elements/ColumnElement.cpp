@@ -1,6 +1,5 @@
 #include "ColumnElement.h"
 
-using namespace std;
 using namespace physicalModel;
 
 ColumnElement::ColumnElement(int elementTag, std::vector<int> jointTags, std::vector<std::shared_ptr<Section>> sections,

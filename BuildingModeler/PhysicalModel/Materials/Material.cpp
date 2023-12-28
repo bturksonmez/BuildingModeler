@@ -1,6 +1,5 @@
 #include "Material.h"
 
-using namespace std;
 using namespace physicalModel;
 
 int Material::getMaterialTag() const

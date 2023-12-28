@@ -1,9 +1,8 @@
 #include "ShellElement.h"
 
-using namespace std;
 using namespace opensees;
 
-ShellElement::ShellElement(int elementTag, vector<int> nodeTags, shared_ptr<Section> section, ShellElementType type = ShellElementType::DKGQ) 
+ShellElement::ShellElement(int elementTag, std::vector<int> nodeTags, std::shared_ptr<Section> section, ShellElementType type = ShellElementType::DKGQ)
 	: QuadrilateralElement(elementTag, nodeTags, section)
 {
 	m_shellElementType = type;
@@ -14,11 +13,11 @@ ShellElementType ShellElement::getShellElementType() const
     return m_shellElementType;
 }
 
-string ShellElement::getOpenseesCommand() const
+std::string ShellElement::getOpenseesCommand() const
 {
-	string command;
+    std::string command;
 
-    string shellType;
+    std::string shellType;
 	switch(m_shellElementType) {
         case ShellElementType::DKGQ:
             shellType = "ShellDKGQ";
@@ -33,8 +32,8 @@ string ShellElement::getOpenseesCommand() const
             shellType = "ShellDKGQ";
     }
 
-	command = "element " + shellType + " " + to_string(m_elementTag) + " " + to_string(m_nodeTags[0]) + " " + to_string(m_nodeTags[1])
-        + " " + to_string(m_nodeTags[2]) + " " + to_string(m_nodeTags[3]) + " " + to_string(m_section->getSectionTag());
+	command = "element " + shellType + " " + std::to_string(m_elementTag) + " " + std::to_string(m_nodeTags[0]) + " " + std::to_string(m_nodeTags[1])
+        + " " + std::to_string(m_nodeTags[2]) + " " + std::to_string(m_nodeTags[3]) + " " + std::to_string(m_section->getSectionTag());
 
 	command += ("\n");
 

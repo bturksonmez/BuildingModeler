@@ -1,6 +1,5 @@
 #include "ElasticMaterial.h"
 
-using namespace std;
 using namespace opensees;
 
 ElasticMaterial::ElasticMaterial(int materialTag, double E, double G, double rho) : Material(materialTag, E, G, rho)
@@ -8,11 +7,11 @@ ElasticMaterial::ElasticMaterial(int materialTag, double E, double G, double rho
 	m_materialType = MaterialType::ELASTIC;
 }
 
-string ElasticMaterial::getOpenseesCommand() const
+std::string ElasticMaterial::getOpenseesCommand() const
 {
-	string commandLine;
+	std::string commandLine;
 
-	commandLine = "uniaxialMaterial Elastic " + to_string(m_materialTag) + " " + to_string(m_E);
+	commandLine = "uniaxialMaterial Elastic " + std::to_string(m_materialTag) + " " + std::to_string(m_E);
 
 	commandLine = commandLine + "\n";
 

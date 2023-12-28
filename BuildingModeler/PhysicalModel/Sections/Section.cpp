@@ -1,6 +1,5 @@
 #include "Section.h"
 
-using namespace std;
 using namespace physicalModel;
 
 int Section::getSectionTag() const
@@ -13,7 +12,7 @@ SectionType Section::getSectionType() const
 	return m_sectionType;
 }
 
-const shared_ptr<Material> Section::getMaterial() const
+const std::shared_ptr<Material> Section::getMaterial() const
 {
 	return m_material;
 }

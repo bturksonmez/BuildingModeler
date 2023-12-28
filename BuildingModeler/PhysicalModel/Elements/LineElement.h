@@ -48,7 +48,7 @@ namespace physicalModel
 			std::vector<std::shared_ptr<SectionModifiers>> sectionModifiers, LineElementFormulation lineElementFormulation);
 	public:
 		LineElement() = delete;
-		~LineElement() {}
+		virtual ~LineElement() {}
 
 		int getElementTag() const;
 		int getIJointTag() const;

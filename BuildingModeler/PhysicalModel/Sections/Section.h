@@ -29,7 +29,7 @@ namespace physicalModel
 
 	public:
 		Section() = delete;
-		~Section() {}
+		virtual ~Section() {}
 
 		int getSectionTag() const;
 		SectionType getSectionType() const;

@@ -1,6 +1,5 @@
 #include "DistributedLineLoad.h"
 
-using namespace std;
 using namespace physicalModel;
 
 DistributedLineLoad::DistributedLineLoad(int beamElementTag, double wz, double wy, double wx)

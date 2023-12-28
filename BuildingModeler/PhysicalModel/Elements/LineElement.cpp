@@ -1,6 +1,5 @@
 #include "LineElement.h"
 
-using namespace std;
 using namespace physicalModel;
 
 LineElement::LineElement(int elementTag, std::vector<int> jointTags, std::vector<std::shared_ptr<Section>> sections,

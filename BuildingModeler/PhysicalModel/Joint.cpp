@@ -1,9 +1,8 @@
 #include "Joint.h"
 
-using namespace std;
 using namespace physicalModel;
 
-Joint::Joint(int JointTag, vector<double> coords, vector<double> massValues) :
+Joint::Joint(int JointTag, std::vector<double> coords, std::vector<double> massValues) :
 	m_jointTag(JointTag), m_coords(coords), m_massValues(massValues)
 {
 }
@@ -13,32 +12,32 @@ int Joint::getJointTag() const
 	return m_jointTag;
 }
 
-const vector<double>& Joint::getCoords() const
+const std::vector<double>& Joint::getCoords() const
 {
 	return m_coords;
 }
 
-const vector<double>& Joint::getMassValues() const
+const std::vector<double>& Joint::getMassValues() const
 {
 	return m_massValues;
 }
 
-const vector<int>& Joint::getConnectedBeamTags() const
+const std::vector<int>& Joint::getConnectedBeamTags() const
 {
 	return m_connectedBeamTags;
 }
 
-const vector<int>& Joint::getConnectedColumnTags() const
+const std::vector<int>& Joint::getConnectedColumnTags() const
 {
 	return m_connectedColumnTags;
 }
 
-const vector<int>& Joint::getConnectedSlabElementTags() const
+const std::vector<int>& Joint::getConnectedSlabElementTags() const
 {
 	return m_connectedSlabElementTags;
 }
 
-const vector<int>& Joint::getConnectedWallTags() const
+const std::vector<int>& Joint::getConnectedWallTags() const
 {
 	return m_connectedWallTags;
 }
@@ -53,7 +52,7 @@ int Joint::getFloorNo() const
 	return m_floorNo;
 }
 
-void Joint::setMassValues(vector<double> massValues)
+void Joint::setMassValues(std::vector<double> massValues)
 {
 	m_massValues = massValues;
 }

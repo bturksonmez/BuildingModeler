@@ -1,6 +1,5 @@
 #include "LoadPattern.h"
 
-using namespace std;
 using namespace opensees;
 
 int LoadPattern::getPatternTag() const
@@ -13,24 +12,24 @@ TimeSeriesType LoadPattern::getTimeSeriesType() const
 	return m_timeSeriesType;
 }
 
-const vector<shared_ptr<Load>>& LoadPattern::getLoadVector() const
+const std::vector<std::shared_ptr<Load>>& LoadPattern::getLoadVector() const
 {
 	return m_loadVector;
 }
 
-void LoadPattern::addLoad(shared_ptr<Load> load)
+void LoadPattern::addLoad(std::shared_ptr<Load> load)
 {
 	m_loadVector.push_back(load);
 }
 
-string LoadPattern::getOpenseesCommand() const
+std::string LoadPattern::getOpenseesCommand() const
 {
 	if (m_loadVector.empty())
-		return "# No load defined for pattern: " + to_string(m_patternTag);
+		return "# No load defined for pattern: " + std::to_string(m_patternTag);
 
-	string command;
+	std::string command;
 
-	string tsType;
+	std::string tsType;
 	switch (m_timeSeriesType) {
 	case TimeSeriesType::CONSTANT:
 		tsType = "Constant";
@@ -42,7 +41,7 @@ string LoadPattern::getOpenseesCommand() const
 		tsType = "Linear";
 	}
 
-	command = "pattern Plain " + to_string(m_patternTag) + " " + tsType + " {\n";
+	command = "pattern Plain " + std::to_string(m_patternTag) + " " + tsType + " {\n";
 
 	for (auto& load : m_loadVector) {
 		command += ("\t" + load->getOpenseesCommand());

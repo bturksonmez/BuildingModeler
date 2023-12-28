@@ -1,6 +1,5 @@
 #include "EqualDOFConstraint.h"
 
-using namespace std;
 using namespace opensees;
 
 EqualDOFConstraint::EqualDOFConstraint(int masterNodeTag, int slaveNodeTag, std::vector<int> constrainedDOFs)
@@ -19,18 +18,18 @@ int EqualDOFConstraint::getSlaveNodeTag() const
 	return m_slaveNodeTag;
 }
 
-const vector<int>& EqualDOFConstraint::getConstrainedDOFs() const
+const std::vector<int>& EqualDOFConstraint::getConstrainedDOFs() const
 {
 	return m_constrainedDOFs;
 }
 
-string EqualDOFConstraint::getOpenseesCommand() const
+std::string EqualDOFConstraint::getOpenseesCommand() const
 {
-	string commandLine;
+	std::string commandLine;
 
-	commandLine = "equalDOF " + to_string(m_masterNodeTag) + " " + to_string(m_slaveNodeTag);
+	commandLine = "equalDOF " + std::to_string(m_masterNodeTag) + " " + std::to_string(m_slaveNodeTag);
 	for (int i = 0; i < m_constrainedDOFs.size(); i++)
-		commandLine = commandLine + " " + to_string(m_constrainedDOFs[i]);
+		commandLine = commandLine + " " + std::to_string(m_constrainedDOFs[i]);
 
 	commandLine = commandLine + "\n";
 

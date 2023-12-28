@@ -86,8 +86,19 @@ add_executable (BuildingModeler
 				"PhysicalModel/Load/PointLoad.cpp"
 				"PhysicalModel/Load/DistributedLineLoad.h"
 				"PhysicalModel/Load/DistributedLineLoad.cpp"
-				"PhysicalModel/FloorPlan.h"
-				"PhysicalModel/FloorPlan.cpp")
+				"PhysicalModel/Floor.h"
+				"PhysicalModel/Floor.cpp" 
+				"PhysicalModel/Building.h" 
+				"PhysicalModel/Building.cpp"
+				"Utilities/Vector2.h"
+				"Utilities/Vector3.h"
+				"Utilities/Vector2.cpp"
+				"Utilities/Vector3.cpp")
+
+target_include_directories(BuildingModeler PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/OpenSeesWrapper
+    ${CMAKE_CURRENT_SOURCE_DIR}/PhysicalModel
+)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

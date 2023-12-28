@@ -1,15 +1,10 @@
 #include "Floor.h"
 
-using namespace std;
 using namespace physicalModel;
 
 Floor::Floor(int floorNumber) : m_floorNumber(floorNumber)
 {
-}
-
-void Floor::setFloorPlan(FloorPlan floorPlan)
-{
-	m_floorPlan = floorPlan;
+	m_isRigid = false;
 }
 
 int Floor::getFloorNumber() const
@@ -17,7 +12,22 @@ int Floor::getFloorNumber() const
 	return m_floorNumber;
 }
 
-const FloorPlan& Floor::getFloorPlan() const
+const std::vector<int>& Floor::getJoints() const
 {
-	return m_floorPlan;
+	return m_joints;
+}
+
+void Floor::addJoint(int jointTag)
+{
+	m_joints.push_back(jointTag);
+}
+
+void Floor::makeRigid()
+{
+	m_isRigid = true;
+}
+
+void Floor::makeFlexible()
+{
+	m_isRigid = false;
 }

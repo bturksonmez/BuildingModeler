@@ -1,6 +1,5 @@
 #include "BeamElement.h"
 
-using namespace std;
 using namespace physicalModel;
 
 BeamElement::BeamElement(int elementTag, std::vector<int> jointTags, std::vector<std::shared_ptr<Section>> sections,

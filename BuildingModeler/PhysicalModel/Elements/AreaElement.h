@@ -33,7 +33,7 @@ namespace physicalModel
 		AreaElement(int elementTag, std::vector<int> jointTags, std::shared_ptr<Section> sections, AreaElementFormulation areaElementFormulation);
 	public:
 		AreaElement() = delete;
-		~AreaElement() {}
+		virtual ~AreaElement() {}
 
 		int getElementTag() const;
 		int getIJointTag() const;

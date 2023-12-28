@@ -1,9 +1,8 @@
 #include "QuadrilateralElement.h"
 
-using namespace std;
 using namespace opensees;
 
-QuadrilateralElement::QuadrilateralElement(int elementTag, vector<int> nodeTags, shared_ptr<Section> section) : Element(elementTag, nodeTags, section)
+QuadrilateralElement::QuadrilateralElement(int elementTag, std::vector<int> nodeTags, std::shared_ptr<Section> section) : Element(elementTag, nodeTags, section)
 {
 	m_elementType = ElementType::QUADRILATERAL;
 }

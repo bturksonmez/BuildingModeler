@@ -1,9 +1,8 @@
 #include "GeometricTransformation.h"
 
-using namespace std;
 using namespace opensees;
 
-GeometricTransformation::GeometricTransformation(int transfTag, vector<int> vecXZ) : m_transfTag(transfTag), m_vecXZ(vecXZ)
+GeometricTransformation::GeometricTransformation(int transfTag, std::vector<int> vecXZ) : m_transfTag(transfTag), m_vecXZ(vecXZ)
 {
 
 }
@@ -18,7 +17,7 @@ GeometricTransformationType GeometricTransformation::getTransfType() const
 	return m_transfType;
 }
 
-const vector<int>& GeometricTransformation::getVectorXZ() const
+const std::vector<int>& GeometricTransformation::getVectorXZ() const
 {
 	return m_vecXZ;
 }

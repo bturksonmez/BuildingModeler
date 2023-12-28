@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Joint.h"
-#include "FloorPlan.h"
+#include <iostream>
+#include <vector>
 
 namespace physicalModel
 {
@@ -9,15 +9,23 @@ namespace physicalModel
 	{
 	private:
 		int m_floorNumber;
-		static FloorPlan m_floorPlan;
+		bool m_isRigid;
+		std::vector<int> m_joints;
+
+		void updateMassCenter();
+		void updateStiffnessCenter();
 
 	public:
 		Floor(int floorNumber);
 		Floor() = delete;
 		~Floor() {}
 
-		void setFloorPlan(FloorPlan floorPlan);
 		int getFloorNumber() const;
-		const FloorPlan& getFloorPlan() const;
+		const std::vector<int>& getJoints() const;
+		void addJoint(int jointTag);
+		void makeRigid();
+		void makeFlexible();
+		void updateProperties();
+		std::vector<double> getMassCenter();
 	};
 }

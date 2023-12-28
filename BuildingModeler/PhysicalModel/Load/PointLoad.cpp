@@ -1,6 +1,5 @@
 #include "PointLoad.h"
 
-using namespace std;
 using namespace physicalModel;
 
 PointLoad::PointLoad(int jointTag, double fx, double fy, double fz, double mx, double my, double mz)

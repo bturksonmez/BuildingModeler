@@ -1,9 +1,8 @@
 #include "Element.h"
 
-using namespace std;
 using namespace opensees;
 
-Element::Element(int elementTag, vector<int> nodeTags, shared_ptr<Section> section) : m_elementTag(elementTag), m_nodeTags(nodeTags), m_section(section)
+Element::Element(int elementTag, std::vector<int> nodeTags, std::shared_ptr<Section> section) : m_elementTag(elementTag), m_nodeTags(nodeTags), m_section(section)
 {
 }
 
@@ -17,12 +16,12 @@ ElementType Element::getElementType() const
 	return m_elementType;
 }
 
-const vector<int>& Element::getNodeTags() const
+const std::vector<int>& Element::getNodeTags() const
 {
 	return m_nodeTags;
 }
 
-const shared_ptr<Section> Element::getSection() const
+const std::shared_ptr<Section> Element::getSection() const
 {
 	return m_section;
 }

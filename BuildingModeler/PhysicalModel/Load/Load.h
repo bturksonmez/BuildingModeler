@@ -21,7 +21,7 @@ namespace physicalModel
 		Load() {}
 
 	public:
-		~Load() {}
+		virtual ~Load() {}
 
 		LoadType getLoadType() const;
 		const std::vector<double>& getLoadVector() const;
