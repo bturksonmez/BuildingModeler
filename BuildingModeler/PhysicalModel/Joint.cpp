@@ -1,9 +1,10 @@
 #include "Joint.h"
 
 using namespace physicalModel;
+using namespace utility;
 
-Joint::Joint(int JointTag, std::vector<double> coords, std::vector<double> massValues) :
-	m_jointTag(JointTag), m_coords(coords), m_massValues(massValues)
+Joint::Joint(int jointTag, Vector3 coords, Vector3 massTranslational, Vector3 massRotational) :
+	m_jointTag(jointTag), m_coords(coords), m_massTranslational(massTranslational), m_massRotational(massRotational)
 {
 }
 
@@ -12,14 +13,19 @@ int Joint::getJointTag() const
 	return m_jointTag;
 }
 
-const std::vector<double>& Joint::getCoords() const
+const Vector3& Joint::getCoords() const
 {
 	return m_coords;
 }
 
-const std::vector<double>& Joint::getMassValues() const
+const Vector3& Joint::getTranslationalMass() const
 {
-	return m_massValues;
+	return m_massTranslational;
+}
+
+const Vector3& Joint::getRotationalMass() const
+{
+	return m_massRotational;
 }
 
 const std::vector<int>& Joint::getConnectedBeamTags() const
@@ -52,9 +58,14 @@ int Joint::getFloorNo() const
 	return m_floorNo;
 }
 
-void Joint::setMassValues(std::vector<double> massValues)
+void Joint::setTranslationalMass(Vector3 massValues)
 {
-	m_massValues = massValues;
+	m_massTranslational = massValues;
+}
+
+void Joint::setRotationalMass(Vector3 massValues)
+{
+	m_massRotational = massValues;
 }
 
 void Joint::addConnectedBeam(int elementTag)

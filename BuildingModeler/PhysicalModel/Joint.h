@@ -1,7 +1,6 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
+#include "../Utilities/Vector3.h"
 
 namespace physicalModel
 {
@@ -9,8 +8,9 @@ namespace physicalModel
 	{
 	private:
 		int m_jointTag;
-		std::vector<double> m_coords;
-		std::vector<double> m_massValues;
+		utility::Vector3 m_coords;
+		utility::Vector3 m_massTranslational;
+		utility::Vector3 m_massRotational;
 		std::vector<int> m_connectedBeamTags;
 		std::vector<int> m_connectedColumnTags;
 		std::vector<int> m_connectedSlabElementTags;
@@ -19,20 +19,22 @@ namespace physicalModel
 		int m_floorNo;
 
 	public:
-		Joint(int nodeTag, std::vector<double> coords, std::vector<double> massValues = {});
+		Joint(int jointTag, utility::Vector3 coords, utility::Vector3 massTranslational = {}, utility::Vector3 massRotational = {});
 		Joint() = delete;
 		~Joint() {}
 
 		int getJointTag() const;
-		const std::vector<double>& getCoords() const;
-		const std::vector<double>& getMassValues() const;
+		const utility::Vector3& getCoords() const;
+		const utility::Vector3& getTranslationalMass() const;
+		const utility::Vector3& getRotationalMass() const;
 		const std::vector<int>& getConnectedBeamTags() const;
 		const std::vector<int>& getConnectedColumnTags() const;
 		const std::vector<int>& getConnectedSlabElementTags() const;
 		const std::vector<int>& getConnectedWallTags() const;
 		const std::vector<int>& getConstraintVector() const;
 		int getFloorNo() const;
-		void setMassValues(std::vector<double> massValues);
+		void setTranslationalMass(utility::Vector3 massValues);
+		void setRotationalMass(utility::Vector3 massValues);
 		void addConnectedBeam(int elementTag);
 		void addConnectedColumn(int elementTag);
 		void addConnectedSlabElement(int elementTag);

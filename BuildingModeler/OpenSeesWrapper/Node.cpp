@@ -1,9 +1,9 @@
 #include "Node.h"
 
 using namespace opensees;
+using namespace utility;
 
-Node::Node(int nodeTag, std::vector<double> coords, std::vector<double> massValues) :
-		m_nodeTag(nodeTag), m_coords(coords), m_massValues(massValues)
+Node::Node(int nodeTag, Vector3 coords) : m_nodeTag(nodeTag), m_coords(coords)
 {
 }
 
@@ -12,19 +12,9 @@ int Node::getNodeTag() const
 	return m_nodeTag;
 }
 
-const std::vector<double>& Node::getCoords() const
+const Vector3& Node::getCoords() const
 {
 	return m_coords;
-}
-
-const std::vector<double>& Node::getMassValues() const
-{
-	return m_massValues;
-}
-
-void Node::setMassValues(std::vector<double> massValues)
-{
-	m_massValues = massValues;
 }
 
 std::string Node::getOpenseesCommand() const
@@ -33,15 +23,9 @@ std::string Node::getOpenseesCommand() const
 
 	command = "node " + std::to_string(m_nodeTag);
 	
-	for (auto val : m_coords)
-		command += (" " + std::to_string(val));
-
-	if (!m_massValues.empty())
-	{
-		command += (" -mass");
-		for (auto val : m_massValues)
-			command += (" " + std::to_string(val));
-	}
+	command += (" " + std::to_string(m_coords.x));
+	command += (" " + std::to_string(m_coords.y));
+	command += (" " + std::to_string(m_coords.z));
 
 	command += ("\n");
 
