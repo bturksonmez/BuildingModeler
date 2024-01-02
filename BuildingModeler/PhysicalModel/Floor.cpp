@@ -3,7 +3,7 @@
 using namespace physicalModel;
 using namespace utility;
 
-Floor::Floor(int floorNumber) : m_floorNumber(floorNumber)
+Floor::Floor(int floorNumber, double height) : m_floorNumber(floorNumber), m_height(height)
 {
 	m_isRigid = false;
 }
@@ -33,9 +33,10 @@ void Floor::addJoint(int jointTag)
 	m_joints.push_back(jointTag);
 }
 
-void Floor::makeRigid()
+void Floor::makeRigid(int masterJoint)
 {
 	m_isRigid = true;
+	m_masterJoint = masterJoint;
 }
 
 void Floor::makeFlexible()
