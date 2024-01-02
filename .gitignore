@@ -2,6 +2,7 @@
 *.d
 
 .vs/
+.vscode/
 out/
 
 # Compiled Object files
