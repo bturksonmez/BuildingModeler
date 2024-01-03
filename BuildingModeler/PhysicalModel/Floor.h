@@ -21,6 +21,8 @@ namespace physicalModel
 
 	public:
 		Floor(int floorNumber, double height);
+		Floor(Floor&& other) = default;
+		Floor& operator=(Floor&& other) = default;
 		Floor() = delete;
 		~Floor() {}
 

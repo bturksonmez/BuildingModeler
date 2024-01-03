@@ -93,7 +93,9 @@ add_executable (BuildingModeler
 				"Utilities/Vector2.h"
 				"Utilities/Vector3.h"
 				"Utilities/Vector2.cpp"
-				"Utilities/Vector3.cpp")
+				"Utilities/Vector3.cpp" 
+				"PhysicalModel/BuildingModeler.h"  
+				"PhysicalModel/BuildingModeler.cpp")
 
 target_include_directories(BuildingModeler PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/OpenSeesWrapper

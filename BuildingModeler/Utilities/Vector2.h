@@ -13,6 +13,10 @@ namespace utility
 
 		Vector2() {}
 		Vector2(double x, double y);
+		Vector2(const Vector2& other) = default;
+		Vector2& operator=(const Vector2& other) = default;
+		Vector2(Vector2&& other) = default;
+		Vector2& operator=(Vector2&& other) = default;
 		~Vector2() {}
 
 		double norm() const;

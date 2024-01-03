@@ -26,6 +26,8 @@ namespace physicalModel
 
 	public:
 		Material() = delete;
+		Material(Material&& other) = default;
+		Material& operator=(Material&& other) = default;
 		virtual ~Material() {}
 
 		int getMaterialTag() const;

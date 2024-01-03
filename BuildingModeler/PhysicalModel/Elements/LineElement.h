@@ -48,6 +48,8 @@ namespace physicalModel
 			std::vector<std::shared_ptr<SectionModifiers>> sectionModifiers, LineElementFormulation lineElementFormulation);
 	public:
 		LineElement() = delete;
+		LineElement(LineElement&& other) = default;
+		LineElement& operator=(LineElement&& other) = default;
 		virtual ~LineElement() {}
 
 		int getElementTag() const;

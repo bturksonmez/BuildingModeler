@@ -29,6 +29,8 @@ namespace physicalModel
 
 	public:
 		Section() = delete;
+		Section(Section&& other) = default;
+		Section& operator=(Section&& other) = default;
 		virtual ~Section() {}
 
 		int getSectionTag() const;

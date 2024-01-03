@@ -14,6 +14,10 @@ namespace utility
 
 		Vector3() {}
 		Vector3(double x, double y, double z);
+		Vector3(const Vector3& other) = default;
+		Vector3& operator=(const Vector3& other) = default;
+		Vector3(Vector3&& other) = default;
+		Vector3& operator=(Vector3&& other) = default;
 		~Vector3() {}
 
 		double norm() const;

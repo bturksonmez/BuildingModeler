@@ -20,6 +20,8 @@ namespace physicalModel
 
 	public:
 		Joint(int jointTag, utility::Vector3 coords, utility::Vector3 massTranslational = {}, utility::Vector3 massRotational = {});
+		Joint(Joint&& other) = default;
+		Joint& operator=(Joint&& other) = default;
 		Joint() = delete;
 		~Joint() {}
 
