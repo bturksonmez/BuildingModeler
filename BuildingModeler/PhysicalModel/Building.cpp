@@ -43,3 +43,15 @@ Floor* Building::getFloor(int floorNumber) const
     auto it = m_floors.find(floorNumber);
     return (it != m_floors.end()) ? it->second.get() : nullptr;
 }
+
+std::shared_ptr<Material> Building::getMaterial(int materialTag) const
+{
+    auto it = m_materials.find(materialTag);
+    return (it != m_materials.end()) ? it->second : nullptr;
+}
+
+std::shared_ptr<Section> Building::getSection(int sectionTag) const
+{
+    auto it = m_sections.find(sectionTag);
+    return (it != m_sections.end()) ? it->second : nullptr;
+}
