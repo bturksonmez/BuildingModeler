@@ -9,11 +9,12 @@
 #include "Floor.h"
 
 #include <unordered_map>
+#include <utility>
 #include <memory>
 
 namespace buildingModeler
 {
-    class BuildingModeler;
+    class BuildingModelerAPI;
 }
 
 namespace physicalModel
@@ -41,14 +42,14 @@ namespace physicalModel
 
         static Building& getInstance();
         Joint* getJoint(int jointTag) const;
-        LineElement* getColumn(int elementTag) const;
-        LineElement* getBeam(int elementTag) const;
-        AreaElement* getSlab(int elementTag) const;
-        AreaElement* getShearWall(int elementTag) const;
-        Floor* getFloor(int floorNumber) const;
+        //LineElement* getColumn(int elementTag) const;
+        //LineElement* getBeam(int elementTag) const;
+        //AreaElement* getSlab(int elementTag) const;
+        //AreaElement* getShearWall(int elementTag) const;
+        //Floor* getFloor(int floorNumber) const;
         std::shared_ptr<Material> getMaterial(int materialTag) const;
         std::shared_ptr<Section> getSection(int sectionTag) const;
 
-        friend class buildingModeler::BuildingModeler;
+        friend class buildingModeler::BuildingModelerAPI;
     };
 }

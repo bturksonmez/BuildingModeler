@@ -39,22 +39,30 @@ namespace physicalModel
 	protected:
 		int m_elementTag;
 		std::vector<int> m_jointTags;
+		std::vector<double> m_segmentLengths;
 		std::vector<std::shared_ptr<Section>> m_sections;
 		std::vector<std::shared_ptr<SectionModifiers>> m_sectionModifiers;
 		LineElementType m_lineElementType;
 		LineElementFormulation m_lineElementFormulation;
 
-		LineElement(int elementTag, std::vector<int> jointTags, std::vector<std::shared_ptr<Section>> sections,
-			std::vector<std::shared_ptr<SectionModifiers>> sectionModifiers, LineElementFormulation lineElementFormulation);
+		LineElement() {}
+		LineElement(int elementTag, std::vector<int> jointTags, std::shared_ptr<Section> sections, LineElementFormulation lineElementFormulation);
+
 	public:
-		LineElement() = delete;
 		LineElement(LineElement&& other) = default;
 		LineElement& operator=(LineElement&& other) = default;
 		virtual ~LineElement() {}
 
+		void setSegmentLengths(std::vector<double> segmentLengths);
+		void setSection(int segmentNo, std::shared_ptr<Section> section);
+		void setSectionModifiers(int segmentNo, std::shared_ptr<SectionModifiers> sectionModifier);
+
 		int getElementTag() const;
 		int getIJointTag() const;
 		int getJJointTag() const;
+		const std::vector<double>& getSegmentLengths() const;
+		const std::shared_ptr<Section> getSection(int segmentNo) const;
+		const std::shared_ptr<SectionModifiers> getSectionModifiers(int segmentNo) const;
 		LineElementType getLineElementType() const;
 		LineElementFormulation getLineElementFormulation() const;
 	};
