@@ -14,7 +14,7 @@ Joint* Building::getJoint(int jointTag) const
     auto it = m_joints.find(jointTag);
     return (it != m_joints.end()) ? it->second.get() : nullptr;
 }
-/*
+
 LineElement* Building::getColumn(int elementTag) const
 {
     auto it = m_columns.find(elementTag);
@@ -44,7 +44,6 @@ Floor* Building::getFloor(int floorNumber) const
     auto it = m_floors.find(floorNumber);
     return (it != m_floors.end()) ? it->second.get() : nullptr;
 }
-*/
 
 std::shared_ptr<Material> Building::getMaterial(int materialTag) const
 {

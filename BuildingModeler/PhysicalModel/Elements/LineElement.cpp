@@ -25,14 +25,21 @@ double LineElement::calculateLength(int jointI, int jointJ)
 void LineElement::setSegmentRelativeLengths(std::vector<double> segmentRelativeLengths)
 {
 	m_segmentRelativeLengths = segmentRelativeLengths;
+
 	m_segmentLengths.resize(segmentRelativeLengths.size());
 	for (size_t i = 0; i < m_segmentLengths.size(); ++i) {
 		m_segmentLengths[i] = m_length * m_segmentRelativeLengths[i];
 	}
-	m_sections.resize(segmentRelativeLengths.size());
-	m_sectionModifiers.resize(segmentRelativeLengths.size());
 
-	
+	m_sections.resize(segmentRelativeLengths.size());
+	for (size_t i = 1; i < m_sections.size(); ++i) {
+		m_sections[i] = m_sections[0];
+	}
+
+	m_sectionModifiers.resize(segmentRelativeLengths.size());
+	for (size_t i = 1; i < m_sectionModifiers.size(); ++i) {
+		m_sectionModifiers[i] = m_sectionModifiers[0];
+	}
 }
 
 void LineElement::setSection(int segmentNo, std::shared_ptr<Section> section)
