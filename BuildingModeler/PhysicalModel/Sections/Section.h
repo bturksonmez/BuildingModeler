@@ -24,8 +24,7 @@ namespace physicalModel
 		double m_Izz;
 		double m_J;
 
-		Section(int sectionTag, std::shared_ptr<Material> material, double A = 0, double Iyy = 0, double Izz = 0, double J = 0)
-			: m_sectionTag(sectionTag), m_material(material), m_A(A), m_Iyy(Iyy), m_Izz(Izz), m_J(J) {}
+		Section(int sectionTag, std::shared_ptr<Material> material) : m_sectionTag(sectionTag), m_material(material){}
 
 	public:
 		Section() = delete;

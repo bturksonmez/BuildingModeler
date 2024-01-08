@@ -10,13 +10,13 @@ namespace physicalModel
 {
 	struct SectionModifiers
 	{
-		double m_modA;
-		double m_modIyy;
-		double m_modIzz;
-		double m_modJ;
+		double m_modifierA;
+		double m_modifierIyy;
+		double m_modifierIzz;
+		double m_modifierJ;
 
-		SectionModifiers(double modA = 1.0, double modIyy = 1.0, double modIzz = 1.0, double modJ = 1.0)
-			: m_modA(modA), m_modIyy(modIyy), m_modIzz(modIzz), m_modJ(modJ) {}
+		SectionModifiers(double modifierA = 1.0, double modifierIyy = 1.0, double modifierIzz = 1.0, double modifierJ = 1.0)
+			: m_modifierA(modifierA), m_modifierIyy(modifierIyy), m_modifierIzz(modifierIzz), m_modifierJ(modifierJ) {}
 	};
 
 	enum class LineElementType

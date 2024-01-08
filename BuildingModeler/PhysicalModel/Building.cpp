@@ -8,6 +8,16 @@ Building& Building::getInstance()
     return instance;
 }
 
+void Building::deleteJoint(int jointTag)
+{
+    m_joints.
+}
+
+void Building::deleteLineElement(int elementTag);
+void Building::deleteAreaElement(int elementTag);
+void Building::deleteFloor(int floorNumber);
+void Building::deleteMaterial(int materialTag);
+void Building::deleteSection(int sectionTag);
 
 Joint* Building::getJoint(int jointTag) const
 {
@@ -15,28 +25,16 @@ Joint* Building::getJoint(int jointTag) const
     return (it != m_joints.end()) ? it->second.get() : nullptr;
 }
 
-LineElement* Building::getColumn(int elementTag) const
+LineElement* Building::getLineElement(int elementTag) const
 {
-    auto it = m_columns.find(elementTag);
-    return (it != m_columns.end()) ? it->second.get() : nullptr;
+    auto it = m_lineElements.find(elementTag);
+    return (it != m_lineElements.end()) ? it->second.get() : nullptr;
 }
 
-LineElement* Building::getBeam(int elementTag) const
+AreaElement* Building::getAreaElement(int elementTag) const
 {
-    auto it = m_beams.find(elementTag);
-    return (it != m_beams.end()) ? it->second.get() : nullptr;
-}
-
-AreaElement* Building::getSlab(int elementTag) const
-{
-    auto it = m_slabs.find(elementTag);
-    return (it != m_slabs.end()) ? it->second.get() : nullptr;
-}
-
-AreaElement* Building::getShearWall(int elementTag) const
-{
-    auto it = m_shearWalls.find(elementTag);
-    return (it != m_shearWalls.end()) ? it->second.get() : nullptr;
+    auto it = m_areaElements.find(elementTag);
+    return (it != m_areaElements.end()) ? it->second.get() : nullptr;
 }
 
 Floor* Building::getFloor(int floorNumber) const
