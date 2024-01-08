@@ -22,5 +22,7 @@ namespace utility
 
 		double norm() const;
 		double norm2() const;
+		friend Vector3 operator+(const Vector3& v1, const Vector3& v2);
+		friend Vector3 operator-(const Vector3& v1, const Vector3& v2);
 	};
 }

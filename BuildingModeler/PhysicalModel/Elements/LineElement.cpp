@@ -1,20 +1,38 @@
 #include "LineElement.h"
+#include "../Building.h"
 
 using namespace physicalModel;
 
 LineElement::LineElement(int elementTag, std::vector<int> jointTags, std::shared_ptr<Section> section, LineElementFormulation lineElementFormulation)
 	: m_elementTag(elementTag), m_jointTags(jointTags), m_lineElementFormulation(lineElementFormulation)
 {
-	m_segmentLengths.push_back(1.0);
+	m_length = calculateLength(jointTags[0], jointTags[1]);
+	m_segmentLengths.push_back(m_length);
+	m_segmentRelativeLengths.push_back(1.0);
 	m_sections.push_back(section);
 	m_sectionModifiers.push_back(std::make_shared<SectionModifiers>());
 }
 
-void LineElement::setSegmentLengths(std::vector<double> segmentLengths)
+double LineElement::calculateLength(int jointI, int jointJ)
 {
-	m_segmentLengths = segmentLengths;
-	m_sections.resize(segmentLengths.size());
-	m_sectionModifiers.resize(segmentLengths.size());
+	utility::Vector3 pointI = physicalModel::Building::getInstance().getJoint(jointI)->getCoords();
+	utility::Vector3 pointJ = physicalModel::Building::getInstance().getJoint(jointJ)->getCoords();
+	utility::Vector3 dirVec = pointJ - pointI;
+
+	return dirVec.norm2();
+}
+
+void LineElement::setSegmentRelativeLengths(std::vector<double> segmentRelativeLengths)
+{
+	m_segmentRelativeLengths = segmentRelativeLengths;
+	m_segmentLengths.resize(segmentRelativeLengths.size());
+	for (size_t i = 0; i < m_segmentLengths.size(); ++i) {
+		m_segmentLengths[i] = m_length * m_segmentRelativeLengths[i];
+	}
+	m_sections.resize(segmentRelativeLengths.size());
+	m_sectionModifiers.resize(segmentRelativeLengths.size());
+
+	
 }
 
 void LineElement::setSection(int segmentNo, std::shared_ptr<Section> section)
@@ -45,6 +63,11 @@ int LineElement::getJJointTag() const
 const std::vector<double>& LineElement::getSegmentLengths() const
 {
 	return m_segmentLengths;
+}
+
+const std::vector<double>& LineElement::getSegmentRelativeLengths() const
+{
+	return m_segmentRelativeLengths;
 }
 
 const std::shared_ptr<Section> LineElement::getSection(int segmentNo) const

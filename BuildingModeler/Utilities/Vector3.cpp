@@ -15,3 +15,25 @@ double Vector3::norm2() const
 {
 	return std::sqrt(std::pow(x, 2.0) + std::pow(y, 2.0) + std::pow(z, 2.0));
 }
+
+Vector3 utility::operator+(const Vector3& v1, const Vector3& v2)
+{
+	Vector3 result;
+
+	result.x = v1.x + v2.x;
+	result.y = v1.y + v2.y;
+	result.z = v1.z + v2.z;
+
+	return result;
+}
+
+Vector3 utility::operator-(const Vector3& v1, const Vector3& v2)
+{
+	Vector3 result;
+
+	result.x = v1.x - v2.x;
+	result.y = v1.y - v2.y;
+	result.z = v1.z - v2.z;
+
+	return result;
+}
