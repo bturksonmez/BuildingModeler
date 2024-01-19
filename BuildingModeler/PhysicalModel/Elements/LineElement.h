@@ -48,7 +48,7 @@ namespace physicalModel
 		LineElementFormulation m_lineElementFormulation;
 
 		LineElement() {}
-		LineElement(int elementTag, std::vector<int> jointTags, std::shared_ptr<Section> sections, LineElementFormulation lineElementFormulation);
+		LineElement(int elementTag, std::vector<int> jointTags, std::shared_ptr<Section> section, LineElementFormulation lineElementFormulation);
 
 	private:
 		double calculateLength(int jointI, int jointJ);

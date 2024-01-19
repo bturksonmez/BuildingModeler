@@ -7,6 +7,11 @@ AreaElement::AreaElement(int elementTag, std::vector<int> jointTags, std::shared
 {
 }
 
+void AreaElement::addSurroundingLineElement(int surroundingLineElementTag)
+{
+	m_surroundingLineElementTags.push_back(surroundingLineElementTag);
+}
+
 int AreaElement::getElementTag() const
 {
 	return m_elementTag;
@@ -30,6 +35,16 @@ int AreaElement::getKJointTag() const
 int AreaElement::getLJointTag() const
 {
 	return m_jointTags[3];
+}
+
+std::vector<int> AreaElement::getSurroundingLineElementTags()
+{
+	return m_surroundingLineElementTags;
+}
+
+const std::shared_ptr<Section> AreaElement::getSection() const
+{
+	return m_section;
 }
 
 AreaElementType AreaElement::getAreaElementType() const

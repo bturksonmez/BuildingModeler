@@ -24,6 +24,7 @@ namespace buildingModeler
         static void setRotationalMass(int jointTag, utility::Vector3 massValues);
         static void setConstraintVector(int jointTag, std::vector<int> constraintVector);
         static void setFloorNo(int jointTag, int floorNo);
+        static void includeMassFromMembers(bool includeMassFromMembers);
 
         // Material API
         static void addElasticMaterial(int materialTag, double E, double G, double rho);
@@ -41,6 +42,15 @@ namespace buildingModeler
         static void setSection(int elementTag, int segmentNo, int sectionTag);
         static void setSectionModifiers(int elementTag, int segmentNo, double modifierA, double modifierIyy, double modifierIzz, double modifierJ);
 
+        // Area Element API
+        static void addShearWall(int elementTag, std::vector<int> jointTags, int sectionTag,
+            physicalModel::AreaElementFormulation areaElementFormulation);
+        static void addSlab(int elementTag, std::vector<int> jointTags, int sectionTag,
+            physicalModel::AreaElementFormulation areaElementFormulation);
+
         // Floor API
+        static void addFloor(int floorNumber, double height);
+        static void makeRigid(int floorNumber, int masterJointTag, utility::Vector3 coords);
+        static void makeFlexible(int floorNumber);
     };
 }

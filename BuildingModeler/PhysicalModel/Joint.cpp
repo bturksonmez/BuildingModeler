@@ -38,9 +38,9 @@ const std::vector<int>& Joint::getConnectedColumnTags() const
 	return m_connectedColumnTags;
 }
 
-const std::vector<int>& Joint::getConnectedSlabElementTags() const
+const std::vector<int>& Joint::getConnectedSlabTags() const
 {
-	return m_connectedSlabElementTags;
+	return m_connectedSlabTags;
 }
 
 const std::vector<int>& Joint::getConnectedWallTags() const
@@ -78,9 +78,9 @@ void Joint::addConnectedColumn(int elementTag)
 	m_connectedColumnTags.push_back(elementTag);
 }
 
-void Joint::addConnectedSlabElement(int elementTag)
+void Joint::addConnectedSlab(int elementTag)
 {
-	m_connectedSlabElementTags.push_back(elementTag);
+	m_connectedSlabTags.push_back(elementTag);
 }
 
 void Joint::addConnectedWall(int elementTag)

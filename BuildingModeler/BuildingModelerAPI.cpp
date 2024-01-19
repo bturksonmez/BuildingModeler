@@ -42,14 +42,23 @@ void BuildingModelerAPI::setConstraintVector(int jointTag, std::vector<int> cons
     }
 }
 
-void BuildingModelerAPI::setFloorNo(int jointTag, int floorNo)
+void BuildingModelerAPI::setFloorNo(int jointTag, int floorNumber)
 {
     if (!jointExists(jointTag)) {
         // To do: exception
     }
-    else {
-        physicalModel::Building::getInstance().m_joints[jointTag]->setFloorNo(floorNo);
+    else if (floorExists(floorNumber)) {
+        // To do: exception
     }
+    else {
+        physicalModel::Building::getInstance().m_joints[jointTag]->setFloorNo(floorNumber);
+        physicalModel::Building::getInstance().m_floors[floorNumber]->addJoint(jointTag);
+    }
+}
+
+void BuildingModelerAPI::includeMassFromMembers(bool includeMassFromMembers)
+{
+    physicalModel::Building::getInstance().m_includeMassFromMembers = includeMassFromMembers;
 }
 
 void BuildingModelerAPI::addElasticMaterial(int materialTag, double E, double G, double rho)
@@ -61,7 +70,7 @@ void BuildingModelerAPI::addElasticMaterial(int materialTag, double E, double G,
         physicalModel::Building::getInstance().m_materials[materialTag] = std::make_unique<physicalModel::ElasticMaterial>(materialTag, E, G, rho);
     }
 }
-//
+
 void BuildingModelerAPI::addElasticSection1D(int sectionTag, int materialTag, double A, double Iyy, double Izz, double J)
 {
     if (sectionExists(sectionTag)) {
@@ -105,6 +114,8 @@ void BuildingModelerAPI::addBeam(int elementTag, std::vector<int> jointTags, int
     else {
         std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
         physicalModel::Building::getInstance().m_lineElements[elementTag] = std::make_unique<physicalModel::BeamElement>(elementTag, jointTags, section, lineElementFormulation);
+        physicalModel::Building::getInstance().m_joints[jointTags[0]]->addConnectedBeam(elementTag);
+        physicalModel::Building::getInstance().m_joints[jointTags[1]]->addConnectedBeam(elementTag);
     }
 }
 
@@ -123,6 +134,8 @@ void BuildingModelerAPI::addColumn(int elementTag, std::vector<int> jointTags, i
     else {
         std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
         physicalModel::Building::getInstance().m_lineElements[elementTag] = std::make_unique<physicalModel::ColumnElement>(elementTag, jointTags, section, lineElementFormulation);
+        physicalModel::Building::getInstance().m_joints[jointTags[0]]->addConnectedColumn(elementTag);
+        physicalModel::Building::getInstance().m_joints[jointTags[1]]->addConnectedColumn(elementTag);
     }
 }
 
@@ -157,6 +170,98 @@ void BuildingModelerAPI::setSectionModifiers(int elementTag, int segmentNo, doub
     }
     else {
         physicalModel::Building::getInstance().m_lineElements[elementTag]->setSectionModifiers(segmentNo, std::make_shared<physicalModel::SectionModifiers>(modifierA, modifierIyy, modifierIzz, modifierJ));
+    }
+}
+
+void BuildingModelerAPI::addShearWall(int elementTag, std::vector<int> jointTags, int sectionTag,
+    physicalModel::AreaElementFormulation areaElementFormulation)
+{
+    if (areaElementExists(elementTag)) {
+        // To do: exception
+    }
+    else if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2])) {
+        // To do: exception
+    }
+    else if (!sectionExists(sectionTag)) {
+        // To do: exception
+    }
+    else {
+        std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
+        physicalModel::Building::getInstance().m_areaElements[elementTag] = std::make_unique<physicalModel::ShearWallElement>(elementTag, jointTags, section, areaElementFormulation);
+        physicalModel::Building::getInstance().m_joints[jointTags[0]]->addConnectedWall(elementTag);
+        physicalModel::Building::getInstance().m_joints[jointTags[1]]->addConnectedWall(elementTag);
+        physicalModel::Building::getInstance().m_joints[jointTags[2]]->addConnectedWall(elementTag);
+        physicalModel::Building::getInstance().m_joints[jointTags[3]]->addConnectedWall(elementTag);
+    }
+}
+
+void BuildingModelerAPI::addSlab(int elementTag, std::vector<int> jointTags, int sectionTag,
+    physicalModel::AreaElementFormulation areaElementFormulation)
+{
+    if (areaElementExists(elementTag)) {
+        // To do: exception
+    }
+    else if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2])) {
+        // To do: exception
+    }
+    else if (!sectionExists(sectionTag)) {
+        // To do: exception
+    }
+    else {
+        std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
+        physicalModel::Building::getInstance().m_areaElements[elementTag] = std::make_unique<physicalModel::SlabElement>(elementTag, jointTags, section, areaElementFormulation);
+        physicalModel::Building::getInstance().m_joints[jointTags[0]]->addConnectedSlab(elementTag);
+        physicalModel::Building::getInstance().m_joints[jointTags[1]]->addConnectedSlab(elementTag);
+        physicalModel::Building::getInstance().m_joints[jointTags[2]]->addConnectedSlab(elementTag);
+        physicalModel::Building::getInstance().m_joints[jointTags[3]]->addConnectedSlab(elementTag);
+    }
+}
+
+void BuildingModelerAPI::addFloor(int floorNumber, double height)
+{
+    if (floorNumber < 0) {
+        // To do: exception
+    }
+    else if (floorExists(floorNumber)) {
+        // To do: exception
+    }
+    else {
+        if (floorNumber == 0) {
+            physicalModel::Building::getInstance().m_floors[floorNumber] = std::make_unique<physicalModel::Floor>(floorNumber);
+        }
+        else {
+            physicalModel::Building::getInstance().m_floors[floorNumber] = std::make_unique<physicalModel::Floor>(floorNumber, height);
+        }
+    }
+}
+
+void BuildingModelerAPI::makeRigid(int floorNumber, int masterJointTag, utility::Vector3 coords)
+{
+    if (jointExists(masterJointTag)) {
+        // To do: exception
+    }
+    else if (!floorExists(floorNumber)) {
+        // To do: exception
+    }
+    else if (physicalModel::Building::getInstance().m_floors[floorNumber]->isRigid()) {
+        // To do: exception
+    }
+    else {
+        physicalModel::Building::getInstance().m_joints[masterJointTag] = std::make_unique<physicalModel::Joint>(masterJointTag, coords);
+        physicalModel::Building::getInstance().m_floors[floorNumber]->makeRigid(masterJointTag);
+    }
+}
+
+void BuildingModelerAPI::makeFlexible(int floorNumber)
+{
+    if (!floorExists(floorNumber)) {
+    // To do: exception
+    }
+    else if (!physicalModel::Building::getInstance().m_floors[floorNumber]->isRigid()) {
+    // To do: exception
+    }
+    else {
+        physicalModel::Building::getInstance().m_floors[floorNumber]->makeFlexible();
     }
 }
 

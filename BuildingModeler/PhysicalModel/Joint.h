@@ -13,7 +13,7 @@ namespace physicalModel
 		utility::Vector3 m_massRotational;
 		std::vector<int> m_connectedBeamTags;
 		std::vector<int> m_connectedColumnTags;
-		std::vector<int> m_connectedSlabElementTags;
+		std::vector<int> m_connectedSlabTags;
 		std::vector<int> m_connectedWallTags;
 		std::vector<int> m_constraintVector;
 		int m_floorNo;
@@ -31,7 +31,7 @@ namespace physicalModel
 		const utility::Vector3& getRotationalMass() const;
 		const std::vector<int>& getConnectedBeamTags() const;
 		const std::vector<int>& getConnectedColumnTags() const;
-		const std::vector<int>& getConnectedSlabElementTags() const;
+		const std::vector<int>& getConnectedSlabTags() const;
 		const std::vector<int>& getConnectedWallTags() const;
 		const std::vector<int>& getConstraintVector() const;
 		int getFloorNo() const;
@@ -39,7 +39,7 @@ namespace physicalModel
 		void setRotationalMass(utility::Vector3 massValues);
 		void addConnectedBeam(int elementTag);
 		void addConnectedColumn(int elementTag);
-		void addConnectedSlabElement(int elementTag);
+		void addConnectedSlab(int elementTag);
 		void addConnectedWall(int elementTag);
 		void setConstraintVector(std::vector<int> constraintVector);
 		void setFloorNo(int floorNo);

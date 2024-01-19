@@ -10,14 +10,11 @@ Building& Building::getInstance()
 
 void Building::deleteJoint(int jointTag)
 {
-    m_joints.
+    auto it = m_joints.find(jointTag);
+    if (it != m_joints.end()) {
+        m_joints.erase(jointTag);
+    }
 }
-
-void Building::deleteLineElement(int elementTag);
-void Building::deleteAreaElement(int elementTag);
-void Building::deleteFloor(int floorNumber);
-void Building::deleteMaterial(int materialTag);
-void Building::deleteSection(int sectionTag);
 
 Joint* Building::getJoint(int jointTag) const
 {
