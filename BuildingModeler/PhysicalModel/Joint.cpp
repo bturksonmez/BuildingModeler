@@ -8,56 +8,6 @@ Joint::Joint(int jointTag, Vector3 coords, Vector3 massTranslational, Vector3 ma
 {
 }
 
-int Joint::getJointTag() const
-{
-	return m_jointTag;
-}
-
-const Vector3& Joint::getCoords() const
-{
-	return m_coords;
-}
-
-const Vector3& Joint::getTranslationalMass() const
-{
-	return m_massTranslational;
-}
-
-const Vector3& Joint::getRotationalMass() const
-{
-	return m_massRotational;
-}
-
-const std::vector<int>& Joint::getConnectedBeamTags() const
-{
-	return m_connectedBeamTags;
-}
-
-const std::vector<int>& Joint::getConnectedColumnTags() const
-{
-	return m_connectedColumnTags;
-}
-
-const std::vector<int>& Joint::getConnectedSlabTags() const
-{
-	return m_connectedSlabTags;
-}
-
-const std::vector<int>& Joint::getConnectedWallTags() const
-{
-	return m_connectedWallTags;
-}
-
-const std::vector<int>& Joint::getConstraintVector() const
-{
-	return m_constraintVector;
-}
-
-int Joint::getFloorNo() const
-{
-	return m_floorNo;
-}
-
 void Joint::setTranslationalMass(Vector3 massValues)
 {
 	m_massTranslational = massValues;
@@ -98,3 +48,52 @@ void Joint::setFloorNo(int floorNo)
 	m_floorNo = floorNo;
 }
 
+int Joint::getJointTag() const
+{
+	return m_jointTag;
+}
+
+Vector3 Joint::getCoords() const
+{
+	return m_coords;
+}
+
+Vector3 Joint::getTranslationalMass() const
+{
+	return m_massTranslational;
+}
+
+Vector3 Joint::getRotationalMass() const
+{
+	return m_massRotational;
+}
+
+const std::vector<int>& Joint::getConnectedBeamTags() const
+{
+	return m_connectedBeamTags;
+}
+
+const std::vector<int>& Joint::getConnectedColumnTags() const
+{
+	return m_connectedColumnTags;
+}
+
+const std::vector<int>& Joint::getConnectedSlabTags() const
+{
+	return m_connectedSlabTags;
+}
+
+const std::vector<int>& Joint::getConnectedWallTags() const
+{
+	return m_connectedWallTags;
+}
+
+const std::vector<int>& Joint::getConstraintVector() const
+{
+	return m_constraintVector;
+}
+
+int Joint::getFloorNo() const
+{
+	return m_floorNo;
+}

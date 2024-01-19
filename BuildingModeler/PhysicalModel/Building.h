@@ -34,6 +34,8 @@ namespace physicalModel
 
         Building() {}
 
+        void addNodesAndMasses();
+
     public:
         ~Building() {}
         Building(Building const&) = default;
@@ -42,6 +44,7 @@ namespace physicalModel
         Building& operator=(Building&&) = delete;
 
         void deleteJoint(int jointTag);
+        void buildAnalyticalModel();
 
         static Building& getInstance();
         Joint* getJoint(int jointTag) const;

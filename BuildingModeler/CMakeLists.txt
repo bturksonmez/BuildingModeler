@@ -97,7 +97,11 @@ add_executable (BuildingModeler
 				"BuildingModelerAPI.h"  
 				"BuildingModelerAPI.cpp"
 				"PhysicalModel/Elements/SlabElement.h"
-				"PhysicalModel/Elements/SlabElement.cpp")
+				"PhysicalModel/Elements/SlabElement.cpp" 
+				"OpenSeesWrapper/OpenseesModel.h" 
+				"OpenSeesWrapper/OpenseesModel.cpp" 
+				"OpenseesConverter.h" 
+				"OpenseesConverter.cpp")
 
 target_include_directories(BuildingModeler PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/OpenSeesWrapper

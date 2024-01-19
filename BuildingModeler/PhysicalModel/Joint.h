@@ -25,16 +25,6 @@ namespace physicalModel
 		Joint() = delete;
 		~Joint() {}
 
-		int getJointTag() const;
-		const utility::Vector3& getCoords() const;
-		const utility::Vector3& getTranslationalMass() const;
-		const utility::Vector3& getRotationalMass() const;
-		const std::vector<int>& getConnectedBeamTags() const;
-		const std::vector<int>& getConnectedColumnTags() const;
-		const std::vector<int>& getConnectedSlabTags() const;
-		const std::vector<int>& getConnectedWallTags() const;
-		const std::vector<int>& getConstraintVector() const;
-		int getFloorNo() const;
 		void setTranslationalMass(utility::Vector3 massValues);
 		void setRotationalMass(utility::Vector3 massValues);
 		void addConnectedBeam(int elementTag);
@@ -43,5 +33,16 @@ namespace physicalModel
 		void addConnectedWall(int elementTag);
 		void setConstraintVector(std::vector<int> constraintVector);
 		void setFloorNo(int floorNo);
+
+		int getJointTag() const;
+		utility::Vector3 getCoords() const;
+		utility::Vector3 getTranslationalMass() const;
+		utility::Vector3 getRotationalMass() const;
+		const std::vector<int>& getConnectedBeamTags() const;
+		const std::vector<int>& getConnectedColumnTags() const;
+		const std::vector<int>& getConnectedSlabTags() const;
+		const std::vector<int>& getConnectedWallTags() const;
+		const std::vector<int>& getConstraintVector() const;
+		int getFloorNo() const;
 	};
 }

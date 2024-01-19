@@ -8,6 +8,16 @@ Mass::Mass(int nodeTag, Vector3 massTranslational,Vector3 massRotational) :
 {
 }
 
+void Mass::addTranslationalMass(utility::Vector3 massTranslational)
+{
+	m_massTranslational = m_massTranslational + massTranslational;
+}
+
+void Mass::addRotationalMass(utility::Vector3 massRotational)
+{
+	m_massRotational = m_massRotational + massRotational;
+}
+
 int Mass::getNodeTag() const
 {
 	return m_nodeTag;

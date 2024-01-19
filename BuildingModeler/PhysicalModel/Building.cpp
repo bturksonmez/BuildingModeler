@@ -1,12 +1,7 @@
 #include "Building.h"
+#include "../OpenseesConverter.h"
 
 using namespace physicalModel;
-
-Building& Building::getInstance()
-{
-    static Building instance;
-    return instance;
-}
 
 void Building::deleteJoint(int jointTag)
 {
@@ -14,6 +9,12 @@ void Building::deleteJoint(int jointTag)
     if (it != m_joints.end()) {
         m_joints.erase(jointTag);
     }
+}
+
+Building& Building::getInstance()
+{
+    static Building instance;
+    return instance;
 }
 
 Joint* Building::getJoint(int jointTag) const
@@ -50,4 +51,11 @@ std::shared_ptr<Section> Building::getSection(int sectionTag) const
 {
     auto it = m_sections.find(sectionTag);
     return (it != m_sections.end()) ? it->second : nullptr;
+}
+
+void Building::addNodesAndMasses()
+{
+    for (auto it = m_joints.begin(); it != m_joints.end(); it++) {
+        buildingModeler::OpenseesConverter::toNodeAndMass(it->second.get());
+    }
 }

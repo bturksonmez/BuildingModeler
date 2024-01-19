@@ -17,6 +17,9 @@ namespace opensees
 		Mass() = delete;
 		~Mass() {}
 
+		void addTranslationalMass(utility::Vector3 massTranslational);
+		void addRotationalMass(utility::Vector3 massRotational);
+
 		int getNodeTag() const;
 		const utility::Vector3& getTranslationalMass() const;
 		const utility::Vector3& getRotationalMass() const;
