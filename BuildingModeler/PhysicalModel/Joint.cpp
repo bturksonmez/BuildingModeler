@@ -3,19 +3,28 @@
 using namespace physicalModel;
 using namespace utility;
 
-Joint::Joint(int jointTag, Vector3 coords, Vector3 massTranslational, Vector3 massRotational) :
-	m_jointTag(jointTag), m_coords(coords), m_massTranslational(massTranslational), m_massRotational(massRotational)
+Joint::Joint(int jointTag, Vector3 coords) : m_jointTag(jointTag), m_coords(coords)
 {
 }
 
-void Joint::setTranslationalMass(Vector3 massValues)
+void Joint::addTranslationalMass(Vector3 massValues)
 {
-	m_massTranslational = massValues;
+	if (m_massTranslational == std::nullopt) {
+		m_massTranslational = massValues;
+	}
+	else {
+		m_massTranslational = m_massTranslational.value() + massValues;
+	}
 }
 
-void Joint::setRotationalMass(Vector3 massValues)
+void Joint::addRotationalMass(Vector3 massValues)
 {
-	m_massRotational = massValues;
+	if (m_massRotational == std::nullopt) {
+		m_massRotational = massValues;
+	}
+	else {
+		m_massRotational = m_massRotational.value() + massValues;
+	}
 }
 
 void Joint::addConnectedBeam(int elementTag)
@@ -58,12 +67,12 @@ Vector3 Joint::getCoords() const
 	return m_coords;
 }
 
-Vector3 Joint::getTranslationalMass() const
+std::optional<Vector3> Joint::getTranslationalMass() const
 {
 	return m_massTranslational;
 }
 
-Vector3 Joint::getRotationalMass() const
+std::optional<Vector3> Joint::getRotationalMass() const
 {
 	return m_massRotational;
 }
@@ -88,7 +97,7 @@ const std::vector<int>& Joint::getConnectedWallTags() const
 	return m_connectedWallTags;
 }
 
-const std::vector<int>& Joint::getConstraintVector() const
+std::optional<std::vector<int>> Joint::getConstraintVector() const
 {
 	return m_constraintVector;
 }

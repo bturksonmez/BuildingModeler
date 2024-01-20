@@ -34,7 +34,9 @@ namespace physicalModel
 
         Building() {}
 
-        void addNodesAndMasses();
+        void convertJoints();
+        void convertMaterials();
+        void convertSections();
 
     public:
         ~Building() {}
@@ -44,7 +46,6 @@ namespace physicalModel
         Building& operator=(Building&&) = delete;
 
         void deleteJoint(int jointTag);
-        void buildAnalyticalModel();
 
         static Building& getInstance();
         Joint* getJoint(int jointTag) const;
@@ -53,6 +54,8 @@ namespace physicalModel
         Floor* getFloor(int floorNumber) const;
         std::shared_ptr<Material> getMaterial(int materialTag) const;
         std::shared_ptr<Section> getSection(int sectionTag) const;
+
+        void toAnalyticalModel();
 
         friend class buildingModeler::BuildingModelerAPI;
     };

@@ -2,33 +2,34 @@
 
 using namespace buildingModeler;
 
-void BuildingModelerAPI::addJoint(int jointTag, utility::Vector3 coords, utility::Vector3 massTranslational, utility::Vector3 massRotational)
+void BuildingModelerAPI::addJoint(int jointTag, utility::Vector3 coords)
 {
     if (jointExists(jointTag)) {
         // To do: exception
     }
     else {
-        physicalModel::Building::getInstance().m_joints[jointTag] = std::make_unique<physicalModel::Joint>(jointTag, coords, massTranslational, massRotational);
+        physicalModel::Building::getInstance().m_joints[jointTag] = std::make_unique<physicalModel::Joint>(jointTag, coords);
     }
+
 }
 
-void BuildingModelerAPI::setTranslationalMass(int jointTag, utility::Vector3 massValues)
+void BuildingModelerAPI::addTranslationalMass(int jointTag, utility::Vector3 massValues)
 {
     if (!jointExists(jointTag)) {
         // To do: exception
     }
     else {
-        physicalModel::Building::getInstance().m_joints[jointTag]->setTranslationalMass(massValues);
+        physicalModel::Building::getInstance().m_joints[jointTag]->addTranslationalMass(massValues);
     }
 }
 
-void BuildingModelerAPI::setRotationalMass(int jointTag, utility::Vector3 massValues)
+void BuildingModelerAPI::addRotationalMass(int jointTag, utility::Vector3 massValues)
 {
     if (!jointExists(jointTag)) {
         // To do: exception
     }
     else {
-        physicalModel::Building::getInstance().m_joints[jointTag]->setRotationalMass(massValues);
+        physicalModel::Building::getInstance().m_joints[jointTag]->addRotationalMass(massValues);
     }
 }
 
@@ -317,4 +318,10 @@ bool BuildingModelerAPI::sectionExists(int sectionTag)
     }
 
     return false;
+}
+
+void BuildingModelerAPI::createInputFile()
+{
+    physicalModel::Building::getInstance().toAnalyticalModel();
+    opensees::OpenseesModel::getInstance().toTclFile();
 }

@@ -11,6 +11,9 @@
 #include "Constraints/SingleConstraint.h"
 #include "Constraints/DiaphragmConstraint.h"
 
+#include <sstream>
+#include <fstream>
+
 namespace buildingModeler
 {
 	class OpenseesConverter;
@@ -23,6 +26,9 @@ namespace opensees
 	private:
 		std::unordered_map<int, std::unique_ptr<Node>> m_nodes;
 		std::unordered_map<int, std::unique_ptr<Mass>> m_masses;
+		std::unordered_map<int, std::unique_ptr<Constraint>> m_contraintsSP;
+		std::unordered_map<int, std::shared_ptr<Material>> m_materials;
+		std::unordered_map<int, std::shared_ptr<Section>> m_sections;
 
 		OpenseesModel() {}
 
@@ -36,6 +42,11 @@ namespace opensees
 		static OpenseesModel& getInstance();
 		Node* getNode(int nodeTag) const;
 		Mass* getMass(int nodeTag) const;
+		Constraint* getSPConstraint(int nodeTag) const;
+		std::shared_ptr<Material> getMaterial(int materialTag) const;
+		std::shared_ptr<Section> getSection(int sectionTag) const;
+
+		void toTclFile();
 
 		friend class buildingModeler::OpenseesConverter;
 	};

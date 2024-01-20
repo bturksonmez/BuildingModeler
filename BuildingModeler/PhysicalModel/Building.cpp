@@ -53,9 +53,31 @@ std::shared_ptr<Section> Building::getSection(int sectionTag) const
     return (it != m_sections.end()) ? it->second : nullptr;
 }
 
-void Building::addNodesAndMasses()
+void Building::toAnalyticalModel()
+{
+    convertJoints();
+    convertMaterials();
+    convertSections();
+}
+
+
+void Building::convertJoints()
 {
     for (auto it = m_joints.begin(); it != m_joints.end(); it++) {
-        buildingModeler::OpenseesConverter::toNodeAndMass(it->second.get());
+        buildingModeler::OpenseesConverter::toNodeMassConstraint(it->second.get());
+    }
+}
+
+void Building::convertMaterials()
+{
+    for (auto it = m_materials.begin(); it != m_materials.end(); it++) {
+        buildingModeler::OpenseesConverter::toMaterial(it->second.get());
+    }
+}
+
+void Building::convertSections()
+{
+    for (auto it = m_sections.begin(); it != m_sections.end(); it++) {
+        buildingModeler::OpenseesConverter::toSection(it->second.get());
     }
 }

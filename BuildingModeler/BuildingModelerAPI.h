@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PhysicalModel/Building.h"
+#include "OpenseesWrapper/OpenseesModel.h"
 
 namespace buildingModeler
 {
@@ -19,9 +20,9 @@ namespace buildingModeler
         ~BuildingModelerAPI() {}
 
         // Joint API
-        static void addJoint(int jointTag, utility::Vector3 coords, utility::Vector3 massTranslational = {}, utility::Vector3 massRotational = {});
-        static void setTranslationalMass(int jointTag, utility::Vector3 massValues);
-        static void setRotationalMass(int jointTag, utility::Vector3 massValues);
+        static void addJoint(int jointTag, utility::Vector3 coords);
+        static void addTranslationalMass(int jointTag, utility::Vector3 massValues);
+        static void addRotationalMass(int jointTag, utility::Vector3 massValues);
         static void setConstraintVector(int jointTag, std::vector<int> constraintVector);
         static void setFloorNo(int jointTag, int floorNo);
         static void includeMassFromMembers(bool includeMassFromMembers);
@@ -52,5 +53,8 @@ namespace buildingModeler
         static void addFloor(int floorNumber, double height);
         static void makeRigid(int floorNumber, int masterJointTag, utility::Vector3 coords);
         static void makeFlexible(int floorNumber);
+
+        // Input File Generation
+        static void createInputFile();
     };
 }

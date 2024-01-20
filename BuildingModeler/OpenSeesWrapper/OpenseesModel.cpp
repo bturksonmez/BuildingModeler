@@ -19,3 +19,55 @@ Mass* OpenseesModel::getMass(int nodeTag) const
     auto it = m_masses.find(nodeTag);
     return (it != m_masses.end()) ? it->second.get() : nullptr;
 }
+
+Constraint* OpenseesModel::getSPConstraint(int nodeTag) const
+{
+    auto it = m_contraintsSP.find(nodeTag);
+    return (it != m_contraintsSP.end()) ? it->second.get() : nullptr;
+}
+
+std::shared_ptr<Material> OpenseesModel::getMaterial(int materialTag) const
+{
+    auto it = m_materials.find(materialTag);
+    return (it != m_materials.end()) ? it->second : nullptr;
+}
+
+std::shared_ptr<Section> OpenseesModel::getSection(int sectionTag) const
+{
+    auto it = m_sections.find(sectionTag);
+    return (it != m_sections.end()) ? it->second : nullptr;
+}
+
+void OpenseesModel::toTclFile()
+{
+    std::stringstream modelTcl;
+
+    for (auto it = m_nodes.begin(); it != m_nodes.end(); it++) {
+        modelTcl << it->second->getOpenseesCommand();
+    }
+
+    for (auto it = m_masses.begin(); it != m_masses.end(); it++) {
+        modelTcl << it->second->getOpenseesCommand();
+    }
+
+    for (auto it = m_contraintsSP.begin(); it != m_contraintsSP.end(); it++) {
+        modelTcl <<it->second->getOpenseesCommand();
+    }
+
+    for (auto it = m_materials.begin(); it != m_materials.end(); it++) {
+        modelTcl << it->second->getOpenseesCommand();
+    }
+
+    for (auto it = m_sections.begin(); it != m_sections.end(); it++) {
+        modelTcl << it->second->getOpenseesCommand();
+    }
+
+    std::ofstream outFile("model.tcl");
+    if (outFile.is_open()) {
+        outFile << modelTcl.str();
+        outFile.close();
+    }
+    else {
+        std::cerr << "Unable to open file for writing." << std::endl;
+    }
+}
