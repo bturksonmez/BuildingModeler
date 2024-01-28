@@ -53,12 +53,57 @@ std::shared_ptr<Section> Building::getSection(int sectionTag) const
     return (it != m_sections.end()) ? it->second : nullptr;
 }
 
+void Building::updateSurroundingLineElements()
+{
+    for (auto it = m_areaElements.begin(); it != m_areaElements.end(); it++) {
+        auto joints = it->second->getJointTags();
+
+        for (int i = 0; i < joints.size(); ++i) {
+            auto jointTagI = joints[i];
+            auto jointTagJ = (i + 1 < joints.size()) ? i + 1 : 0;
+
+            bool found = false;
+            for (const auto& beamTagI : m_joints[jointTagI]->getConnectedBeamTags()) {
+
+                for (const auto& beamTagJ : m_joints[jointTagJ]->getConnectedBeamTags()) {
+                    if (beamTagI == beamTagJ) {
+                        it->second->addSurroundingLineElement(i, beamTagI);
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    break;
+                }
+            }
+
+            found = false;
+            for (const auto& columnTagI : m_joints[jointTagI]->getConnectedColumnTags()) {
+
+                for (const auto& columnTagJ : m_joints[jointTagJ]->getConnectedColumnTags()) {
+                    if (columnTagI == columnTagJ) {
+                        it->second->addSurroundingLineElement(i, columnTagI);
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    break;
+                }
+            }
+        }
+    }
+}
+
 void Building::toAnalyticalModel()
 {
     convertJoints();
     convertMaterials();
     convertSections();
     convertLineElements(m_includeMassFromMembers);
+    convertAreaElements();
 }
 
 
@@ -89,5 +134,12 @@ void Building::convertLineElements(bool includePDeltaEffects)
 
     for (auto it = m_lineElements.begin(); it != m_lineElements.end(); it++) {
         buildingModeler::OpenseesConverter::toBeamColumnElement(it->second.get());
+    }
+}
+
+void Building::convertAreaElements()
+{
+    for (auto it = m_areaElements.begin(); it != m_areaElements.end(); it++) {
+        buildingModeler::OpenseesConverter::toQuadrilateralElement(it->second.get());
     }
 }

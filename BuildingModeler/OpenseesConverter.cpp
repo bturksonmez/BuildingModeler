@@ -145,6 +145,11 @@ void OpenseesConverter::toBeamColumnElement(physicalModel::LineElement* element)
     }
 }
 
+void OpenseesConverter::toQuadrilateralElement(physicalModel::AreaElement* element)
+{
+
+}
+
 bool OpenseesConverter::nodeExists(int nodeTag)
 {
     if (opensees::OpenseesModel::getInstance().m_nodes.find(nodeTag) != opensees::OpenseesModel::getInstance().m_nodes.end()) {

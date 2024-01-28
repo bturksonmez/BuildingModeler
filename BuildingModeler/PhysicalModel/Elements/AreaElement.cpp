@@ -5,11 +5,20 @@ using namespace physicalModel;
 AreaElement::AreaElement(int elementTag, std::vector<int> jointTags, std::shared_ptr<Section> section, AreaElementFormulation areaElementFormulation)
 	: m_elementTag(elementTag), m_jointTags(jointTags), m_section(section)
 {
+	m_meshable = false;
+	m_surroundingLineElementTags.resize(4, -1);
 }
 
-void AreaElement::addSurroundingLineElement(int surroundingLineElementTag)
+void AreaElement::addSurroundingLineElement(int index, int surroundingLineElementTag)
 {
-	m_surroundingLineElementTags.push_back(surroundingLineElementTag);
+	m_surroundingLineElementTags[index] = surroundingLineElementTag;
+}
+
+void AreaElement::mesh(bool meshable, int n1 = -1, int n2 = -1)
+{
+	m_meshable = meshable;
+	m_n1 = n1;
+	m_n2 = n2;
 }
 
 int AreaElement::getElementTag() const
@@ -35,6 +44,21 @@ int AreaElement::getKJointTag() const
 int AreaElement::getLJointTag() const
 {
 	return m_jointTags[3];
+}
+
+const std::vector<int> AreaElement::getJointTags() const
+{
+	return m_jointTags;
+}
+
+bool AreaElement::isMeshable() const
+{
+	return m_meshable;
+}
+
+std::pair<int, int> AreaElement::getMeshDivisions() const
+{
+	return { m_n1, m_n2 };
 }
 
 std::vector<int> AreaElement::getSurroundingLineElementTags()

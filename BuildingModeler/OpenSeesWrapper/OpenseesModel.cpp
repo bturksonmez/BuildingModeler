@@ -38,6 +38,12 @@ Element* OpenseesModel::getBeamColumnElement(int elementTag) const
     return (it != m_beamColumnElements.end()) ? it->second.get() : nullptr;
 }
 
+Element* OpenseesModel::getQuadrilateralElement(int elementTag) const
+{
+    auto it = m_quadrilateralElement.find(elementTag);
+    return (it != m_quadrilateralElement.end()) ? it->second.get() : nullptr;
+}
+
 std::shared_ptr<Material> OpenseesModel::getMaterial(int materialTag) const
 {
     auto it = m_materials.find(materialTag);

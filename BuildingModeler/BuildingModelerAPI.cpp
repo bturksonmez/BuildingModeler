@@ -169,9 +169,8 @@ void BuildingModelerAPI::setSectionModifiers(int elementTag, int segmentNo, doub
     if (!lineElementExists(elementTag)) {
         // To do: exception
     }
-    else {
-        physicalModel::Building::getInstance().m_lineElements[elementTag]->setSectionModifiers(segmentNo, std::make_shared<physicalModel::SectionModifiers>(modifierA, modifierIyy, modifierIzz, modifierJ));
-    }
+    
+    physicalModel::Building::getInstance().m_lineElements[elementTag]->setSectionModifiers(segmentNo, std::make_shared<physicalModel::SectionModifiers>(modifierA, modifierIyy, modifierIzz, modifierJ));
 }
 
 void BuildingModelerAPI::addShearWall(int elementTag, std::vector<int> jointTags, int sectionTag,
@@ -186,14 +185,13 @@ void BuildingModelerAPI::addShearWall(int elementTag, std::vector<int> jointTags
     else if (!sectionExists(sectionTag)) {
         // To do: exception
     }
-    else {
-        std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
-        physicalModel::Building::getInstance().m_areaElements[elementTag] = std::make_unique<physicalModel::ShearWallElement>(elementTag, jointTags, section, areaElementFormulation);
-        physicalModel::Building::getInstance().m_joints[jointTags[0]]->addConnectedWall(elementTag);
-        physicalModel::Building::getInstance().m_joints[jointTags[1]]->addConnectedWall(elementTag);
-        physicalModel::Building::getInstance().m_joints[jointTags[2]]->addConnectedWall(elementTag);
-        physicalModel::Building::getInstance().m_joints[jointTags[3]]->addConnectedWall(elementTag);
-    }
+    
+    std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
+    physicalModel::Building::getInstance().m_areaElements[elementTag] = std::make_unique<physicalModel::ShearWallElement>(elementTag, jointTags, section, areaElementFormulation);
+    physicalModel::Building::getInstance().m_joints[jointTags[0]]->addConnectedWall(elementTag);
+    physicalModel::Building::getInstance().m_joints[jointTags[1]]->addConnectedWall(elementTag);
+    physicalModel::Building::getInstance().m_joints[jointTags[2]]->addConnectedWall(elementTag);
+    physicalModel::Building::getInstance().m_joints[jointTags[3]]->addConnectedWall(elementTag);
 }
 
 void BuildingModelerAPI::addSlab(int elementTag, std::vector<int> jointTags, int sectionTag,
@@ -208,14 +206,22 @@ void BuildingModelerAPI::addSlab(int elementTag, std::vector<int> jointTags, int
     else if (!sectionExists(sectionTag)) {
         // To do: exception
     }
-    else {
-        std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
-        physicalModel::Building::getInstance().m_areaElements[elementTag] = std::make_unique<physicalModel::SlabElement>(elementTag, jointTags, section, areaElementFormulation);
-        physicalModel::Building::getInstance().m_joints[jointTags[0]]->addConnectedSlab(elementTag);
-        physicalModel::Building::getInstance().m_joints[jointTags[1]]->addConnectedSlab(elementTag);
-        physicalModel::Building::getInstance().m_joints[jointTags[2]]->addConnectedSlab(elementTag);
-        physicalModel::Building::getInstance().m_joints[jointTags[3]]->addConnectedSlab(elementTag);
+    
+    std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
+    physicalModel::Building::getInstance().m_areaElements[elementTag] = std::make_unique<physicalModel::SlabElement>(elementTag, jointTags, section, areaElementFormulation);
+    physicalModel::Building::getInstance().m_joints[jointTags[0]]->addConnectedSlab(elementTag);
+    physicalModel::Building::getInstance().m_joints[jointTags[1]]->addConnectedSlab(elementTag);
+    physicalModel::Building::getInstance().m_joints[jointTags[2]]->addConnectedSlab(elementTag);
+    physicalModel::Building::getInstance().m_joints[jointTags[3]]->addConnectedSlab(elementTag);
+}
+
+void BuildingModelerAPI::meshAreaElement(int elementTag, bool meshable, int n1, int n2)
+{
+    if (!areaElementExists(elementTag)) {
+        // To do: exception
     }
+
+    physicalModel::Building::getInstance().m_areaElements[elementTag]->mesh(meshable, n1, n2);
 }
 
 void BuildingModelerAPI::addFloor(int floorNumber, double height)
@@ -269,6 +275,11 @@ void BuildingModelerAPI::makeFlexible(int floorNumber)
 void BuildingModelerAPI::includePDeltaEffects(bool includePDeltaEffects)
 {
     physicalModel::Building::getInstance().m_includePDeltaEffects = includePDeltaEffects;
+}
+
+void BuildingModelerAPI::updateAreaElementProperties()
+{
+    physicalModel::Building::getInstance().updateSurroundingLineElements();
 }
 
 bool BuildingModelerAPI::jointExists(int jointTag)

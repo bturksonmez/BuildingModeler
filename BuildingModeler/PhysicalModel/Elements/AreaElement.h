@@ -25,6 +25,9 @@ namespace physicalModel
 	{
 	protected:
 		int m_elementTag;
+		bool m_meshable;
+		int m_n1; // number of division along IJ path for meshing
+		int m_n2; // number of division along JK path for meshing
 		std::vector<int> m_jointTags;
 		std::vector<int> m_surroundingLineElementTags;
 		std::shared_ptr<Section> m_section;
@@ -38,15 +41,17 @@ namespace physicalModel
 		AreaElement& operator=(AreaElement&& other) = default;
 		virtual ~AreaElement() {}
 
-		void addSurroundingLineElement(int surroundingLineElementTag);
-		void meshAccordingToSurroundingElements();
-		void mesh(int n1, int n2);
+		void addSurroundingLineElement(int index, int surroundingLineElementTag);
+		void mesh(bool meshable, int n1, int n2);
 
 		int getElementTag() const;
 		int getIJointTag() const;
 		int getJJointTag() const;
 		int getKJointTag() const;
 		int getLJointTag() const;
+		const std::vector<int> getJointTags() const;
+		bool isMeshable() const;
+		std::pair<int, int> getMeshDivisions() const;
 		std::vector<int> getSurroundingLineElementTags();
 		const std::shared_ptr<Section> getSection() const;
 		AreaElementType getAreaElementType() const;

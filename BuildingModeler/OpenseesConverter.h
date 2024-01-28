@@ -21,5 +21,6 @@ namespace buildingModeler
         static void toSection(const physicalModel::Section* section);
         static void includePDeltaEffects(bool includePDeltaEffects);
         static void toBeamColumnElement(physicalModel::LineElement* element);
+        static void toQuadrilateralElement(physicalModel::AreaElement* element);
     };
 }

@@ -39,6 +39,7 @@ namespace physicalModel
         void convertMaterials();
         void convertSections();
         void convertLineElements(bool includePDeltaEffects);
+        void convertAreaElements();
 
     public:
         ~Building() {}
@@ -57,6 +58,7 @@ namespace physicalModel
         std::shared_ptr<Material> getMaterial(int materialTag) const;
         std::shared_ptr<Section> getSection(int sectionTag) const;
 
+        void updateSurroundingLineElements(); // for area elements
         void toAnalyticalModel();
 
         friend class buildingModeler::BuildingModelerAPI;

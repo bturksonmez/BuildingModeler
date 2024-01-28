@@ -48,6 +48,7 @@ namespace buildingModeler
             physicalModel::AreaElementFormulation areaElementFormulation);
         static void addSlab(int elementTag, std::vector<int> jointTags, int sectionTag,
             physicalModel::AreaElementFormulation areaElementFormulation);
+        static void meshAreaElement(int elementTag, bool meshable, int n1 = -1, int n2 = -1);
 
         // Floor API
         static void addFloor(int floorNumber, double height);
@@ -56,6 +57,9 @@ namespace buildingModeler
 
         // Building API
         static void includePDeltaEffects(bool includePDeltEffects);
+
+        // Preprocessing
+        static void updateAreaElementProperties();
 
         // Input File Generation
         static void createInputFile();
