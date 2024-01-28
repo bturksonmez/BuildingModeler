@@ -58,6 +58,7 @@ void Building::toAnalyticalModel()
     convertJoints();
     convertMaterials();
     convertSections();
+    convertLineElements(m_includeMassFromMembers);
 }
 
 
@@ -79,5 +80,14 @@ void Building::convertSections()
 {
     for (auto it = m_sections.begin(); it != m_sections.end(); it++) {
         buildingModeler::OpenseesConverter::toSection(it->second.get());
+    }
+}
+
+void Building::convertLineElements(bool includePDeltaEffects)
+{
+    buildingModeler::OpenseesConverter::includePDeltaEffects(includePDeltaEffects);
+
+    for (auto it = m_lineElements.begin(); it != m_lineElements.end(); it++) {
+        buildingModeler::OpenseesConverter::toBeamColumnElement(it->second.get());
     }
 }

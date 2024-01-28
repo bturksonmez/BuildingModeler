@@ -266,6 +266,11 @@ void BuildingModelerAPI::makeFlexible(int floorNumber)
     }
 }
 
+void BuildingModelerAPI::includePDeltaEffects(bool includePDeltaEffects)
+{
+    physicalModel::Building::getInstance().m_includePDeltaEffects = includePDeltaEffects;
+}
+
 bool BuildingModelerAPI::jointExists(int jointTag)
 {
     if (physicalModel::Building::getInstance().m_joints.find(jointTag) != physicalModel::Building::getInstance().m_joints.end()) {

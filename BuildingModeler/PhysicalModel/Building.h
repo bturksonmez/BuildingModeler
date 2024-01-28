@@ -25,6 +25,7 @@ namespace physicalModel
     {
     private:
         bool m_includeMassFromMembers = true;
+        bool m_includePDeltaEffects = false;
         std::unordered_map<int, std::unique_ptr<Joint>> m_joints;
         std::unordered_map<int, std::unique_ptr<LineElement>> m_lineElements;
         std::unordered_map<int, std::unique_ptr<AreaElement>> m_areaElements;
@@ -37,6 +38,7 @@ namespace physicalModel
         void convertJoints();
         void convertMaterials();
         void convertSections();
+        void convertLineElements(bool includePDeltaEffects);
 
     public:
         ~Building() {}

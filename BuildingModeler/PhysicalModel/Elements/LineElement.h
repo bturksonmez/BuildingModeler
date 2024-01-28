@@ -44,6 +44,7 @@ namespace physicalModel
 		std::vector<double> m_segmentRelativeLengths;
 		std::vector<std::shared_ptr<Section>> m_sections;
 		std::vector<std::shared_ptr<SectionModifiers>> m_sectionModifiers;
+		std::vector<int> m_analyticalElementTags;
 		LineElementType m_lineElementType;
 		LineElementFormulation m_lineElementFormulation;
 
@@ -61,10 +62,12 @@ namespace physicalModel
 		void setSegmentRelativeLengths(std::vector<double> segmentRelativeLengths);
 		void setSection(int segmentNo, std::shared_ptr<Section> section);
 		void setSectionModifiers(int segmentNo, std::shared_ptr<SectionModifiers> sectionModifier);
+		void addAnalyticalElementTag(int analyticalElementTag);
 
 		int getElementTag() const;
 		int getIJointTag() const;
 		int getJJointTag() const;
+		double getElementLength() const;
 		const std::vector<double>& getSegmentLengths() const;
 		const std::vector<double>& getSegmentRelativeLengths() const;
 		const std::shared_ptr<Section> getSection(int segmentNo) const;

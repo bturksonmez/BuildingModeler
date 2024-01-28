@@ -52,6 +52,11 @@ void LineElement::setSectionModifiers(int segmentNo, std::shared_ptr<SectionModi
 	m_sectionModifiers[segmentNo] = sectionModifier;
 }
 
+void LineElement::addAnalyticalElementTag(int analyticalElementTag)
+{
+	m_analyticalElementTags.push_back(analyticalElementTag);
+}
+
 int LineElement::getElementTag() const
 {
 	return m_elementTag;
@@ -65,6 +70,11 @@ int LineElement::getIJointTag() const
 int LineElement::getJJointTag() const
 {
 	return m_jointTags[1];
+}
+
+double LineElement::getElementLength() const
+{
+	return m_length;
 }
 
 const std::vector<double>& LineElement::getSegmentLengths() const

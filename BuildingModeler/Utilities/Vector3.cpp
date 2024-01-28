@@ -37,3 +37,25 @@ Vector3 utility::operator-(const Vector3& v1, const Vector3& v2)
 
 	return result;
 }
+
+Vector3 utility::operator/(const Vector3& v1, const double c)
+{
+	Vector3 result;
+
+	result.x = v1.x / c;
+	result.y = v1.y / c;
+	result.y = v1.z / c;
+
+	return result;
+}
+
+Vector3 utility::operator*(const double c, const Vector3& v1)
+{
+	Vector3 result;
+
+	result.x = v1.x * c;
+	result.y = v1.y * c;
+	result.y = v1.z * c;
+
+	return result;
+}

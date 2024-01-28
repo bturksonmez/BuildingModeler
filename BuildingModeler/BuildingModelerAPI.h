@@ -54,6 +54,9 @@ namespace buildingModeler
         static void makeRigid(int floorNumber, int masterJointTag, utility::Vector3 coords);
         static void makeFlexible(int floorNumber);
 
+        // Building API
+        static void includePDeltaEffects(bool includePDeltEffects);
+
         // Input File Generation
         static void createInputFile();
     };

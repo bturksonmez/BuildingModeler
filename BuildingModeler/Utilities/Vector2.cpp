@@ -35,3 +35,23 @@ Vector2 utility::operator-(const Vector2& v1, const Vector2& v2)
 
 	return result;
 }
+
+Vector2 utility::operator/(const Vector2& v1, const double c)
+{
+	Vector2 result;
+
+	result.x = v1.x / c;
+	result.y = v1.y / c;
+
+	return result;
+}
+
+Vector2 utility::operator*(const double c, const Vector2& v1)
+{
+	Vector2 result;
+
+	result.x = v1.x * c;
+	result.y = v1.y * c;
+
+	return result;
+}
