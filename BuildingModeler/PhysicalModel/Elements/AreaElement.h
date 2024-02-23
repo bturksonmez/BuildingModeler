@@ -43,6 +43,7 @@ namespace physicalModel
 
 		void addSurroundingLineElement(int index, int surroundingLineElementTag);
 		void mesh(bool meshable, int n1, int n2);
+		void setMeshable(bool meshable);
 
 		int getElementTag() const;
 		int getIJointTag() const;
@@ -50,7 +51,6 @@ namespace physicalModel
 		int getKJointTag() const;
 		int getLJointTag() const;
 		const std::vector<int> getJointTags() const;
-		bool isMeshable() const;
 		std::pair<int, int> getMeshDivisions() const;
 		std::vector<int> getSurroundingLineElementTags();
 		const std::shared_ptr<Section> getSection() const;

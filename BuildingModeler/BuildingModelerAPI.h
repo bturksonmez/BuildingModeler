@@ -15,6 +15,8 @@ namespace buildingModeler
         static bool materialExists(int materialTag);
         static bool sectionExists(int sectionTag);
 
+        static void invalidateAreaMeshAlongLineElement(int elementTag);
+
     public:
         BuildingModelerAPI() {}
         ~BuildingModelerAPI() {}
@@ -48,8 +50,9 @@ namespace buildingModeler
             physicalModel::AreaElementFormulation areaElementFormulation);
         static void addSlab(int elementTag, std::vector<int> jointTags, int sectionTag,
             physicalModel::AreaElementFormulation areaElementFormulation);
-        static void meshAreaElement(int elementTag, bool meshable, int n1 = -1, int n2 = -1);
-
+        static void meshAreaElement(int elementTag, int n1 = -1, int n2 = -1);
+        static void disableMeshForAreaElement(int elementTag);
+        
         // Floor API
         static void addFloor(int floorNumber, double height);
         static void makeRigid(int floorNumber, int masterJointTag, utility::Vector3 coords);

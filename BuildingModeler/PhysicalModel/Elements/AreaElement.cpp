@@ -21,6 +21,11 @@ void AreaElement::mesh(bool meshable, int n1 = -1, int n2 = -1)
 	m_n2 = n2;
 }
 
+void AreaElement::setMeshable(bool meshable)
+{
+	m_meshable = meshable;
+}
+
 int AreaElement::getElementTag() const
 {
 	return m_elementTag;
@@ -49,11 +54,6 @@ int AreaElement::getLJointTag() const
 const std::vector<int> AreaElement::getJointTags() const
 {
 	return m_jointTags;
-}
-
-bool AreaElement::isMeshable() const
-{
-	return m_meshable;
 }
 
 std::pair<int, int> AreaElement::getMeshDivisions() const

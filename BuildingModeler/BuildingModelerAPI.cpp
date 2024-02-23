@@ -147,6 +147,7 @@ void BuildingModelerAPI::setSegmentRatios(int elementTag, std::vector<double> se
     }
     else {
         physicalModel::Building::getInstance().m_lineElements[elementTag]->setSegmentRelativeLengths(segmentRatios);
+        invalidateAreaMeshAlongLineElement(elementTag);
     }
 }
 
@@ -215,13 +216,77 @@ void BuildingModelerAPI::addSlab(int elementTag, std::vector<int> jointTags, int
     physicalModel::Building::getInstance().m_joints[jointTags[3]]->addConnectedSlab(elementTag);
 }
 
-void BuildingModelerAPI::meshAreaElement(int elementTag, bool meshable, int n1, int n2)
+void BuildingModelerAPI::meshAreaElement(int elementTag, int n1, int n2)
 {
     if (!areaElementExists(elementTag)) {
         // To do: exception
     }
 
-    physicalModel::Building::getInstance().m_areaElements[elementTag]->mesh(meshable, n1, n2);
+    auto areaElement = physicalModel::Building::getInstance().getAreaElement(elementTag);
+    auto surroundingElementTags = areaElement->getSurroundingLineElementTags();
+
+    if ((surroundingElementTags[0] != -1 || surroundingElementTags[2] != -1) && n1 != -1) {
+        // to do: exception
+    }
+    else if ((surroundingElementTags[1] != -1 || surroundingElementTags[3] != -1) && n2 != -1) {
+        // to do: exception
+    }
+    else if ((surroundingElementTags[0] * surroundingElementTags[2] < 0) && n1 == -1)
+    {
+        // to do: exception
+    }
+    else if ((surroundingElementTags[1] * surroundingElementTags[3] < 0) && n2 == -1)
+    {
+        // to do: exception
+    }
+
+    if (n1 == -1)
+    {
+        if (surroundingElementTags[0] + surroundingElementTags[2] < 0) {
+            // to do:exception
+        }
+
+        auto element1 = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[0]);
+        auto element2 = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[2]);
+
+        if (element1 == nullptr || element2 == nullptr) {
+            // to do: exception
+        }
+
+        if (element1->getSegmentLengths().size() != element2->getSegmentLengths().size()) {
+            // to do:exception
+        }
+    }
+
+    if (n2 == -1)
+    {
+        if (surroundingElementTags[1] + surroundingElementTags[3] < 0) {
+            // to do:exception
+        }
+
+        auto element1 = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[1]);
+        auto element2 = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[3]);
+
+        if (element1 == nullptr || element2 == nullptr) {
+            // to do: exception
+        }
+
+        if (element1->getSegmentLengths().size() != element2->getSegmentLengths().size()) {
+            // to do:exception
+        }
+    }
+
+    areaElement->mesh(true, n1, n2);
+}
+
+void BuildingModelerAPI::disableMeshForAreaElement(int elementTag)
+{
+    if (!areaElementExists(elementTag)) {
+        // To do: exception
+    }
+
+    auto areaElement = physicalModel::Building::getInstance().getAreaElement(elementTag);
+    areaElement->setMeshable(false);
 }
 
 void BuildingModelerAPI::addFloor(int floorNumber, double height)
@@ -334,6 +399,35 @@ bool BuildingModelerAPI::sectionExists(int sectionTag)
     }
 
     return false;
+}
+
+void BuildingModelerAPI::invalidateAreaMeshAlongLineElement(int elementTag)
+{
+    if (!lineElementExists(elementTag)) {
+        // To do: exception
+    }
+
+    auto lineElement = physicalModel::Building::getInstance().getLineElement(elementTag);
+    auto jointI = physicalModel::Building::getInstance().getJoint(lineElement->getIJointTag());
+    auto jointJ = physicalModel::Building::getInstance().getJoint(lineElement->getJJointTag());
+
+    for (const auto& tagI : jointI->getConnectedSlabTags()) {
+
+        for (const auto& tagJ : jointJ->getConnectedSlabTags()) {
+            if (tagI == tagJ) {
+                disableMeshForAreaElement(tagI);
+            }
+        }
+    }
+
+    for (const auto& tagI : jointI->getConnectedWallTags()) {
+
+        for (const auto& tagJ : jointJ->getConnectedWallTags()) {
+            if (tagI == tagJ) {
+                disableMeshForAreaElement(tagI);
+            }
+        }
+    }
 }
 
 void BuildingModelerAPI::createInputFile()
