@@ -103,7 +103,9 @@ add_executable (BuildingModeler
 				"OpenseesConverter.h" 
 				"OpenseesConverter.cpp" 
 				"OpenSeesWrapper/Utilities/TagGenerator.h" 
-				"OpenSeesWrapper/Utilities/TagGenerator.cpp" )
+				"OpenSeesWrapper/Utilities/TagGenerator.cpp"
+				"Utilities/LineUtilities.h"
+				"Utilities/LineUtilities.cpp")
 
 target_include_directories(BuildingModeler PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/OpenSeesWrapper

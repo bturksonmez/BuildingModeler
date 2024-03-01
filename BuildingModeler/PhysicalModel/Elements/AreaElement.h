@@ -31,6 +31,8 @@ namespace physicalModel
 		std::vector<int> m_jointTags;
 		std::vector<int> m_surroundingLineElementTags;
 		std::shared_ptr<Section> m_section;
+		std::vector<std::vector<int>> m_analyticalNodeTags;
+		std::vector<int> m_analyticalElementTags;
 		AreaElementType m_areaElementType;
 		AreaElementFormulation m_areaElementFormulation;
 
@@ -44,16 +46,21 @@ namespace physicalModel
 		void addSurroundingLineElement(int index, int surroundingLineElementTag);
 		void mesh(bool meshable, int n1, int n2);
 		void setMeshable(bool meshable);
+		void addAnalyticalNodeTags(std::vector<int> analyticalNodeTags);
+		void addAnalyticalElementTag(int analyticalElementTag);
 
 		int getElementTag() const;
 		int getIJointTag() const;
 		int getJJointTag() const;
 		int getKJointTag() const;
 		int getLJointTag() const;
-		const std::vector<int> getJointTags() const;
+		bool isMeshable() const;
+		const std::vector<int>& getJointTags() const;
 		std::pair<int, int> getMeshDivisions() const;
-		std::vector<int> getSurroundingLineElementTags();
+		const std::vector<int>& getSurroundingLineElementTags();
 		const std::shared_ptr<Section> getSection() const;
+		const std::vector<std::vector<int>>& getAnalyticalNodeTags() const;
+		const std::vector<int>& getAnalyticalElementTags() const;
 		AreaElementType getAreaElementType() const;
 		AreaElementFormulation getAreaElementFormulation() const;
 	};

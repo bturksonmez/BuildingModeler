@@ -26,6 +26,16 @@ void AreaElement::setMeshable(bool meshable)
 	m_meshable = meshable;
 }
 
+void AreaElement::addAnalyticalNodeTags(std::vector<int> analyticalNodeTags)
+{
+	m_analyticalNodeTags.push_back(analyticalNodeTags);
+}
+
+void AreaElement::addAnalyticalElementTag(int analyticalElementTag)
+{
+	m_analyticalElementTags.push_back(analyticalElementTag);
+}
+
 int AreaElement::getElementTag() const
 {
 	return m_elementTag;
@@ -51,7 +61,12 @@ int AreaElement::getLJointTag() const
 	return m_jointTags[3];
 }
 
-const std::vector<int> AreaElement::getJointTags() const
+bool AreaElement::isMeshable() const
+{
+	return m_meshable;
+}
+
+const std::vector<int>& AreaElement::getJointTags() const
 {
 	return m_jointTags;
 }
@@ -61,7 +76,7 @@ std::pair<int, int> AreaElement::getMeshDivisions() const
 	return { m_n1, m_n2 };
 }
 
-std::vector<int> AreaElement::getSurroundingLineElementTags()
+const std::vector<int>& AreaElement::getSurroundingLineElementTags()
 {
 	return m_surroundingLineElementTags;
 }
@@ -69,6 +84,16 @@ std::vector<int> AreaElement::getSurroundingLineElementTags()
 const std::shared_ptr<Section> AreaElement::getSection() const
 {
 	return m_section;
+}
+
+const std::vector<std::vector<int>>& AreaElement::getAnalyticalNodeTags() const
+{
+	return m_analyticalNodeTags;
+}
+
+const std::vector<int>& AreaElement::getAnalyticalElementTags() const
+{
+	return m_analyticalElementTags;
 }
 
 AreaElementType AreaElement::getAreaElementType() const

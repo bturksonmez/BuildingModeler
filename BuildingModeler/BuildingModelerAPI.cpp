@@ -106,6 +106,9 @@ void BuildingModelerAPI::addBeam(int elementTag, std::vector<int> jointTags, int
     if (lineElementExists(elementTag)) {
         // To do: exception
     }
+    else if (jointTags.size() != 2) {
+        // To do: exception
+    }
     else if (!jointExists(jointTags[0]) || !jointExists(jointTags[1])) {
         // To do: exception
     }
@@ -124,6 +127,9 @@ void BuildingModelerAPI::addColumn(int elementTag, std::vector<int> jointTags, i
     physicalModel::LineElementFormulation lineElementFormulation)
 {
     if (lineElementExists(elementTag)) {
+        // To do: exception
+    }
+    else if (jointTags.size() != 2) {
         // To do: exception
     }
     else if (!jointExists(jointTags[0]) || !jointExists(jointTags[1])) {
@@ -180,6 +186,9 @@ void BuildingModelerAPI::addShearWall(int elementTag, std::vector<int> jointTags
     if (areaElementExists(elementTag)) {
         // To do: exception
     }
+    else if (jointTags.size() != 4) {
+        // To do: exception
+    }
     else if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2])) {
         // To do: exception
     }
@@ -199,6 +208,9 @@ void BuildingModelerAPI::addSlab(int elementTag, std::vector<int> jointTags, int
     physicalModel::AreaElementFormulation areaElementFormulation)
 {
     if (areaElementExists(elementTag)) {
+        // To do: exception
+    }
+    else if (jointTags.size() != 4) {
         // To do: exception
     }
     else if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2])) {
@@ -227,23 +239,28 @@ void BuildingModelerAPI::meshAreaElement(int elementTag, int n1, int n2)
 
     if ((surroundingElementTags[0] != -1 || surroundingElementTags[2] != -1) && n1 != -1) {
         // to do: exception
+        return;
     }
     else if ((surroundingElementTags[1] != -1 || surroundingElementTags[3] != -1) && n2 != -1) {
         // to do: exception
+        return;
     }
     else if ((surroundingElementTags[0] * surroundingElementTags[2] < 0) && n1 == -1)
     {
         // to do: exception
+        return;
     }
     else if ((surroundingElementTags[1] * surroundingElementTags[3] < 0) && n2 == -1)
     {
         // to do: exception
+        return;
     }
 
     if (n1 == -1)
     {
-        if (surroundingElementTags[0] + surroundingElementTags[2] < 0) {
+        if (surroundingElementTags[0] < 0 || surroundingElementTags[2] < 0) {
             // to do:exception
+            return;
         }
 
         auto element1 = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[0]);
@@ -251,17 +268,25 @@ void BuildingModelerAPI::meshAreaElement(int elementTag, int n1, int n2)
 
         if (element1 == nullptr || element2 == nullptr) {
             // to do: exception
+            return;
         }
 
         if (element1->getSegmentLengths().size() != element2->getSegmentLengths().size()) {
             // to do:exception
+            return;
+        }
+
+        if (element1->getSegmentLengths().size() == 1) {
+            // to do:exception
+            return;
         }
     }
 
     if (n2 == -1)
     {
-        if (surroundingElementTags[1] + surroundingElementTags[3] < 0) {
+        if (surroundingElementTags[1] < 0 || surroundingElementTags[3] < 0) {
             // to do:exception
+            return;
         }
 
         auto element1 = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[1]);
@@ -269,11 +294,18 @@ void BuildingModelerAPI::meshAreaElement(int elementTag, int n1, int n2)
 
         if (element1 == nullptr || element2 == nullptr) {
             // to do: exception
+            return;
         }
 
         if (element1->getSegmentLengths().size() != element2->getSegmentLengths().size()) {
             // to do:exception
+            return;
         }
+        if (element1->getSegmentLengths().size() == 1) {
+            // to do:exception
+            return;
+        }
+
     }
 
     areaElement->mesh(true, n1, n2);

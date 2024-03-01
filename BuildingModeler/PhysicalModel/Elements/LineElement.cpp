@@ -52,6 +52,11 @@ void LineElement::setSectionModifiers(int segmentNo, std::shared_ptr<SectionModi
 	m_sectionModifiers[segmentNo] = sectionModifier;
 }
 
+void LineElement::addAnalyticalNodeTag(int analyticalNodeTag)
+{
+	m_analyticalNodeTags.push_back(analyticalNodeTag);
+}
+
 void LineElement::addAnalyticalElementTag(int analyticalElementTag)
 {
 	m_analyticalElementTags.push_back(analyticalElementTag);
@@ -95,6 +100,16 @@ const std::shared_ptr<Section> LineElement::getSection(int segmentNo) const
 const std::shared_ptr<SectionModifiers> LineElement::getSectionModifiers(int segmentNo) const
 {
 	return m_sectionModifiers[segmentNo];
+}
+
+std::vector<int> LineElement::getAnalyticalNodeTags() const
+{
+	return m_analyticalNodeTags;
+}
+
+const std::vector<int>& LineElement::getAnalyticalElementTags() const
+{
+	return m_analyticalElementTags;
 }
 
 LineElementType LineElement::getLineElementType() const

@@ -29,7 +29,7 @@ namespace opensees
 		std::unordered_map<int, std::unique_ptr<Mass>> m_masses;
 		std::unordered_map<int, std::unique_ptr<Constraint>> m_contraintsSP;
 		std::unordered_map<int, std::unique_ptr<Element>> m_beamColumnElements;
-		std::unordered_map<int, std::unique_ptr<Element>> m_quadrilateralElement;
+		std::unordered_map<int, std::unique_ptr<Element>> m_quadrilateralElements;
 		std::unordered_map<int, std::shared_ptr<Material>> m_materials;
 		std::unordered_map<int, std::shared_ptr<GeometricTransformation>> m_geometricTransformation;
 		std::unordered_map<int, std::shared_ptr<Section>> m_sections;

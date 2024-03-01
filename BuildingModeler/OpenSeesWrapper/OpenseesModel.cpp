@@ -5,7 +5,7 @@ using namespace opensees;
 OpenseesModel::OpenseesModel()
 {
     m_geometricTransformation[0] = std::make_shared<LinearGeometricTransformation>(0, std::vector<int>{0, 1, 0}); // for columns
-    m_geometricTransformation[1] = std::make_shared<LinearGeometricTransformation>(1, std::vector<int>{0, 1, 0}); // for beams
+    m_geometricTransformation[1] = std::make_shared<LinearGeometricTransformation>(1, std::vector<int>{0, 0, 1}); // for beams
 }
 
 OpenseesModel& OpenseesModel::getInstance()
@@ -40,8 +40,8 @@ Element* OpenseesModel::getBeamColumnElement(int elementTag) const
 
 Element* OpenseesModel::getQuadrilateralElement(int elementTag) const
 {
-    auto it = m_quadrilateralElement.find(elementTag);
-    return (it != m_quadrilateralElement.end()) ? it->second.get() : nullptr;
+    auto it = m_quadrilateralElements.find(elementTag);
+    return (it != m_quadrilateralElements.end()) ? it->second.get() : nullptr;
 }
 
 std::shared_ptr<Material> OpenseesModel::getMaterial(int materialTag) const
