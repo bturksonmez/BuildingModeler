@@ -2,6 +2,8 @@
 
 #include "../Utilities/Vector2.h"
 
+#include <optional>
+
 namespace physicalModel
 {
 	class Floor
@@ -13,11 +15,8 @@ namespace physicalModel
 		bool m_isRigid;
 		int m_masterJoint = -1;
 		std::vector<int> m_jointTags;
-		utility::Vector2 m_massCenter;
-		utility::Vector2 m_stiffnessCenter;
-
-		void updateMassCenter();
-		void updateStiffnessCenter();
+		std::optional<utility::Vector2> m_massCenter;
+		std::optional<utility::Vector2> m_stiffnessCenter;
 
 	public:
 		Floor(int floorNumber, double height = 0);
@@ -29,12 +28,16 @@ namespace physicalModel
 		void addJoint(int jointTag);
 		void makeRigid(int masterJoint);
 		void makeFlexible();
-		void updateProperties();
+		bool updateMassCenter();
+		void updateStiffnessCenter();
 
 		int getFloorNumber() const;
+		double getFloorHeight() const;
+		double getFloorMass() const;
 		bool isRigid() const;
+		int getMassCenterJointTag() const;
 		const std::vector<int>& getJoints() const;
-		const utility::Vector2& getMassCenter() const;
-		const utility::Vector2& getStiffnessCenter() const;
+		std::optional<utility::Vector2> getMassCenter() const;
+		std::optional<utility::Vector2> getStiffnessCenter() const;
 	};
 }

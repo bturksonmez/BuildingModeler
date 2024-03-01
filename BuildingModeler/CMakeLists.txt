@@ -88,7 +88,7 @@ add_executable (BuildingModeler
 				"PhysicalModel/Load/DistributedLineLoad.cpp"
 				"PhysicalModel/Floor.h"
 				"PhysicalModel/Floor.cpp" 
-				"PhysicalModel/Building.h" 
+				"PhysicalModel/Sections/Building.h" 
 				"PhysicalModel/Building.cpp"
 				"Utilities/Vector2.h"
 				"Utilities/Vector3.h"
@@ -105,7 +105,7 @@ add_executable (BuildingModeler
 				"OpenSeesWrapper/Utilities/TagGenerator.h" 
 				"OpenSeesWrapper/Utilities/TagGenerator.cpp"
 				"Utilities/LineUtilities.h"
-				"Utilities/LineUtilities.cpp")
+				"Utilities/LineUtilities.cpp" "PhysicalModel/Building.h")
 
 target_include_directories(BuildingModeler PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/OpenSeesWrapper

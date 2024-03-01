@@ -9,6 +9,8 @@ void Building::deleteJoint(int jointTag)
     if (it != m_joints.end()) {
         m_joints.erase(jointTag);
     }
+
+    // To do: delete also the elements connected to a joint, and remove that joint from its floor member
 }
 
 Building& Building::getInstance()
@@ -102,7 +104,7 @@ void Building::toAnalyticalModel()
     convertJoints();
     convertMaterials();
     convertSections();
-    convertLineElements(m_includeMassFromMembers);
+    convertLineElements();
     convertAreaElements();
 }
 
@@ -128,9 +130,9 @@ void Building::convertSections()
     }
 }
 
-void Building::convertLineElements(bool includePDeltaEffects)
+void Building::convertLineElements()
 {
-    buildingModeler::OpenseesConverter::includePDeltaEffects(includePDeltaEffects);
+    buildingModeler::OpenseesConverter::includePDeltaEffects(m_includePDeltaEffects);
 
     for (auto it = m_lineElements.begin(); it != m_lineElements.end(); it++) {
         buildingModeler::OpenseesConverter::toBeamColumnElement(it->second.get());

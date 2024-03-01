@@ -55,7 +55,7 @@ namespace buildingModeler
         
         // Floor API
         static void addFloor(int floorNumber, double height);
-        static void makeRigid(int floorNumber, int masterJointTag, utility::Vector3 coords);
+        static void makeRigid(int floorNumber, int masterJointTag);
         static void makeFlexible(int floorNumber);
 
         // Building API

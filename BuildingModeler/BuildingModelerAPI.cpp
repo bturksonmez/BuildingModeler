@@ -339,21 +339,41 @@ void BuildingModelerAPI::addFloor(int floorNumber, double height)
     }
 }
 
-void BuildingModelerAPI::makeRigid(int floorNumber, int masterJointTag, utility::Vector3 coords)
+void BuildingModelerAPI::makeRigid(int floorNumber, int masterJointTag)
 {
     if (jointExists(masterJointTag)) {
         // To do: exception
     }
-    else if (!floorExists(floorNumber)) {
+
+    if (!floorExists(floorNumber)) {
         // To do: exception
     }
-    else if (physicalModel::Building::getInstance().m_floors[floorNumber]->isRigid()) {
+
+    auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
+    if (floor->isRigid()) {
         // To do: exception
     }
-    else {
-        physicalModel::Building::getInstance().m_joints[masterJointTag] = std::make_unique<physicalModel::Joint>(masterJointTag, coords);
-        physicalModel::Building::getInstance().m_floors[floorNumber]->makeRigid(masterJointTag);
+
+    if (floor->getMassCenterJointTag() != -1) {
+        // To do: exception
     }
+    
+    auto massCenter = floor->getMassCenter();
+    if (massCenter == std::nullopt)
+    {
+        if (!floor->updateMassCenter()) {
+            //To do: exception
+        }
+        massCenter = floor->getMassCenter();
+    }
+
+    utility::Vector3 coords;
+    coords.x = massCenter.value().x;
+    coords.y = massCenter.value().y;
+    coords.z = floor->getFloorHeight();
+
+    physicalModel::Building::getInstance().m_joints[masterJointTag] = std::make_unique<physicalModel::Joint>(masterJointTag, coords);
+    physicalModel::Building::getInstance().m_floors[floorNumber]->makeRigid(masterJointTag);
 }
 
 void BuildingModelerAPI::makeFlexible(int floorNumber)
@@ -365,7 +385,10 @@ void BuildingModelerAPI::makeFlexible(int floorNumber)
     // To do: exception
     }
     else {
-        physicalModel::Building::getInstance().m_floors[floorNumber]->makeFlexible();
+        auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
+        auto masterJointTag = floor->getMassCenterJointTag();
+        floor->makeFlexible();
+        physicalModel::Building::getInstance().deleteJoint(masterJointTag);
     }
 }
 
