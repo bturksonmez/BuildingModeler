@@ -108,7 +108,6 @@ void Building::toAnalyticalModel()
     convertAreaElements();
 }
 
-
 void Building::convertJoints()
 {
     for (auto it = m_joints.begin(); it != m_joints.end(); it++) {

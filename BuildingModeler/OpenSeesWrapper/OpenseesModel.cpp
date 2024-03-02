@@ -72,6 +72,10 @@ void OpenseesModel::toTclFile()
         modelTcl <<it->second->getOpenseesCommand();
     }
 
+    for (auto it = m_geometricTransformation.begin(); it != m_geometricTransformation.end(); it++) {
+        modelTcl << it->second->getOpenseesCommand();
+    }
+
     for (auto it = m_materials.begin(); it != m_materials.end(); it++) {
         modelTcl << it->second->getOpenseesCommand();
     }
