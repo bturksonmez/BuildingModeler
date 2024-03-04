@@ -303,6 +303,16 @@ std::vector<int> OpenseesConverter::createNodesBetweenTwoJoints(int jointTagA, i
         // To do exception
         return {};
     }
+
+    auto constraintA = opensees::OpenseesModel::getInstance().getSPConstraint(jointTagA);
+    auto constraintB = opensees::OpenseesModel::getInstance().getSPConstraint(jointTagB);
+    auto assignConstraint = false;
+    std::vector<int> constraintVector;
+    if ((constraintA && constraintB) && (constraintA == constraintB)) {
+        assignConstraint = true;
+        constraintVector = dynamic_cast<opensees::SingleConstraint*>(constraintA)->getFixedDOFs();
+    }
+
     auto startCoord = opensees::OpenseesModel::getInstance().m_nodes[jointTagA]->getCoords();
     auto endCoord = opensees::OpenseesModel::getInstance().m_nodes[jointTagB]->getCoords();
     auto increment = (endCoord - startCoord) / (double)numberOfIntervals;
@@ -321,6 +331,10 @@ std::vector<int> OpenseesConverter::createNodesBetweenTwoJoints(int jointTagA, i
         currentCoord = currentCoord + increment;
         opensees::OpenseesModel::getInstance().m_nodes[nodeTag] = std::make_unique<opensees::Node>(nodeTag, currentCoord);
         nodes.push_back(nodeTag);
+
+        if (assignConstraint) {
+            opensees::OpenseesModel::getInstance().m_contraintsSP[nodeTag] = std::make_unique<opensees::SingleConstraint>(nodeTag, constraintVector);
+        }
     }
     nodes.push_back(jointTagB);
 
