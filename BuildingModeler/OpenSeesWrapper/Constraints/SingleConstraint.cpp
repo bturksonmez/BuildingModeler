@@ -7,6 +7,12 @@ SingleConstraint::SingleConstraint(int nodeTag, std::vector<int> fixedDOFs) : m_
 	m_constraintType = ConstraintType::SINGLE;
 }
 
+bool SingleConstraint::isEqual(const Constraint& other) const
+{
+	return m_fixedDOFs == static_cast<const SingleConstraint&>(other).getFixedDOFs();
+}
+
+
 int SingleConstraint::getNodeTag() const
 {
 	return m_nodeTag;

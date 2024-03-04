@@ -11,6 +11,8 @@ namespace opensees
 		int m_slaveNodeTag;
 		std::vector<int> m_constrainedDOFs;
 
+		virtual bool isEqual(const Constraint& other) const override;
+
 	public:
 		EqualDOFConstraint(int masterNodeTag, int slaveNodeTag, std::vector<int> constrainedDOFs);
 		EqualDOFConstraint() = delete;

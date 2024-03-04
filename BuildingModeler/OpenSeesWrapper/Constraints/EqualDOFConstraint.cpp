@@ -8,6 +8,11 @@ EqualDOFConstraint::EqualDOFConstraint(int masterNodeTag, int slaveNodeTag, std:
 	m_constraintType = ConstraintType::EQUALDOF;
 }
 
+bool EqualDOFConstraint::isEqual(const Constraint& other) const
+{
+	return m_constrainedDOFs == static_cast<const EqualDOFConstraint&>(other).getConstrainedDOFs();
+}
+
 int EqualDOFConstraint::getMasterNodeTag() const
 {
 	return m_masterNodeTag;

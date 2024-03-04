@@ -20,10 +20,13 @@ namespace opensees
 
 		Constraint() {}
 
+		virtual bool isEqual(const Constraint& other) const = 0;
+
 	public:
 		~Constraint() {}
 
 		ConstraintType getConstraintType() const;
+		bool operator==(const Constraint& other) const;
 	};
 }
 

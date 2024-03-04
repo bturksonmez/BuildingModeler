@@ -11,6 +11,8 @@ namespace opensees
 		std::vector<int> m_slaveNodeTags;
 		int m_planeDirection;
 
+		virtual bool isEqual(const Constraint& other) const override;
+
 	public:
 		DiaphragmConstraint(int masterNodeTag, std::vector<int> slaveNodeTags, int planeDirection);
 		DiaphragmConstraint() = delete;

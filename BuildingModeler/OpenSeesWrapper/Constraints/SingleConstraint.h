@@ -10,6 +10,8 @@ namespace opensees
 		int m_nodeTag;
 		std::vector<int> m_fixedDOFs;
 
+		virtual bool isEqual(const Constraint& other) const override;
+
 	public:
 		SingleConstraint(int nodeTag, std::vector<int> fixedDOFs);
 		SingleConstraint() = delete;

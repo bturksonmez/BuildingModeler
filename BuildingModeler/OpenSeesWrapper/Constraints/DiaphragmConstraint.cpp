@@ -8,6 +8,11 @@ DiaphragmConstraint::DiaphragmConstraint(int masterNodeTag, std::vector<int> sla
 	m_constraintType = ConstraintType::DIAPHRAGM;
 }
 
+bool DiaphragmConstraint::isEqual(const Constraint& other) const
+{
+	return m_planeDirection == static_cast<const DiaphragmConstraint&>(other).getPlaneDirection();
+}
+
 int DiaphragmConstraint::getMasterNodeTag() const
 {
 	return m_masterNodeTag;
