@@ -26,5 +26,6 @@ namespace buildingModeler
         static void includePDeltaEffects(bool includePDeltaEffects);
         static void toBeamColumnElement(physicalModel::LineElement* element);
         static void toQuadrilateralElement(physicalModel::AreaElement* element);
+        static void toRigidDiaphragm(physicalModel::Floor* floor);
     };
 }

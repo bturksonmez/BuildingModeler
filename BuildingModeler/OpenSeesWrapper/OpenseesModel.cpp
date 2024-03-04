@@ -32,6 +32,12 @@ Constraint* OpenseesModel::getSPConstraint(int nodeTag) const
     return (it != m_contraintsSP.end()) ? it->second.get() : nullptr;
 }
 
+Constraint* OpenseesModel::getDiaphragmConstraint(int nodeTag) const
+{
+    auto it = m_contraintsDiaphragm.find(nodeTag);
+    return (it != m_contraintsDiaphragm.end()) ? it->second.get() : nullptr;
+}
+
 Element* OpenseesModel::getBeamColumnElement(int elementTag) const
 {
     auto it = m_beamColumnElements.find(elementTag);
@@ -70,6 +76,10 @@ void OpenseesModel::toTclFile()
 
     for (auto it = m_contraintsSP.begin(); it != m_contraintsSP.end(); it++) {
         modelTcl <<it->second->getOpenseesCommand();
+    }
+
+    for (auto it = m_contraintsDiaphragm.begin(); it != m_contraintsDiaphragm.end(); it++) {
+        modelTcl << it->second->getOpenseesCommand();
     }
 
     for (auto it = m_geometricTransformation.begin(); it != m_geometricTransformation.end(); it++) {

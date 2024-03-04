@@ -225,6 +225,17 @@ void OpenseesConverter::toQuadrilateralElement(physicalModel::AreaElement* eleme
     createMeshForQuadElement(element, nodes);
 }
 
+void OpenseesConverter::toRigidDiaphragm(physicalModel::Floor* floor)
+{
+    auto floorNumber = floor->getFloorNumber();
+
+    if (floor->isRigid()) {
+        auto masterNodeTag = floor->getMassCenterJointTag();
+        auto slaveNodeTags = floor->getJoints();
+        opensees::OpenseesModel::getInstance().m_contraintsDiaphragm[floorNumber] = std::make_unique<opensees::DiaphragmConstraint>(masterNodeTag, slaveNodeTags, 3);
+    }
+}
+
 bool OpenseesConverter::nodeExists(int nodeTag)
 {
     if (opensees::OpenseesModel::getInstance().m_nodes.find(nodeTag) != opensees::OpenseesModel::getInstance().m_nodes.end()) {

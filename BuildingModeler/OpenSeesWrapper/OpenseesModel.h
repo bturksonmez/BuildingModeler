@@ -28,6 +28,7 @@ namespace opensees
 		std::unordered_map<int, std::unique_ptr<Node>> m_nodes;
 		std::unordered_map<int, std::unique_ptr<Mass>> m_masses;
 		std::unordered_map<int, std::unique_ptr<Constraint>> m_contraintsSP;
+		std::unordered_map<int, std::unique_ptr<Constraint>> m_contraintsDiaphragm;
 		std::unordered_map<int, std::unique_ptr<Element>> m_beamColumnElements;
 		std::unordered_map<int, std::unique_ptr<Element>> m_quadrilateralElements;
 		std::unordered_map<int, std::shared_ptr<Material>> m_materials;
@@ -47,6 +48,7 @@ namespace opensees
 		Node* getNode(int nodeTag) const;
 		Mass* getMass(int nodeTag) const;
 		Constraint* getSPConstraint(int nodeTag) const;
+		Constraint* getDiaphragmConstraint(int nodeTag) const;
 		Element* getBeamColumnElement(int elementTag) const;
 		Element* getQuadrilateralElement(int elementTag) const;
 		std::shared_ptr<Material> getMaterial(int materialTag) const;

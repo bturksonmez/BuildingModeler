@@ -106,6 +106,7 @@ void Building::toAnalyticalModel()
     convertSections();
     convertLineElements();
     convertAreaElements();
+    applyRigidDiaphragms();
 }
 
 void Building::convertJoints()
@@ -142,5 +143,12 @@ void Building::convertAreaElements()
 {
     for (auto it = m_areaElements.begin(); it != m_areaElements.end(); it++) {
         buildingModeler::OpenseesConverter::toQuadrilateralElement(it->second.get());
+    }
+}
+
+void Building::applyRigidDiaphragms()
+{
+    for (auto it = m_floors.begin(); it != m_floors.end(); it++) {
+        buildingModeler::OpenseesConverter::toRigidDiaphragm(it->second.get());
     }
 }
