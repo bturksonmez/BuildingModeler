@@ -3,7 +3,7 @@
 using namespace physicalModel;
 
 AreaElement::AreaElement(int elementTag, std::vector<int> jointTags, std::shared_ptr<Section> section, AreaElementFormulation areaElementFormulation)
-	: m_elementTag(elementTag), m_jointTags(jointTags), m_section(section)
+	: m_elementTag(elementTag), m_jointTags(jointTags), m_section(section), m_areaElementFormulation(areaElementFormulation)
 {
 	m_meshable = false;
 	m_surroundingLineElementTags.resize(4, -1);

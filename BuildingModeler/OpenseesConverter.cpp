@@ -356,15 +356,15 @@ std::vector<std::vector<int>> OpenseesConverter::createNodesForMesh(std::vector<
 {
     std::vector<std::vector<int>> nodes2D;
     nodes2D.resize(nodesIL.size());
-    for (auto nodes : nodes2D) {
+    for (auto& nodes : nodes2D) {
         nodes.resize(nodesIJ.size());
     }
 
     nodes2D[0] = nodesIJ;
-    for (int i = 1; nodes2D.size() - 1; ++i) {
+    for (int i = 1; i < nodes2D.size() - 1; ++i) {
 
         nodes2D[i][0] = nodesIL[i];
-        for (int j = 1; nodes2D[i].size() - 1; j++) {
+        for (int j = 1; j < nodes2D[i].size() - 1; j++) {
 
             auto startCoordP = opensees::OpenseesModel::getInstance().m_nodes[nodesIJ[j]]->getCoords();
             auto endCoordP = opensees::OpenseesModel::getInstance().m_nodes[nodesLK[i]]->getCoords();
@@ -398,7 +398,7 @@ void OpenseesConverter::createMeshForQuadElement(physicalModel::AreaElement* ele
 
     for (int i = 0; i < nodes.size() - 1; ++i) {
 
-        for (int j = 0; i < nodes[i].size() - 1; ++j) {
+        for (int j = 0; j < nodes[i].size() - 1; ++j) {
 
             std::vector<int> nodeTags;
             nodeTags.push_back(nodes[i][j]);

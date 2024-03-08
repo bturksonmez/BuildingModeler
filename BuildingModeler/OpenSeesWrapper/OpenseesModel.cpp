@@ -98,6 +98,10 @@ void OpenseesModel::toTclFile()
         modelTcl << it->second->getOpenseesCommand();
     }
 
+    for (auto it = m_quadrilateralElements.begin(); it != m_quadrilateralElements.end(); it++) {
+        modelTcl << it->second->getOpenseesCommand();
+    }
+
     std::ofstream outFile("model.tcl");
     if (outFile.is_open()) {
         outFile << modelTcl.str();

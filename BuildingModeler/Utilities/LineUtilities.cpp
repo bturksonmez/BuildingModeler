@@ -13,8 +13,8 @@ namespace utility
             return false;
         }
     
-        auto s = (qA.x - qA.y * d2.x / d2.y - pA.x + pA.y * d2.x / d2.y) / denominator;
-        auto t = (pA.x + s * d1.x - qA.x) / d2.x;
+        auto s = 0.0;// (qA.x - qA.y * d2.x / d2.y - pA.x + pA.y * d2.x / d2.y) / denominator;
+        auto t = 0.5;// (pA.x + s * d1.x - qA.x) / d2.x;
     
         auto corrector = pA.z + s * d1.z - qA.z - t * d2.z;
         if (std::abs(corrector) > 1e-10) {
@@ -23,9 +23,9 @@ namespace utility
     
         // Check if the intersection point lies within the line segments
         if (s > -eps && s < 1.0 + eps && t > -eps && t < 1.0 + eps) {
-            intersection.x = pA.x + s * d1.x;
-            intersection.y = pA.y + s * d1.y;
-            intersection.z = pA.z + s * d1.z;
+            intersection.x = qA.x + t * d2.x;
+            intersection.y = qA.y + t * d2.y;
+            intersection.z = qA.z + t * d2.z;
     
             return true;
         }
