@@ -1,119 +1,19 @@
-﻿# CMakeList.txt : CMake project for BuildingModeler, include source and define
-# project specific logic here.
-#
-cmake_minimum_required (VERSION 3.10)
-
-project ("BuildingModeler")
-
-# Add source to this project's executable.
-add_executable (BuildingModeler 
-				"Main.cpp"  
-				"OpenSeesWrapper/Elements/Element.cpp" 
-				"OpenSeesWrapper/Elements/BeamColumnElement.h" 
-				"OpenSeesWrapper/Elements/BeamColumnElement.cpp" 
-				"OpenSeesWrapper/Sections/Patch.h" 
-				"OpenSeesWrapper/Sections/Patch.cpp" 
-				"OpenSeesWrapper/Sections/RectangularPatch.h" 
-				"OpenSeesWrapper/Sections/RectangularPatch.cpp" 
-				"OpenSeesWrapper/Node.h" 
-				"OpenSeesWrapper/Node.cpp" 
-				"OpenSeesWrapper/OpenseesObject.h"  
-				"OpenSeesWrapper/Materials/Material.h" 
-				"OpenSeesWrapper/Materials/Material.cpp" 
-				"OpenSeesWrapper/Mass.h" 
-				"OpenSeesWrapper/Mass.cpp" 
-				"OpenSeesWrapper/Constraints/Constraint.h" 
-				"OpenSeesWrapper/Constraints/Constraint.cpp" 
-				"OpenSeesWrapper/Constraints/SingleConstraint.h" 
-				"OpenSeesWrapper/Constraints/SingleConstraint.cpp" 
-				"OpenSeesWrapper/Constraints/DiaphragmConstraint.h" 
-				"OpenSeesWrapper/Constraints/DiaphragmConstraint.cpp" 
-				"OpenSeesWrapper/GeometricTransformations/GeometricTransformation.h" 
-				"OpenSeesWrapper/GeometricTransformations/GeometricTransformation.cpp" 
-				"OpenSeesWrapper/GeometricTransformations/LinearGeometricTransformation.h" 
-				"OpenSeesWrapper/GeometricTransformations/LinearGeometricTransformation.cpp" 
-				"OpenSeesWrapper/Elements/ElasticBeamColumnElement.h" 
-				"OpenSeesWrapper/Elements/ElasticBeamColumnElement.cpp" 
-				"OpenSeesWrapper/Sections/Section.h" 
-				"OpenSeesWrapper/Sections/Section.cpp" 
-				"OpenSeesWrapper/Sections/ElasticSection.h" 
-				"OpenSeesWrapper/Sections/ElasticSection.cpp" 
-				"OpenSeesWrapper/Materials/ElasticMaterial.h" 
-				"OpenSeesWrapper/Materials/ElasticMaterial.cpp" 
-				"OpenSeesWrapper/Constraints/EqualDOFConstraint.h" 
-				"OpenSeesWrapper/Constraints/EqualDOFConstraint.cpp" 
-				"OpenSeesWrapper/Elements/QuadrilateralElement.h" 
-				"OpenSeesWrapper/Elements/QuadrilateralElement.cpp" 
-				"OpenSeesWrapper/Elements/ShellElement.h" 
-				"OpenSeesWrapper/Elements/ShellElement.cpp" 
-				"OpenSeesWrapper/Sections/ElasticMembranePlateSection.h" 
-				"OpenSeesWrapper/Sections/ElasticMembranePlateSection.cpp" 
-				"OpenSeesWrapper/GeometricTransformations/PDeltaGeometricTransformation.h" 
-				"OpenSeesWrapper/GeometricTransformations/PDeltaGeometricTransformation.cpp" 
-				"OpenSeesWrapper/Load/Load.h" 
-				"OpenSeesWrapper/Load/Load.cpp" 
-				"OpenSeesWrapper/Load/NodalLoad.h" 
-				"OpenSeesWrapper/Load/NodalLoad.cpp"
-				"OpenSeesWrapper/Load/ElementLoad.h" 
-				"OpenSeesWrapper/Load/ElementLoad.cpp" 
-				"OpenSeesWrapper/Load/LoadPattern.h" 
-				"OpenSeesWrapper/Load/LoadPattern.cpp" 
-				"PhysicalModel/Joint.h" 
-				"PhysicalModel/Joint.cpp" 
-				"PhysicalModel/Elements/LineElement.h" 
-				"PhysicalModel/Elements/LineElement.cpp" 
-				"PhysicalModel/Elements/AreaElement.h" 
-				"PhysicalModel/Elements/AreaElement.cpp"
-				"PhysicalModel/Materials/Material.h"
-				"PhysicalModel/Materials/Material.cpp"
-				"PhysicalModel/Materials/ElasticMaterial.h"
-				"PhysicalModel/Materials/ElasticMaterial.cpp"
-				"PhysicalModel/Sections/Section.h"
-				"PhysicalModel/Sections/Section.cpp"
-				"PhysicalModel/Sections/ElasticSection1D.h"
-				"PhysicalModel/Sections/ElasticSection1D.cpp"
-				"PhysicalModel/Sections/ElasticSection2D.h"
-				"PhysicalModel/Sections/ElasticSection2D.cpp" 
-				"PhysicalModel/Elements/BeamElement.h" 
-				"PhysicalModel/Elements/BeamElement.cpp" 
-				"PhysicalModel/Elements/ColumnElement.h" 
-				"PhysicalModel/Elements/ColumnElement.cpp"
-				"PhysicalModel/Elements/ShearWallElement.h"
-				"PhysicalModel/Elements/ShearWallElement.cpp"
-				"PhysicalModel/Load/Load.h"
-				"PhysicalModel/Load/Load.cpp"
-				"PhysicalModel/Load/PointLoad.h"
-				"PhysicalModel/Load/PointLoad.cpp"
-				"PhysicalModel/Load/DistributedLineLoad.h"
-				"PhysicalModel/Load/DistributedLineLoad.cpp"
-				"PhysicalModel/Floor.h"
-				"PhysicalModel/Floor.cpp" 
-				"PhysicalModel/Sections/Building.h" 
-				"PhysicalModel/Building.cpp"
-				"Utilities/Vector2.h"
-				"Utilities/Vector3.h"
-				"Utilities/Vector2.cpp"
-				"Utilities/Vector3.cpp" 
-				"BuildingModelerAPI.h"  
-				"BuildingModelerAPI.cpp"
-				"PhysicalModel/Elements/SlabElement.h"
-				"PhysicalModel/Elements/SlabElement.cpp" 
-				"OpenSeesWrapper/OpenseesModel.h" 
-				"OpenSeesWrapper/OpenseesModel.cpp" 
-				"OpenseesConverter.h" 
-				"OpenseesConverter.cpp" 
-				"OpenSeesWrapper/Utilities/TagGenerator.h" 
-				"OpenSeesWrapper/Utilities/TagGenerator.cpp"
-				"Utilities/LineUtilities.h"
-				"Utilities/LineUtilities.cpp"
-				"PhysicalModel/Building.h")
-
-target_include_directories(BuildingModeler PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/OpenSeesWrapper
-    ${CMAKE_CURRENT_SOURCE_DIR}/PhysicalModel
-)
+﻿cmake_minimum_required(VERSION 3.10)
+project("BuildingModeler" VERSION 1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# TODO: Add tests and install targets if needed.
+# Add subdirectories
+add_subdirectory(OpenSeesWrapper)
+add_subdirectory(PhysicalModel)
+add_subdirectory(Utilities)
+
+# Add source to this project's executable.
+add_executable(BuildingModeler Main.cpp)
+
+# Link libraries (these are the names of the targets we will define in subdirectories)
+target_link_libraries(BuildingModeler PRIVATE OpenSeesWrapper PhysicalModel Utilities)
+
+# Global include directory for the project
+target_include_directories(BuildingModeler PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
