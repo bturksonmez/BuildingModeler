@@ -4,6 +4,7 @@
 .vs/
 .vscode/
 out/
+external/
 
 # Compiled Object files
 *.slo
