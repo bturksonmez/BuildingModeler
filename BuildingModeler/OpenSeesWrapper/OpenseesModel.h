@@ -11,6 +11,7 @@
 #include "Elements/ShellElement.h"
 #include "Constraints/SingleConstraint.h"
 #include "Constraints/DiaphragmConstraint.h"
+#include "../PhysicalModel/Building.h"
 
 #include <sstream>
 #include <fstream>
@@ -25,15 +26,15 @@ namespace opensees
 	class OpenseesModel
 	{
 	private:
-		std::unordered_map<int, std::unique_ptr<Node>> m_nodes;
-		std::unordered_map<int, std::unique_ptr<Mass>> m_masses;
-		std::unordered_map<int, std::unique_ptr<Constraint>> m_contraintsSP;
-		std::unordered_map<int, std::unique_ptr<Constraint>> m_contraintsDiaphragm;
+		std::map<int, std::unique_ptr<Node>> m_nodes;
+		std::map<int, std::unique_ptr<Mass>> m_masses;
+		std::map<int, std::unique_ptr<Constraint>> m_contraintsSP;
+		std::map<int, std::unique_ptr<Constraint>> m_contraintsDiaphragm;
 		std::unordered_map<int, std::unique_ptr<Element>> m_beamColumnElements;
 		std::unordered_map<int, std::unique_ptr<Element>> m_quadrilateralElements;
-		std::unordered_map<int, std::shared_ptr<Material>> m_materials;
-		std::unordered_map<int, std::shared_ptr<GeometricTransformation>> m_geometricTransformation;
-		std::unordered_map<int, std::shared_ptr<Section>> m_sections;
+		std::map<int, std::shared_ptr<Material>> m_materials;
+		std::map<int, std::shared_ptr<GeometricTransformation>> m_geometricTransformation;
+		std::map<int, std::shared_ptr<Section>> m_sections;
 
 		OpenseesModel();
 

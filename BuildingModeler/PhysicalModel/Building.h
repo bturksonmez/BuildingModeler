@@ -10,13 +10,18 @@
 #include "Elements/SlabElement.h"
 #include "Floor.h"
 
-#include <unordered_map>
+#include <map>
 #include <utility>
 #include <memory>
 
 namespace buildingModeler
 {
     class BuildingModelerAPI;
+}
+
+namespace opensees
+{
+    class OpenseesModel;
 }
 
 namespace physicalModel
@@ -26,12 +31,12 @@ namespace physicalModel
     private:
         bool m_includeMassFromMembers = true;
         bool m_includePDeltaEffects = false;
-        std::unordered_map<int, std::unique_ptr<Joint>> m_joints;
-        std::unordered_map<int, std::unique_ptr<LineElement>> m_lineElements;
-        std::unordered_map<int, std::unique_ptr<AreaElement>> m_areaElements;
-        std::unordered_map<int, std::unique_ptr<Floor>> m_floors;
-        std::unordered_map<int, std::shared_ptr<Material>> m_materials;
-        std::unordered_map<int, std::shared_ptr<Section>> m_sections;
+        std::map<int, std::unique_ptr<Joint>> m_joints;
+        std::map<int, std::unique_ptr<LineElement>> m_lineElements;
+        std::map<int, std::unique_ptr<AreaElement>> m_areaElements;
+        std::map<int, std::unique_ptr<Floor>> m_floors;
+        std::map<int, std::shared_ptr<Material>> m_materials;
+        std::map<int, std::shared_ptr<Section>> m_sections;
 
         Building() {}
 
@@ -63,5 +68,6 @@ namespace physicalModel
         void toAnalyticalModel();
 
         friend class buildingModeler::BuildingModelerAPI;
+        friend class opensees::OpenseesModel;
     };
 }

@@ -94,12 +94,22 @@ void OpenseesModel::toTclFile()
         modelTcl << it->second->getOpenseesCommand();
     }
 
-    for (auto it = m_beamColumnElements.begin(); it != m_beamColumnElements.end(); it++) {
-        modelTcl << it->second->getOpenseesCommand();
+    for (auto it = physicalModel::Building::getInstance().m_lineElements.begin(); it != physicalModel::Building::getInstance().m_lineElements.end(); it++) {
+        
+        for (auto elementTag : it->second->getAnalyticalElementTags()) {
+
+            auto element = m_beamColumnElements[elementTag].get();
+            modelTcl << element->getOpenseesCommand();
+        }
     }
 
-    for (auto it = m_quadrilateralElements.begin(); it != m_quadrilateralElements.end(); it++) {
-        modelTcl << it->second->getOpenseesCommand();
+    for (auto it = physicalModel::Building::getInstance().m_areaElements.begin(); it != physicalModel::Building::getInstance().m_areaElements.end(); it++) {
+
+        for (auto elementTag : it->second->getAnalyticalElementTags()) {
+
+            auto element = m_quadrilateralElements[elementTag].get();
+            modelTcl << element->getOpenseesCommand();
+        }
     }
 
     std::ofstream outFile("model.tcl");
