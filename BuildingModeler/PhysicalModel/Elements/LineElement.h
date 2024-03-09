@@ -53,7 +53,7 @@ namespace physicalModel
 		LineElement(int elementTag, std::vector<int> jointTags, std::shared_ptr<Section> section, LineElementFormulation lineElementFormulation);
 
 	private:
-		double calculateLength(int jointI, int jointJ);
+		double calculateLength();
 
 	public:
 		LineElement(LineElement&& other) = default;
@@ -69,7 +69,8 @@ namespace physicalModel
 		int getElementTag() const;
 		int getIJointTag() const;
 		int getJJointTag() const;
-		double getElementLength() const;
+		double getMass() const;
+		double getLength() const;
 		const std::vector<double>& getSegmentLengths() const;
 		const std::vector<double>& getSegmentRelativeLengths() const;
 		const std::shared_ptr<Section> getSection(int segmentNo) const;

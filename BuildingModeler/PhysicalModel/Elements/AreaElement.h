@@ -29,6 +29,8 @@ namespace physicalModel
 		int m_n1; // number of division along IJ path for meshing
 		int m_n2; // number of division along JK path for meshing
 		std::vector<int> m_jointTags;
+		double m_area;
+		double m_thickness;
 		std::vector<int> m_surroundingLineElementTags;
 		std::shared_ptr<Section> m_section;
 		std::vector<std::vector<int>> m_analyticalNodeTags;
@@ -37,6 +39,10 @@ namespace physicalModel
 		AreaElementFormulation m_areaElementFormulation;
 
 		AreaElement(int elementTag, std::vector<int> jointTags, std::shared_ptr<Section> section, AreaElementFormulation areaElementFormulation);
+
+	private:
+		double calculateArea();
+		
 	public:
 		AreaElement() = delete;
 		AreaElement(AreaElement&& other) = default;
@@ -54,6 +60,9 @@ namespace physicalModel
 		int getJJointTag() const;
 		int getKJointTag() const;
 		int getLJointTag() const;
+		double getMass() const;
+		double getArea() const;
+		double getThickness() const;
 		bool isMeshable() const;
 		const std::vector<int>& getJointTags() const;
 		std::pair<int, int> getMeshDivisions() const;

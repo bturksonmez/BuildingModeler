@@ -1,5 +1,5 @@
 #include "OpenseesConverter.h"
-#include "Utilities/LineUtilities.h"
+#include "Utilities/VectorUtilities.h"
 #include <algorithm> 
 
 using namespace buildingModeler;
@@ -285,7 +285,7 @@ std::vector<int> OpenseesConverter::createNodesForLineElement(const physicalMode
 {
     auto startCoord = opensees::OpenseesModel::getInstance().m_nodes[element->getIJointTag()]->getCoords();
     auto endCoord = opensees::OpenseesModel::getInstance().m_nodes[element->getJJointTag()]->getCoords();
-    auto direction = (endCoord - startCoord) / element->getElementLength();
+    auto direction = (endCoord - startCoord) / element->getLength();
 
     std::vector<int> nodes;
     nodes.push_back(element->getIJointTag());
@@ -372,7 +372,7 @@ std::vector<std::vector<int>> OpenseesConverter::createNodesForMesh(std::vector<
             auto endCoordQ = opensees::OpenseesModel::getInstance().m_nodes[nodesJK[i]]->getCoords();
 
             utility::Vector3 nodeCoord;
-            auto intersects = utility::LineUtilities::intersectsVector3(startCoordP, endCoordP, startCoordQ, endCoordQ, nodeCoord);
+            auto intersects = utility::VectorUtilities::intersectsVector3(startCoordP, endCoordP, startCoordQ, endCoordQ, nodeCoord);
             if (!intersects) {
                 // To do: exception
             }

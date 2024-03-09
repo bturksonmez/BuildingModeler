@@ -101,12 +101,46 @@ void Building::updateSurroundingLineElements()
 
 void Building::toAnalyticalModel()
 {
+    if (m_includeMassFromMembers) {
+        addMemberMasses();
+    }
     convertJoints();
     convertMaterials();
     convertSections();
     convertLineElements();
     convertAreaElements();
     applyRigidDiaphragms();
+}
+
+void Building::addMemberMasses()
+{
+    for (auto it = m_lineElements.begin(); it != m_lineElements.end(); it++) {
+        
+        auto jointI = it->second->getIJointTag();
+        auto jointJ = it->second->getJJointTag();
+        auto mass = it->second->getMass() / 2.0;
+
+        utility::Vector3 translationalMass(mass, mass, 0.0);
+
+        m_joints[jointI]->addTranslationalMass(translationalMass);
+        m_joints[jointJ]->addTranslationalMass(translationalMass);
+    }
+
+    for (auto it = m_areaElements.begin(); it != m_areaElements.end(); it++) {
+
+        auto jointI = it->second->getIJointTag();
+        auto jointJ = it->second->getJJointTag();
+        auto jointK = it->second->getIJointTag();
+        auto jointL = it->second->getJJointTag();
+        auto mass = it->second->getMass() / 4.0;
+
+        utility::Vector3 translationalMass(mass, mass, 0.0);
+
+        m_joints[jointI]->addTranslationalMass(translationalMass);
+        m_joints[jointJ]->addTranslationalMass(translationalMass);
+        m_joints[jointK]->addTranslationalMass(translationalMass);
+        m_joints[jointL]->addTranslationalMass(translationalMass);
+    }
 }
 
 void Building::convertJoints()

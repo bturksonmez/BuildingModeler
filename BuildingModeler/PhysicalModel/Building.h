@@ -40,6 +40,7 @@ namespace physicalModel
 
         Building() {}
 
+        void addMemberMasses();
         void convertJoints();
         void convertMaterials();
         void convertSections();

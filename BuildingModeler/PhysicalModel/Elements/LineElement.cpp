@@ -6,17 +6,17 @@ using namespace physicalModel;
 LineElement::LineElement(int elementTag, std::vector<int> jointTags, std::shared_ptr<Section> section, LineElementFormulation lineElementFormulation)
 	: m_elementTag(elementTag), m_jointTags(jointTags), m_lineElementFormulation(lineElementFormulation)
 {
-	m_length = calculateLength(jointTags[0], jointTags[1]);
+	m_length = calculateLength();
 	m_segmentLengths.push_back(m_length);
 	m_segmentRelativeLengths.push_back(1.0);
 	m_sections.push_back(section);
 	m_sectionModifiers.push_back(std::make_shared<SectionModifiers>());
 }
 
-double LineElement::calculateLength(int jointI, int jointJ)
+double LineElement::calculateLength()
 {
-	utility::Vector3 pointI = physicalModel::Building::getInstance().getJoint(jointI)->getCoords();
-	utility::Vector3 pointJ = physicalModel::Building::getInstance().getJoint(jointJ)->getCoords();
+	utility::Vector3 pointI = physicalModel::Building::getInstance().getJoint(m_jointTags[0])->getCoords();
+	utility::Vector3 pointJ = physicalModel::Building::getInstance().getJoint(m_jointTags[1])->getCoords();
 	utility::Vector3 dirVec = pointJ - pointI;
 
 	return dirVec.norm2();
@@ -77,7 +77,20 @@ int LineElement::getJJointTag() const
 	return m_jointTags[1];
 }
 
-double LineElement::getElementLength() const
+double LineElement::getMass() const
+{
+	auto elementMass = 0.0;
+
+	for (int i = 0; i < m_segmentLengths.size(); ++i) {
+
+		auto segmentMass = m_sections[i]->getMaterial()->getRho() * m_segmentLengths[i] * m_sections[i]->getA();
+		elementMass += segmentMass;
+	}
+
+	return elementMass;
+}
+
+double LineElement::getLength() const
 {
 	return m_length;
 }

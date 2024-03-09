@@ -1,4 +1,6 @@
 #include "AreaElement.h"
+#include "../Building.h"
+#include "../../Utilities/VectorUtilities.h"
 
 using namespace physicalModel;
 
@@ -7,6 +9,31 @@ AreaElement::AreaElement(int elementTag, std::vector<int> jointTags, std::shared
 {
 	m_meshable = false;
 	m_surroundingLineElementTags.resize(4, -1);
+	m_area = calculateArea();
+
+	if (auto tempSection = std::dynamic_pointer_cast<ElasticSection2D>(section)) {
+		m_thickness = tempSection->getThickness();
+	}
+}
+
+double AreaElement::calculateArea()
+{
+	utility::Vector3 pointI = physicalModel::Building::getInstance().getJoint(m_jointTags[0])->getCoords();
+	utility::Vector3 pointJ = physicalModel::Building::getInstance().getJoint(m_jointTags[1])->getCoords();
+	utility::Vector3 pointK = physicalModel::Building::getInstance().getJoint(m_jointTags[2])->getCoords();
+	utility::Vector3 pointL = physicalModel::Building::getInstance().getJoint(m_jointTags[3])->getCoords();
+
+	auto angleA = utility::VectorUtilities::getAngleBtw(pointJ - pointI, pointL - pointI);
+	auto angleC = utility::VectorUtilities::getAngleBtw(pointJ - pointK, pointL - pointK);
+	
+	auto theta = angleA + angleC;
+	auto a = (pointJ - pointI).norm2();
+	auto b = (pointK - pointJ).norm2();
+	auto c = (pointL - pointK).norm2();
+	auto d = (pointI - pointL).norm2();
+	auto s = (a + b + c + d) / 2.0;
+
+	return std::sqrt((s - a) * (s - b) * (s - c) * (s - d) - a * b * c * d * std::pow(theta / 2.0, 2));
 }
 
 void AreaElement::addSurroundingLineElement(int index, int surroundingLineElementTag)
@@ -59,6 +86,23 @@ int AreaElement::getKJointTag() const
 int AreaElement::getLJointTag() const
 {
 	return m_jointTags[3];
+}
+
+double AreaElement::getMass() const
+{
+	auto elementMass = m_section->getMaterial()->getRho() * m_thickness * m_area;
+
+	return elementMass;
+}
+
+double AreaElement::getArea() const
+{
+	return m_area;
+}
+
+double AreaElement::getThickness() const
+{
+	return m_thickness;
 }
 
 bool AreaElement::isMeshable() const
