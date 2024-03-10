@@ -352,8 +352,11 @@ std::vector<int> OpenseesConverter::createNodesBetweenTwoJoints(int jointTagA, i
     return nodes;
 }
 
-std::vector<std::vector<int>> OpenseesConverter::createNodesForMesh(std::vector<int> nodesIJ, std::vector<int> nodesLK, std::vector<int> nodesIL, std::vector<int> nodesJK)
+std::vector<std::vector<int>> OpenseesConverter::createNodesForMesh(const std::vector<int>& nodesIJ, const std::vector<int>& nodesLK, const std::vector<int>& nodesIL, const std::vector<int>& nodesJK)
 {
+    auto [u, v, w] = getLocalCoordinateSystem(nodesIJ, nodesIL);
+    auto zeroCoord = opensees::OpenseesModel::getInstance().m_nodes[nodesIJ.front()]->getCoords();
+
     std::vector<std::vector<int>> nodes2D;
     nodes2D.resize(nodesIL.size());
     for (auto& nodes : nodes2D) {
@@ -367,15 +370,22 @@ std::vector<std::vector<int>> OpenseesConverter::createNodesForMesh(std::vector<
         for (int j = 1; j < nodes2D[i].size() - 1; j++) {
 
             auto startCoordP = opensees::OpenseesModel::getInstance().m_nodes[nodesIJ[j]]->getCoords();
+            auto startPlocal = utility::VectorUtilities::projectVectorOn2DLocalBasis((startCoordP - zeroCoord), u, v);
             auto endCoordP = opensees::OpenseesModel::getInstance().m_nodes[nodesLK[i]]->getCoords();
+            auto endPlocal = utility::VectorUtilities::projectVectorOn2DLocalBasis((endCoordP - zeroCoord), u, v);
             auto startCoordQ = opensees::OpenseesModel::getInstance().m_nodes[nodesIL[j]]->getCoords();
+            auto startQlocal = utility::VectorUtilities::projectVectorOn2DLocalBasis((startCoordQ - zeroCoord), u, v);
             auto endCoordQ = opensees::OpenseesModel::getInstance().m_nodes[nodesJK[i]]->getCoords();
+            auto endQlocal = utility::VectorUtilities::projectVectorOn2DLocalBasis((endCoordQ - zeroCoord), u, v);
 
             utility::Vector3 nodeCoord;
-            auto intersects = utility::VectorUtilities::intersectsVector3(startCoordP, endCoordP, startCoordQ, endCoordQ, nodeCoord);
+            utility::Vector2 nodeCoordLocal;
+            auto intersects = utility::VectorUtilities::intersectsVector2(startPlocal, endPlocal, startQlocal, endQlocal, nodeCoordLocal);
             if (!intersects) {
                 // To do: exception
             }
+            nodeCoord = zeroCoord + nodeCoordLocal.x * u + nodeCoordLocal.y * v;
+
             auto nodeTag = opensees::utilities::TagGenerator::getInstance().getNextNodeTag();
             if (nodeExists(nodeTag)) {
                 // To do: exception
@@ -438,4 +448,21 @@ void OpenseesConverter::createMeshForQuadElement(physicalModel::AreaElement* ele
             }
         }
     }
+}
+
+std::tuple<utility::Vector3, utility::Vector3, utility::Vector3> OpenseesConverter::getLocalCoordinateSystem(std::vector<int> lineIJ, std::vector<int> lineIL)
+{
+    auto pointI = opensees::OpenseesModel::getInstance().m_nodes[lineIJ.front()]->getCoords();
+    auto pointJ = opensees::OpenseesModel::getInstance().m_nodes[lineIJ.back()]->getCoords();
+    auto pointL = opensees::OpenseesModel::getInstance().m_nodes[lineIL.back()]->getCoords();
+    
+    auto u = pointJ - pointI;
+    auto uv = pointL - pointI;
+
+    auto w = utility::VectorUtilities::crossProduct(u, uv);
+    u = u / u.norm2();
+    w = w / w.norm2();
+    auto v = utility::VectorUtilities::crossProduct(w, u);
+
+    return std::make_tuple(u, v, w);
 }

@@ -6,10 +6,10 @@ TEST(QuadMesherTests, PlainMesher) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
-    api::addJoint(1, { 0, 0, 0 });
-    api::addJoint(2, { 1, 0, 0 });
-    api::addJoint(3, { 1, 1, 0 });
-    api::addJoint(4, { 0, 1, 0 });
+    api::addJoint(1, { 1, 0, 0 });
+    api::addJoint(2, { 2, 0, 0 });
+    api::addJoint(3, { 2, 1, 0 });
+    api::addJoint(4, { 1, 1, 0 });
 
     // add material
     api::addElasticMaterial(1, 20, 20, 2);

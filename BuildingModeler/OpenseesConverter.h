@@ -16,8 +16,9 @@ namespace buildingModeler
         static bool quadrilateralElementExists(int elementTag);
         static std::vector<int> createNodesForLineElement(const physicalModel::LineElement* element);
         static std::vector<int> createNodesBetweenTwoJoints(int jointTagA, int jointTagB, int numberOfIntervals);
-        static std::vector<std::vector<int>> createNodesForMesh(std::vector<int> lineIJ, std::vector<int> lineLK, std::vector<int> lineIL, std::vector<int> lineJK);
+        static std::vector<std::vector<int>> createNodesForMesh(const std::vector<int>& nodesIJ, const std::vector<int>& nodesLK, const std::vector<int>& nodesIL, const std::vector<int>& nodesJK);
         static void createMeshForQuadElement(physicalModel::AreaElement* element, const std::vector<std::vector<int>>& nodes);
+        static std::tuple<utility::Vector3, utility::Vector3, utility::Vector3> getLocalCoordinateSystem(std::vector<int> lineIJ, std::vector<int> lineIL);
 
     public:
         static void toNodeMassConstraint(const physicalModel::Joint* joint);

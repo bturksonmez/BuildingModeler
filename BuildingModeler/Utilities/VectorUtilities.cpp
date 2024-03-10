@@ -2,36 +2,51 @@
 
 namespace utility
 {
-	bool VectorUtilities::intersectsVector3(const Vector3 & pA, const Vector3 & pB, const Vector3 & qA, const Vector3 & qB, Vector3 & intersection)
+	bool VectorUtilities::intersectsVector2(const Vector2& pA, const Vector2& pB, const Vector2& qA, const Vector2& qB, Vector2& intersection)
     {
-        double eps = 1e-10;
-        Vector3 d1 = pB - pA;
-        Vector3 d2 = qB - qA;
-    
-        auto denominator = (d1.x - d1.y * d2.x / d2.y);
-        if (std::abs(denominator) < 1e-10) {
+        auto ma = calculateSlope(pA, pB);
+        auto mb = calculateSlope(qA, qB);
+
+        auto ba = pA.y - ma * pA.x;
+        auto bb = qA.y - mb * qA.x;
+
+        if (ma == DBL_MAX) {
+            
+            auto y = mb * pA.x + bb;
+            if (y <= pB.y && y >= pA.y) {
+                intersection.x = pA.x;
+                intersection.y = y;
+                return true;
+            }
+
             return false;
         }
-    
-        auto s = 0.0;// (qA.x - qA.y * d2.x / d2.y - pA.x + pA.y * d2.x / d2.y) / denominator;
-        auto t = 0.5;// (pA.x + s * d1.x - qA.x) / d2.x;
-    
-        auto corrector = pA.z + s * d1.z - qA.z - t * d2.z;
-        if (std::abs(corrector) > 1e-10) {
+        else if (mb == DBL_MAX) {
+
+            auto y = ma * qA.x + ba;
+            if (y <= qB.y && y >= qA.y) {
+                intersection.x = qA.x;
+                intersection.y = y;
+                return true;
+            }
+
             return false;
         }
-    
-        // Check if the intersection point lies within the line segments
-        if (s > -eps && s < 1.0 + eps && t > -eps && t < 1.0 + eps) {
-            intersection.x = qA.x + t * d2.x;
-            intersection.y = qA.y + t * d2.y;
-            intersection.z = qA.z + t * d2.z;
-    
-            return true;
+        else if (ma == mb) {
+            return false;
         }
-    
-        // Intersection point is outside the line segments
-        return false;
+        else {
+            auto x = (bb - ba) / (ma - mb);
+            auto y = ma * x + ba;
+
+            if (isBetween(pA, pB, { x, y }) && isBetween(qA, qB, { x, y })) {
+                intersection.x = x;
+                intersection.y = y;
+                return true;
+            }
+
+            return false;
+        }
     }
 
     double VectorUtilities::dotProduct(const Vector3& vecA, const Vector3& vecB)
@@ -39,8 +54,53 @@ namespace utility
         return vecA.x * vecB.x + vecA.y * vecB.y + vecA.z * vecB.z;
     }
 
+    Vector3 VectorUtilities::crossProduct(const Vector2& vecA, const Vector2& vecB)
+    {
+        auto z = vecA.x * vecB.y - vecA.y * vecB.x;
+
+        return Vector3{ 0.0, 0.0, z };
+    }
+
+    Vector3 VectorUtilities::crossProduct(const Vector3& vecA, const Vector3& vecB)
+    {
+        auto x = vecA.y * vecB.z - vecA.z * vecB.y;
+        auto y = vecA.z * vecB.x - vecA.x * vecB.z;
+        auto z = vecA.x * vecB.y - vecA.y * vecB.x;
+
+        return Vector3{ x, y, z };
+    }
+
     double VectorUtilities::getAngleBtw(const Vector3& vecA, const Vector3& vecB)
     {
         return std::acos(dotProduct(vecA, vecB) / (vecA.norm2() * vecB.norm2()));
+    }
+
+    double VectorUtilities::calculateSlope(const Vector2& pA, const Vector2& pB)
+    {
+        if (pB.x - pA.x == 0) {
+            return DBL_MAX; // Avoid division by zero
+        }
+
+        return (pB.y - pA.y) / (pB.x - pA.x);
+    }
+
+    Vector2 VectorUtilities::projectVectorOn2DLocalBasis(const Vector3& vec, const Vector3& u, const Vector3& v)
+    {
+        utility::Vector2 projectedVec;
+
+        projectedVec.x = utility::VectorUtilities::dotProduct(vec, u);
+        projectedVec.y = utility::VectorUtilities::dotProduct(vec, u);
+
+        return projectedVec;
+    }
+
+    bool VectorUtilities::isBetween(const Vector2& pA, const Vector2& pB, const Vector2& point)
+    {
+        if (point.x >= std::min(pA.x, pB.x) && point.x <= std::max(pA.x, pB.x) 
+            && point.y >= std::min(pA.y, pB.y) && point.y <= std::max(pA.y, pB.y)) {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -8,8 +8,13 @@ namespace utility
 	class VectorUtilities
 	{
 	public:
-		static bool intersectsVector3(const Vector3& pA, const Vector3& pB, const Vector3& qA, const Vector3& qB, Vector3& intersection);
+		static bool intersectsVector2(const Vector2& pA, const Vector2& pB, const Vector2& qA, const Vector2& qB, Vector2& intersection);
 		static double dotProduct(const Vector3& vecA, const Vector3& vecB);
+		static Vector3 crossProduct(const Vector2& vecA, const Vector2& vecB);
+		static Vector3 crossProduct(const Vector3& vecA, const Vector3& vecB);
 		static double getAngleBtw(const Vector3& vecA, const Vector3& vecB);
+		static double calculateSlope(const Vector2& pA, const Vector2& pB);
+		static Vector2 projectVectorOn2DLocalBasis(const Vector3& vec, const Vector3& u, const Vector3& v);
+		static bool isBetween(const Vector2& pA, const Vector2& pB, const Vector2& point);
 	};
 }
