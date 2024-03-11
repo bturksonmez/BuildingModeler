@@ -1,4 +1,5 @@
 #include "BuildingModelerAPI.h"
+#include "Utilities/VectorUtilities.h"
 
 using namespace buildingModeler;
 
@@ -186,13 +187,34 @@ void BuildingModelerAPI::addShearWall(int elementTag, std::vector<int> jointTags
     if (areaElementExists(elementTag)) {
         // To do: exception
     }
-    else if (jointTags.size() != 4) {
+
+    if (jointTags.size() != 4) {
         // To do: exception
     }
-    else if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2])) {
+
+    if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2])) {
         // To do: exception
     }
-    else if (!sectionExists(sectionTag)) {
+
+    if (!sectionExists(sectionTag)) {
+        // To do: exception
+    }
+
+    std::vector<utility::Vector3> joints;
+    joints.push_back(physicalModel::Building::getInstance().getJoint(jointTags[0])->getCoords());
+    joints.push_back(physicalModel::Building::getInstance().getJoint(jointTags[1])->getCoords());
+    joints.push_back(physicalModel::Building::getInstance().getJoint(jointTags[2])->getCoords());
+    joints.push_back(physicalModel::Building::getInstance().getJoint(jointTags[3])->getCoords());
+
+    if (!checkIfJointsCoplanar(joints)) {
+        // To do: exception
+    }
+
+    if (!checkIfJointsCounterClockwise(joints)) {
+        // To do: exception
+    }
+
+    if (!checkIfQuadConvex(joints)) {
         // To do: exception
     }
     
@@ -483,6 +505,76 @@ void BuildingModelerAPI::invalidateAreaMeshAlongLineElement(int elementTag)
             }
         }
     }
+}
+
+bool BuildingModelerAPI::checkIfJointsCoplanar(const std::vector<utility::Vector3>& joints)
+{
+    auto vec1 = joints[1] - joints[0];
+    auto vec2 = joints[3] - joints[0];
+    auto vec3 = joints[2] - joints[0];
+    
+    auto normal = utility::VectorUtilities::crossProduct(vec1, vec2);
+    normal = normal / normal.norm2();
+    auto eps = utility::VectorUtilities::dotProduct(normal, vec3);
+
+    if (eps < 1e-6) {
+        return true;
+    }
+
+    return false;
+}
+
+bool BuildingModelerAPI::checkIfJointsCounterClockwise(const std::vector<utility::Vector3>& joints)
+{
+    auto u = joints[1] - joints[0];
+    auto uv = joints[3] - joints[0];
+
+    auto w = utility::VectorUtilities::crossProduct(u, uv);
+    u = u / u.norm2();
+    w = w / w.norm2();
+    auto v = utility::VectorUtilities::crossProduct(w, u);
+
+    auto origin = joints[0];
+    std::vector<utility::Vector2> joints2D;
+    for (const auto& vec : joints) {
+        joints2D.push_back(utility::VectorUtilities::projectVectorOn2DLocalBasis((vec - origin), u, v));
+    }
+
+    auto signedArea = 0.5 * (joints2D[3].x * joints2D[0].y - joints2D[0].x * joints2D[3].y);
+    for (int i = 0; i < 3; ++i) {
+        signedArea += (0.5 * (joints2D[i].x * joints2D[i + 1].y - joints2D[i + 1].x * joints2D[i].y));
+    }
+
+    if (signedArea > 0) {
+        return true;
+    }
+
+    return false;
+}
+
+bool BuildingModelerAPI::checkIfQuadConvex(const std::vector<utility::Vector3>& joints)
+{
+    std::vector<utility::Vector3> vecs;
+
+    vecs.push_back(joints[1] - joints[0]);
+    vecs.push_back(joints[2] - joints[1]);
+    vecs.push_back(joints[3] - joints[2]);
+    vecs.push_back(joints[0] - joints[3]);
+
+    auto totalSignBit = 0;
+    for (int i = 0; i < 4; ++i) {
+        auto startInd = i;
+        auto endInd = (i == 3) ? 0 : i + 1;
+
+        auto crossProduct = utility::VectorUtilities::crossProduct(vecs[startInd], vecs[endInd]);
+        totalSignBit += std::signbit(crossProduct.z);
+    }
+
+    if (totalSignBit == 4 || totalSignBit == 0) {
+        return true;
+    }
+
+    return false;
 }
 
 void BuildingModelerAPI::createInputFile()

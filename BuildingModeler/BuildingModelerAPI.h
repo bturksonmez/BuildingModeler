@@ -16,6 +16,9 @@ namespace buildingModeler
         static bool sectionExists(int sectionTag);
 
         static void invalidateAreaMeshAlongLineElement(int elementTag);
+        static bool checkIfJointsCoplanar(const std::vector<utility::Vector3>& joints);
+        static bool checkIfJointsCounterClockwise(const std::vector<utility::Vector3>& joints);
+        static bool checkIfQuadConvex(const std::vector<utility::Vector3>& joints);
 
     public:
         BuildingModelerAPI() {}

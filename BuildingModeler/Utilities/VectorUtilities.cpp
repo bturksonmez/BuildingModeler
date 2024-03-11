@@ -89,7 +89,7 @@ namespace utility
         utility::Vector2 projectedVec;
 
         projectedVec.x = utility::VectorUtilities::dotProduct(vec, u);
-        projectedVec.y = utility::VectorUtilities::dotProduct(vec, u);
+        projectedVec.y = utility::VectorUtilities::dotProduct(vec, v);
 
         return projectedVec;
     }
