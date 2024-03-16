@@ -185,19 +185,19 @@ void BuildingModelerAPI::addShearWall(int elementTag, std::vector<int> jointTags
     physicalModel::AreaElementFormulation areaElementFormulation)
 {
     if (areaElementExists(elementTag)) {
-        // To do: exception
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
     }
 
     if (jointTags.size() != 4) {
-        // To do: exception
+        throw InvalidInputException("Number of joints must be four to create an area element.");
     }
 
     if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2])) {
-        // To do: exception
+        throw InvalidInputException("Joints do not exists to create area element with tag " + std::to_string(elementTag) + " .");
     }
 
     if (!sectionExists(sectionTag)) {
-        // To do: exception
+        throw EntityNotFoundException("Section with tag " + std::to_string(sectionTag) + " does not exist.");
     }
 
     std::vector<utility::Vector3> joints;
@@ -207,15 +207,15 @@ void BuildingModelerAPI::addShearWall(int elementTag, std::vector<int> jointTags
     joints.push_back(physicalModel::Building::getInstance().getJoint(jointTags[3])->getCoords());
 
     if (!checkIfJointsCoplanar(joints)) {
-        // To do: exception
+        throw InvalidOperationException("Joints of area element with tag " + std::to_string(elementTag) + " are not coplanar.");
     }
 
     if (!checkIfJointsCounterClockwise(joints)) {
-        // To do: exception
+        throw InvalidOperationException("Joints of area element with tag " + std::to_string(elementTag) + " are not in counter-clockwise direction.");
     }
 
     if (!checkIfQuadConvex(joints)) {
-        // To do: exception
+        throw InvalidOperationException("Joints of area element with tag " + std::to_string(elementTag) + " do not form convex geometry.");
     }
     
     std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
@@ -230,113 +230,132 @@ void BuildingModelerAPI::addSlab(int elementTag, std::vector<int> jointTags, int
     physicalModel::AreaElementFormulation areaElementFormulation)
 {
     if (areaElementExists(elementTag)) {
-        // To do: exception
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
     }
-    else if (jointTags.size() != 4) {
-        // To do: exception
+
+    if (jointTags.size() != 4) {
+        throw InvalidInputException("Number of joints must be four to create an area element.");
     }
-    else if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2])) {
-        // To do: exception
+
+    if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2])) {
+        throw InvalidInputException("Joints do not exists to create area element with tag " + std::to_string(elementTag) + " .");
     }
-    else if (!sectionExists(sectionTag)) {
-        // To do: exception
+
+    if (!sectionExists(sectionTag)) {
+        throw EntityNotFoundException("Section with tag " + std::to_string(sectionTag) + " does not exist.");
     }
-    
-    std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
-    physicalModel::Building::getInstance().m_areaElements[elementTag] = std::make_unique<physicalModel::SlabElement>(elementTag, jointTags, section, areaElementFormulation);
-    physicalModel::Building::getInstance().m_joints[jointTags[0]]->addConnectedSlab(elementTag);
-    physicalModel::Building::getInstance().m_joints[jointTags[1]]->addConnectedSlab(elementTag);
-    physicalModel::Building::getInstance().m_joints[jointTags[2]]->addConnectedSlab(elementTag);
-    physicalModel::Building::getInstance().m_joints[jointTags[3]]->addConnectedSlab(elementTag);
+
+    std::vector<utility::Vector3> joints;
+    joints.push_back(physicalModel::Building::getInstance().getJoint(jointTags[0])->getCoords());
+    joints.push_back(physicalModel::Building::getInstance().getJoint(jointTags[1])->getCoords());
+    joints.push_back(physicalModel::Building::getInstance().getJoint(jointTags[2])->getCoords());
+    joints.push_back(physicalModel::Building::getInstance().getJoint(jointTags[3])->getCoords());
+
+    if (!checkIfJointsCoplanar(joints)) {
+        throw InvalidOperationException("Joints of area element with tag " + std::to_string(elementTag) + " are not coplanar.");
+    }
+
+    if (!checkIfJointsCounterClockwise(joints)) {
+        throw InvalidOperationException("Joints of area element with tag " + std::to_string(elementTag) + " are not in counter-clockwise direction.");
+    }
+
+    if (!checkIfQuadConvex(joints)) {
+        throw InvalidOperationException("Joints of area element with tag " + std::to_string(elementTag) + " do not form convex geometry.");
+    }
 }
 
-void BuildingModelerAPI::meshAreaElement(int elementTag, int n1, int n2)
+void BuildingModelerAPI::meshAreaElement(int elementTag, std::optional<int> n1 = -1, std::optional<int> n2 = -1)
 {
     if (!areaElementExists(elementTag)) {
-        // To do: exception
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
     }
 
     auto areaElement = physicalModel::Building::getInstance().getAreaElement(elementTag);
     auto surroundingElementTags = areaElement->getSurroundingLineElementTags();
 
-    if ((surroundingElementTags[0] != -1 || surroundingElementTags[2] != -1) && n1 != -1) {
-        // to do: exception
-        return;
-    }
-    else if ((surroundingElementTags[1] != -1 || surroundingElementTags[3] != -1) && n2 != -1) {
-        // to do: exception
-        return;
-    }
-    else if ((surroundingElementTags[0] * surroundingElementTags[2] < 0) && n1 == -1)
-    {
-        // to do: exception
-        return;
-    }
-    else if ((surroundingElementTags[1] * surroundingElementTags[3] < 0) && n2 == -1)
-    {
-        // to do: exception
-        return;
+    if ((surroundingElementTags[0] != -1 || surroundingElementTags[2] != -1) && n1 != std::nullopt) {
+        throw InvalidInputException("n1 cannot be assigned while there are surrounding elements in that direction.");
     }
 
-    if (n1 == -1)
+    if ((surroundingElementTags[1] != -1 || surroundingElementTags[3] != -1) && n2 != std::nullopt) {
+        throw InvalidInputException("n2 cannot be assigned while there are surrounding elements in that direction.");
+    }
+    
+    if ((surroundingElementTags[0] * surroundingElementTags[2] < 0) && n1 == std::nullopt)
+    {
+        throw InvalidInputException("There must be surrounding elements on the opposite sides when n1 is not assigned.");
+    }
+    
+    if ((surroundingElementTags[1] * surroundingElementTags[3] < 0) && n2 == std::nullopt)
+    {
+        throw InvalidInputException("There must be surrounding elements on the opposite sides when n2 is not assigned.");
+    }
+
+    if (n1 == std::nullopt)
     {
         if (surroundingElementTags[0] < 0 || surroundingElementTags[2] < 0) {
-            // to do:exception
-            return;
+            throw InvalidInputException("There must be surrounding elements on the opposite sides when n1 is not assigned.");
         }
 
         auto element1 = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[0]);
         auto element2 = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[2]);
 
         if (element1 == nullptr || element2 == nullptr) {
-            // to do: exception
-            return;
+            throw EntityNotFoundException("Surrounding line elements with tags " + std::to_string(surroundingElementTags[0]) + " or "
+                + std::to_string(surroundingElementTags[1])  + " does not exist.");
         }
 
         if (element1->getSegmentLengths().size() != element2->getSegmentLengths().size()) {
-            // to do:exception
-            return;
+            throw InvalidInputException("Surrounding elements on the opposite sides must have the same number of elements.");
         }
 
         if (element1->getSegmentLengths().size() == 1) {
-            // to do:exception
             return;
         }
     }
+    else if (n1.value() < 1)
+    {
+        throw InvalidInputException("n1 value cannot be less than 1.");
+    }
 
-    if (n2 == -1)
+
+    if (n2 == std::nullopt)
     {
         if (surroundingElementTags[1] < 0 || surroundingElementTags[3] < 0) {
-            // to do:exception
-            return;
+            throw InvalidInputException("There must be surrounding elements on the opposite sides when n2 is not assigned.");
         }
 
         auto element1 = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[1]);
         auto element2 = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[3]);
 
         if (element1 == nullptr || element2 == nullptr) {
-            // to do: exception
-            return;
+            throw EntityNotFoundException("Surrounding line elements with tags " + std::to_string(surroundingElementTags[0]) + " or "
+                + std::to_string(surroundingElementTags[1]) + " does not exist.");
         }
 
         if (element1->getSegmentLengths().size() != element2->getSegmentLengths().size()) {
-            // to do:exception
-            return;
+            throw InvalidInputException("Surrounding elements on the opposite sides must have the same number of elements.");
         }
         if (element1->getSegmentLengths().size() == 1) {
-            // to do:exception
             return;
         }
-
+    }
+    else if (n2.value() < 1)
+    {
+        throw InvalidInputException("n2 value cannot be less than 1.");
     }
 
-    areaElement->mesh(true, n1, n2);
+    if (n1.value() == 1 && n2.value() == 1) {
+        return;
+    }
+
+    areaElement->mesh(true, n1.value(), n2.value());
 }
 
 void BuildingModelerAPI::disableMeshForAreaElement(int elementTag)
 {
     if (!areaElementExists(elementTag)) {
-        // To do: exception
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
     }
 
     auto areaElement = physicalModel::Building::getInstance().getAreaElement(elementTag);
