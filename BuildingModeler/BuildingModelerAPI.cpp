@@ -150,6 +150,15 @@ void BuildingModelerAPI::setSegmentRatios(int elementTag, std::vector<double> se
     if (!lineElementExists(elementTag)) {
         throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
     }
+
+    double totalRatio = 0.0;
+    for (const auto& ratio : segmentRatios) {
+        totalRatio += ratio;
+    }
+
+    if (totalRatio > 1.0 + 1e-7 || totalRatio < 1.0 - 1e-7) {
+        throw InvalidInputException("Segment ratios should sum up to 1.0");
+    }
     
     physicalModel::Building::getInstance().m_lineElements[elementTag]->setSegmentRelativeLengths(segmentRatios);
     invalidateAreaMeshAlongLineElement(elementTag);
@@ -175,6 +184,15 @@ void BuildingModelerAPI::setSectionModifiers(int elementTag, int segmentNo, doub
     }
     
     physicalModel::Building::getInstance().m_lineElements[elementTag]->setSectionModifiers(segmentNo, std::make_shared<physicalModel::SectionModifiers>(modifierA, modifierIyy, modifierIzz, modifierJ));
+}
+
+const std::vector<utility::Vector3>& BuildingModelerAPI::getNodeCoordinatesOfLineElement(int elementTag)
+{
+    if (!lineElementExists(elementTag)) {
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->getAnalyticalNodeCoords();
 }
 
 void BuildingModelerAPI::addShearWall(int elementTag, std::vector<int> jointTags, int sectionTag,
@@ -356,6 +374,15 @@ void BuildingModelerAPI::disableMeshForAreaElement(int elementTag)
 
     auto areaElement = physicalModel::Building::getInstance().getAreaElement(elementTag);
     areaElement->setMeshable(false);
+}
+
+const std::vector<std::vector<utility::Vector3>>& BuildingModelerAPI::getNodeCoordinatesOfAreaElement(int elementTag)
+{
+    if (!areaElementExists(elementTag)) {
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    return physicalModel::Building::getInstance().getAreaElement(elementTag)->getAnalyticalNodeCoords();
 }
 
 void BuildingModelerAPI::addFloor(int floorNumber, double height)

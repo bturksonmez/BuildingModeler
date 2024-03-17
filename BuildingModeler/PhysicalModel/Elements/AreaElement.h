@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "../Sections/Section.h"
+#include "../../Utilities/Vector3.h"
 
 namespace physicalModel
 {
@@ -34,6 +35,7 @@ namespace physicalModel
 		std::vector<int> m_surroundingLineElementTags;
 		std::shared_ptr<Section> m_section;
 		std::vector<std::vector<int>> m_analyticalNodeTags;
+		std::vector<std::vector<utility::Vector3>> m_analyticalNodeCoords;
 		std::vector<int> m_analyticalElementTags;
 		AreaElementType m_areaElementType;
 		AreaElementFormulation m_areaElementFormulation;
@@ -69,6 +71,7 @@ namespace physicalModel
 		const std::vector<int>& getSurroundingLineElementTags();
 		const std::shared_ptr<Section> getSection() const;
 		const std::vector<std::vector<int>>& getAnalyticalNodeTags() const;
+		const std::vector < std::vector<utility::Vector3>>& getAnalyticalNodeCoords() const;
 		const std::vector<int>& getAnalyticalElementTags() const;
 		AreaElementType getAreaElementType() const;
 		AreaElementFormulation getAreaElementFormulation() const;

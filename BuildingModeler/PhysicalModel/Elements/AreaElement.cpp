@@ -1,6 +1,7 @@
 #include "AreaElement.h"
 #include "../Building.h"
 #include "../../Utilities/VectorUtilities.h"
+#include "../../OpenSeesWrapper/OpenseesModel.h"
 
 using namespace physicalModel;
 
@@ -56,6 +57,12 @@ void AreaElement::setMeshable(bool meshable)
 void AreaElement::addAnalyticalNodeTags(std::vector<int> analyticalNodeTags)
 {
 	m_analyticalNodeTags.push_back(analyticalNodeTags);
+
+	std::vector<utility::Vector3> analyticalNodeCoords;
+	for (const auto& tag : analyticalNodeTags) {
+		analyticalNodeCoords.push_back(opensees::OpenseesModel::getInstance().getNode(tag)->getCoords());
+	}
+	m_analyticalNodeCoords.push_back(analyticalNodeCoords);
 }
 
 void AreaElement::addAnalyticalElementTag(int analyticalElementTag)
@@ -133,6 +140,11 @@ const std::shared_ptr<Section> AreaElement::getSection() const
 const std::vector<std::vector<int>>& AreaElement::getAnalyticalNodeTags() const
 {
 	return m_analyticalNodeTags;
+}
+
+const std::vector<std::vector<utility::Vector3>>& AreaElement::getAnalyticalNodeCoords() const
+{
+	return m_analyticalNodeCoords;
 }
 
 const std::vector<int>& AreaElement::getAnalyticalElementTags() const

@@ -1,5 +1,6 @@
 #include "LineElement.h"
 #include "../Building.h"
+#include "../../OpenSeesWrapper/OpenseesModel.h"
 
 using namespace physicalModel;
 
@@ -55,6 +56,7 @@ void LineElement::setSectionModifiers(int segmentNo, std::shared_ptr<SectionModi
 void LineElement::addAnalyticalNodeTag(int analyticalNodeTag)
 {
 	m_analyticalNodeTags.push_back(analyticalNodeTag);
+	m_analyticalNodeCoords.push_back(opensees::OpenseesModel::getInstance().getNode(analyticalNodeTag)->getCoords());
 }
 
 void LineElement::addAnalyticalElementTag(int analyticalElementTag)
@@ -119,6 +121,12 @@ std::vector<int> LineElement::getAnalyticalNodeTags() const
 {
 	return m_analyticalNodeTags;
 }
+
+const std::vector<utility::Vector3>& LineElement::getAnalyticalNodeCoords() const
+{
+	return m_analyticalNodeCoords;
+}
+
 
 const std::vector<int>& LineElement::getAnalyticalElementTags() const
 {

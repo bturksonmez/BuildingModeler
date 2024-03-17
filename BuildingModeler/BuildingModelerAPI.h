@@ -48,6 +48,7 @@ namespace buildingModeler
         static void setSegmentRatios(int elementTag, std::vector<double> segmentRatios);
         static void setSection(int elementTag, int segmentNo, int sectionTag);
         static void setSectionModifiers(int elementTag, int segmentNo, double modifierA, double modifierIyy, double modifierIzz, double modifierJ);
+        static const std::vector<utility::Vector3>& getNodeCoordinatesOfLineElement(int elementTag);
 
         // Area Element API
         static void addShearWall(int elementTag, std::vector<int> jointTags, int sectionTag,
@@ -56,6 +57,7 @@ namespace buildingModeler
             physicalModel::AreaElementFormulation areaElementFormulation);
         static void meshAreaElement(int elementTag, std::optional<int> n1, std::optional<int> n2);
         static void disableMeshForAreaElement(int elementTag);
+        static const std::vector<std::vector<utility::Vector3>>& getNodeCoordinatesOfAreaElement(int elementTag);
         
         // Floor API
         static void addFloor(int floorNumber, double height);
