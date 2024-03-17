@@ -42,7 +42,7 @@ void AreaElement::addSurroundingLineElement(int index, int surroundingLineElemen
 	m_surroundingLineElementTags[index] = surroundingLineElementTag;
 }
 
-void AreaElement::mesh(bool meshable, int n1 = -1, int n2 = -1)
+void AreaElement::mesh(bool meshable, int n1, int n2)
 {
 	m_meshable = meshable;
 	m_n1 = n1;

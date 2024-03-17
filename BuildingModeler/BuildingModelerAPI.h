@@ -55,7 +55,7 @@ namespace buildingModeler
             physicalModel::AreaElementFormulation areaElementFormulation);
         static void addSlab(int elementTag, std::vector<int> jointTags, int sectionTag,
             physicalModel::AreaElementFormulation areaElementFormulation);
-        static void meshAreaElement(int elementTag, std::optional<int> n1, std::optional<int> n2);
+        static void meshAreaElement(int elementTag, std::optional<int> n1 = std::nullopt, std::optional<int> n2 = std::nullopt);
         static void disableMeshForAreaElement(int elementTag);
         static const std::vector<std::vector<utility::Vector3>>& getNodeCoordinatesOfAreaElement(int elementTag);
         

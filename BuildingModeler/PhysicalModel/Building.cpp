@@ -62,7 +62,7 @@ void Building::updateSurroundingLineElements()
 
         for (int i = 0; i < joints.size(); ++i) {
             auto jointTagI = joints[i];
-            auto jointTagJ = (i + 1 < joints.size()) ? i + 1 : 0;
+            auto jointTagJ = (i + 1 < joints.size()) ? joints[i + 1] : joints[0];
 
             bool found = false;
             for (const auto& beamTagI : m_joints[jointTagI]->getConnectedBeamTags()) {

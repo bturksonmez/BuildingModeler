@@ -278,7 +278,7 @@ void BuildingModelerAPI::addSlab(int elementTag, std::vector<int> jointTags, int
     }
 }
 
-void BuildingModelerAPI::meshAreaElement(int elementTag, std::optional<int> n1 = -1, std::optional<int> n2 = -1)
+void BuildingModelerAPI::meshAreaElement(int elementTag, std::optional<int> n1, std::optional<int> n2)
 {
     if (!areaElementExists(elementTag)) {
         throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
@@ -305,6 +305,7 @@ void BuildingModelerAPI::meshAreaElement(int elementTag, std::optional<int> n1 =
         throw InvalidInputException("There must be surrounding elements on the opposite sides when n2 is not assigned.");
     }
 
+    bool meshIJ = true;
     if (n1 == std::nullopt)
     {
         if (surroundingElementTags[0] < 0 || surroundingElementTags[2] < 0) {
@@ -324,7 +325,7 @@ void BuildingModelerAPI::meshAreaElement(int elementTag, std::optional<int> n1 =
         }
 
         if (element1->getSegmentLengths().size() == 1) {
-            return;
+            meshIJ = false;
         }
     }
     else if (n1.value() < 1)
@@ -332,7 +333,7 @@ void BuildingModelerAPI::meshAreaElement(int elementTag, std::optional<int> n1 =
         throw InvalidInputException("n1 value cannot be less than 1.");
     }
 
-
+    bool meshJK = true;
     if (n2 == std::nullopt)
     {
         if (surroundingElementTags[1] < 0 || surroundingElementTags[3] < 0) {
@@ -351,7 +352,7 @@ void BuildingModelerAPI::meshAreaElement(int elementTag, std::optional<int> n1 =
             throw InvalidInputException("Surrounding elements on the opposite sides must have the same number of elements.");
         }
         if (element1->getSegmentLengths().size() == 1) {
-            return;
+            meshJK = false;
         }
     }
     else if (n2.value() < 1)
@@ -359,11 +360,28 @@ void BuildingModelerAPI::meshAreaElement(int elementTag, std::optional<int> n1 =
         throw InvalidInputException("n2 value cannot be less than 1.");
     }
 
-    if (n1.value() == 1 && n2.value() == 1) {
+    if (!meshIJ && !meshJK) {
+        areaElement->setMeshable(false);
         return;
     }
 
-    areaElement->mesh(true, n1.value(), n2.value());
+    if (n1.has_value() && n2.has_value()) {
+        if (n1.value() == 1 && n2.value() == 1) {
+            areaElement->setMeshable(false);
+            return;
+        }
+
+        areaElement->mesh(true, n1.value(), n2.value());
+    }
+    else if (n1.has_value()) {
+        areaElement->mesh(true, n1.value(), -1);
+    }
+    else if (n2.has_value()) {
+        areaElement->mesh(true, -1, n2.value());
+    }
+    else {
+        areaElement->mesh(true);
+    }
 }
 
 void BuildingModelerAPI::disableMeshForAreaElement(int elementTag)

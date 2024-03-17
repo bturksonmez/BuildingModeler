@@ -192,8 +192,8 @@ void OpenseesConverter::toQuadrilateralElement(physicalModel::AreaElement* eleme
 
         std::vector<int> nodesIL;
         std::vector<int> nodesJK;
-        // We do not check if surroundingElementTags[2] is also -1 as we do that check in BuildingModelerAPI.cpp
-        if (surroundingElementTags[0] != -1)
+        // We do not check if surroundingElementTags[3] is also -1 as we do that check in BuildingModelerAPI.cpp
+        if (surroundingElementTags[1] != -1)
         {
             nodesIL = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[3])->getAnalyticalNodeTags();
             // Check surrounding element and element directions on IJ edge are in the same direction
@@ -216,10 +216,11 @@ void OpenseesConverter::toQuadrilateralElement(physicalModel::AreaElement* eleme
         nodes = createNodesForMesh(nodesIJ, nodesLK, nodesIL, nodesJK);
     }
     else {
-        nodes.resize(4);
-        for (int i = 0; i < 4; ++i) {
-            nodes[i].push_back(elementNodes[i]);
-        }
+        nodes.resize(2);
+        nodes[0].push_back(elementNodes[0]);
+        nodes[0].push_back(elementNodes[1]);
+        nodes[1].push_back(elementNodes[3]);
+        nodes[1].push_back(elementNodes[2]);
     }
     
     createMeshForQuadElement(element, nodes);
@@ -371,9 +372,9 @@ std::vector<std::vector<int>> OpenseesConverter::createNodesForMesh(const std::v
 
             auto startCoordP = opensees::OpenseesModel::getInstance().m_nodes[nodesIJ[j]]->getCoords();
             auto startPlocal = utility::VectorUtilities::projectVectorOn2DLocalBasis((startCoordP - zeroCoord), u, v);
-            auto endCoordP = opensees::OpenseesModel::getInstance().m_nodes[nodesLK[i]]->getCoords();
+            auto endCoordP = opensees::OpenseesModel::getInstance().m_nodes[nodesLK[j]]->getCoords();
             auto endPlocal = utility::VectorUtilities::projectVectorOn2DLocalBasis((endCoordP - zeroCoord), u, v);
-            auto startCoordQ = opensees::OpenseesModel::getInstance().m_nodes[nodesIL[j]]->getCoords();
+            auto startCoordQ = opensees::OpenseesModel::getInstance().m_nodes[nodesIL[i]]->getCoords();
             auto startQlocal = utility::VectorUtilities::projectVectorOn2DLocalBasis((startCoordQ - zeroCoord), u, v);
             auto endCoordQ = opensees::OpenseesModel::getInstance().m_nodes[nodesJK[i]]->getCoords();
             auto endQlocal = utility::VectorUtilities::projectVectorOn2DLocalBasis((endCoordQ - zeroCoord), u, v);

@@ -52,7 +52,7 @@ namespace physicalModel
 		virtual ~AreaElement() {}
 
 		void addSurroundingLineElement(int index, int surroundingLineElementTag);
-		void mesh(bool meshable, int n1, int n2);
+		void mesh(bool meshable, int n1 = -1, int n2 = -1);
 		void setMeshable(bool meshable);
 		void addAnalyticalNodeTags(std::vector<int> analyticalNodeTags);
 		void addAnalyticalElementTag(int analyticalElementTag);

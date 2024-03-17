@@ -96,8 +96,8 @@ namespace utility
 
     bool VectorUtilities::isBetween(const Vector2& pA, const Vector2& pB, const Vector2& point)
     {
-        if (point.x >= std::min(pA.x, pB.x) && point.x <= std::max(pA.x, pB.x) 
-            && point.y >= std::min(pA.y, pB.y) && point.y <= std::max(pA.y, pB.y)) {
+        if (point.x >= std::min(pA.x, pB.x) - 1e-10 && point.x <= std::max(pA.x, pB.x) + 1e-10
+            && point.y >= std::min(pA.y, pB.y) - 1e-10 && point.y <= std::max(pA.y, pB.y) + 1e-10) {
             return true;
         }
 

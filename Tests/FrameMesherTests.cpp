@@ -78,7 +78,7 @@ TEST(FrameMesherTests, MeshSuccess) {
     // set segment ratios
     api::setSegmentRatios(1, { 0.2, 0.4, 0.2, 0.2 });
 
-    // create tcl file
+    // create analytical model
     physicalModel::Building::getInstance().toAnalyticalModel();
 
     // retrieve node coords
