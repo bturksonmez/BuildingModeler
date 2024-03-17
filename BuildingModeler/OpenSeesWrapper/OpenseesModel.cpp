@@ -62,6 +62,20 @@ std::shared_ptr<Section> OpenseesModel::getSection(int sectionTag) const
     return (it != m_sections.end()) ? it->second : nullptr;
 }
 
+std::vector<int> OpenseesModel::getDivisionsBetweenNodes(int nodeA, int nodeB) const
+{
+    if (m_divisionsBetweenNodes.count(std::make_pair(nodeA, nodeB))) {
+        return m_divisionsBetweenNodes.find(std::make_pair(nodeA, nodeB))->second;
+    }
+
+    return {};
+}
+
+void OpenseesModel::addDivisionsBetweenNodes(int nodeA, int nodeB, std::vector<int> dividedNodes)
+{
+    m_divisionsBetweenNodes.insert_or_assign(std::make_pair(nodeA, nodeB), dividedNodes);
+}
+
 void OpenseesModel::toTclFile()
 {
     std::stringstream modelTcl;

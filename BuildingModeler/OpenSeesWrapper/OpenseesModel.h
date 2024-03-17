@@ -35,6 +35,7 @@ namespace opensees
 		std::map<int, std::shared_ptr<Material>> m_materials;
 		std::map<int, std::shared_ptr<GeometricTransformation>> m_geometricTransformation;
 		std::map<int, std::shared_ptr<Section>> m_sections;
+		std::map<std::pair<int, int>, std::vector<int>> m_divisionsBetweenNodes;
 
 		OpenseesModel();
 
@@ -54,7 +55,9 @@ namespace opensees
 		Element* getQuadrilateralElement(int elementTag) const;
 		std::shared_ptr<Material> getMaterial(int materialTag) const;
 		std::shared_ptr<Section> getSection(int sectionTag) const;
+		std::vector<int> getDivisionsBetweenNodes(int nodeA, int nodeB) const;
 
+		void addDivisionsBetweenNodes(int nodeA, int nodeB, std::vector<int> dividedNodes);
 		void toTclFile();
 
 		friend class buildingModeler::OpenseesConverter;

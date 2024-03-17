@@ -1,5 +1,7 @@
 #include "OpenseesConverter.h"
 #include "Utilities/VectorUtilities.h"
+#include "BuildingModelerExceptions.h"
+
 #include <algorithm> 
 
 using namespace buildingModeler;
@@ -186,8 +188,42 @@ void OpenseesConverter::toQuadrilateralElement(physicalModel::AreaElement* eleme
         }
         else
         {
-            nodesIJ = createNodesBetweenTwoJoints(elementNodes[0], elementNodes[1], element->getMeshDivisions().first);
-            nodesLK = createNodesBetweenTwoJoints(elementNodes[3], elementNodes[2], element->getMeshDivisions().first);
+            nodesIJ = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[0], elementNodes[1]);
+            if (nodesIJ.empty()) {
+                nodesIJ = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[1], elementNodes[0]);
+
+                if (nodesIJ.empty()) {
+                    nodesIJ = createNodesBetweenTwoJoints(elementNodes[0], elementNodes[1], element->getMeshDivisions().first);
+                    opensees::OpenseesModel::getInstance().addDivisionsBetweenNodes(elementNodes[0], elementNodes[1], nodesIJ);
+                }
+                else {
+                    std::reverse(nodesIJ.begin(), nodesIJ.end());
+                }
+                
+            }
+            else {
+                if ((int)nodesIJ.size() - 1 != element->getMeshDivisions().first) {
+                    throw InvalidInputException("Area elements sharing an edge must have the same mesh size along that edge!.");
+                }
+            }
+
+            nodesLK = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[3], elementNodes[2]);
+            if (nodesLK.empty()) {
+                nodesLK = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[2], elementNodes[3]);
+
+                if (nodesLK.empty()) {
+                    nodesLK = createNodesBetweenTwoJoints(elementNodes[3], elementNodes[2], element->getMeshDivisions().first);
+                    opensees::OpenseesModel::getInstance().addDivisionsBetweenNodes(elementNodes[3], elementNodes[2], nodesLK);
+                }
+                else {
+                    std::reverse(nodesLK.begin(), nodesLK.end());
+                }
+            }
+            else {
+                if ((int)nodesLK.size() - 1 != element->getMeshDivisions().first) {
+                    throw InvalidInputException("Area elements sharing an edge must have the same mesh size along that edge!.");
+                }
+            }
         }
 
         std::vector<int> nodesIL;
@@ -209,8 +245,42 @@ void OpenseesConverter::toQuadrilateralElement(physicalModel::AreaElement* eleme
         }
         else
         {
-            nodesIL = createNodesBetweenTwoJoints(elementNodes[0], elementNodes[3], element->getMeshDivisions().second);
-            nodesJK = createNodesBetweenTwoJoints(elementNodes[1], elementNodes[2], element->getMeshDivisions().second);
+            nodesIL = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[0], elementNodes[3]);
+            if (nodesIL.empty()) {
+                nodesIL = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[3], elementNodes[0]);
+
+                if (nodesIL.empty()) {
+                    nodesIL = createNodesBetweenTwoJoints(elementNodes[0], elementNodes[3], element->getMeshDivisions().second);
+                    opensees::OpenseesModel::getInstance().addDivisionsBetweenNodes(elementNodes[0], elementNodes[3], nodesIL);
+                }
+                else {
+                    std::reverse(nodesIL.begin(), nodesIL.end());
+                }
+            }
+            else {
+                if ((int)nodesIL.size() - 1 != element->getMeshDivisions().second) {
+                    throw InvalidInputException("Area elements sharing an edge must have the same mesh size along that edge!.");
+                }
+            }
+
+            nodesJK = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[1], elementNodes[2]);
+            if (nodesJK.empty()) {
+                nodesJK = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[2], elementNodes[1]);
+
+                if (nodesJK.empty()) {
+                    nodesJK = createNodesBetweenTwoJoints(elementNodes[1], elementNodes[2], element->getMeshDivisions().second);
+                    opensees::OpenseesModel::getInstance().addDivisionsBetweenNodes(elementNodes[1], elementNodes[2], nodesJK);
+                }
+                else {
+                    std::reverse(nodesJK.begin(), nodesJK.end());
+                }
+            }
+            else {
+                if ((int)nodesJK.size() - 1 != element->getMeshDivisions().second) {
+                    throw InvalidInputException("Area elements sharing an edge must have the same mesh size along that edge!.");
+                }
+            }
+
         }
 
         nodes = createNodesForMesh(nodesIJ, nodesLK, nodesIL, nodesJK);

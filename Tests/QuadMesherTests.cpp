@@ -526,3 +526,101 @@ TEST(QuadMesherTests, MeshWith2SurroundingElementsN2Success) {
         }
     }
 }
+
+TEST(QuadMesherTests, MeshWithN1nN2TwoElementsSuccess) {
+    typedef buildingModeler::BuildingModelerAPI api;
+
+    // add quad joints
+    api::addJoint(1, { 1, 0, 0 });
+    api::addJoint(2, { 2, 0, 0 });
+    api::addJoint(3, { 2, 1, 0 });
+    api::addJoint(4, { 1, 1, 0 });
+    api::addJoint(5, { 3, 0, 0 });
+    api::addJoint(6, { 3, 1, 0 });
+
+    // add material
+    api::addElasticMaterial(1, 20, 20, 2);
+
+    // add section 2D
+    api::addElasticSection2D(1, 1, 2.0);
+
+    // add area element
+    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(2, { 2, 5, 6, 3 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+
+    // update connectivity between line and area elements
+    api::updateAreaElementProperties();
+
+    //mesh the element
+    api::meshAreaElement(1, 2, 2);
+    api::meshAreaElement(2, 2, 2);
+
+    // create analytical model
+    physicalModel::Building::getInstance().toAnalyticalModel();
+
+    // retrieve node coords
+    auto nodeCoords = api::getNodeCoordinatesOfAreaElement(2);
+
+    // expected values
+    std::vector<std::vector<utility::Vector3>> expectedCoords{ { {2.0, 0.0, 0.0}, {2.5, 0.0, 0.0}, {2.5, 0.5, 0.0}, {2.0, 0.5, 0.0} },
+                                                               { {2.5, 0.0, 0.0}, {3.0, 0.0, 0.0}, {3.0, 0.5, 0.0}, {2.5, 0.5, 0.0} },
+                                                               { {2.0, 0.5, 0.0}, {2.5, 0.5, 0.0}, {2.5, 1.0, 0.0}, {2.0, 1.0, 0.0} },
+                                                               { {2.5, 0.5, 0.0}, {3.0, 0.5, 0.0}, {3.0, 1.0, 0.0}, {2.5, 1.0, 0.0} } };
+
+    // ensure the vectors have the same length
+    ASSERT_EQ(nodeCoords.size(), expectedCoords.size()) << "Vectors differ in size.";
+    
+    // floating-point comparison tolerance
+    const double epsilon = 1e-6;
+    
+    for (size_t i = 0; i < nodeCoords.size(); ++i) {
+    
+        for (size_t j = 0; j < nodeCoords[i].size(); ++j) {
+            EXPECT_NEAR(expectedCoords[i][j].x, nodeCoords[i][j].x, epsilon) << "X coordinate mismatch at index " << i << "," << j;
+            EXPECT_NEAR(expectedCoords[i][j].y, nodeCoords[i][j].y, epsilon) << "Y coordinate mismatch at index " << i << "," << j;
+            EXPECT_NEAR(expectedCoords[i][j].z, nodeCoords[i][j].z, epsilon) << "Z coordinate mismatch at index " << i << "," << j;
+        }
+    }
+}
+
+TEST(QuadMesherTests, MeshWithN1nN2TwoElementsFail) {
+    typedef buildingModeler::BuildingModelerAPI api;
+
+    // add quad joints
+    api::addJoint(1, { 1, 0, 0 });
+    api::addJoint(2, { 2, 0, 0 });
+    api::addJoint(3, { 2, 1, 0 });
+    api::addJoint(4, { 1, 1, 0 });
+    api::addJoint(5, { 3, 0, 0 });
+    api::addJoint(6, { 3, 1, 0 });
+
+    // add material
+    api::addElasticMaterial(1, 20, 20, 2);
+
+    // add section 2D
+    api::addElasticSection2D(1, 1, 2.0);
+
+    // add area element
+    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(2, { 2, 5, 6, 3 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+
+    // update connectivity between line and area elements
+    api::updateAreaElementProperties();
+
+    //mesh the element
+    api::meshAreaElement(1, 2, 2);
+    api::meshAreaElement(2, 2, 3);
+
+    try {
+        physicalModel::Building::getInstance().toAnalyticalModel();
+        FAIL() << "Expected buildingModeler::InvalidInputException";
+    }
+    catch (const buildingModeler::InvalidInputException& e) {
+        std::string expected = "Area elements sharing an edge must have the same mesh size along that edge!.";
+        std::string actual = e.what();
+        EXPECT_EQ(expected, actual);
+    }
+    catch (...) {
+        FAIL() << "Expected buildingModeler::InvalidInputException";
+    }
+}
