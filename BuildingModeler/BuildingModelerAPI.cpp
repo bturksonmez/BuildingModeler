@@ -6,56 +6,51 @@ using namespace buildingModeler;
 void BuildingModelerAPI::addJoint(int jointTag, utility::Vector3 coords)
 {
     if (jointExists(jointTag)) {
-        // To do: exception
+        throw EntityFoundException("Joint with tag " + std::to_string(jointTag) + " already exists.");
     }
-    else {
-        physicalModel::Building::getInstance().m_joints[jointTag] = std::make_unique<physicalModel::Joint>(jointTag, coords);
-    }
-
+    
+    physicalModel::Building::getInstance().m_joints[jointTag] = std::make_unique<physicalModel::Joint>(jointTag, coords);
 }
 
 void BuildingModelerAPI::addTranslationalMass(int jointTag, utility::Vector3 massValues)
 {
     if (!jointExists(jointTag)) {
-        // To do: exception
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
     }
-    else {
-        physicalModel::Building::getInstance().m_joints[jointTag]->addTranslationalMass(massValues);
-    }
+    
+    physicalModel::Building::getInstance().m_joints[jointTag]->addTranslationalMass(massValues);
 }
 
 void BuildingModelerAPI::addRotationalMass(int jointTag, utility::Vector3 massValues)
 {
     if (!jointExists(jointTag)) {
-        // To do: exception
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
     }
-    else {
-        physicalModel::Building::getInstance().m_joints[jointTag]->addRotationalMass(massValues);
-    }
+    
+    physicalModel::Building::getInstance().m_joints[jointTag]->addRotationalMass(massValues);
 }
 
 void BuildingModelerAPI::setConstraintVector(int jointTag, std::vector<int> constraintVector)
 {
     if (!jointExists(jointTag)) {
-        // To do: exception
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
     }
-    else {
-        physicalModel::Building::getInstance().m_joints[jointTag]->setConstraintVector(constraintVector);
-    }
+    
+    physicalModel::Building::getInstance().m_joints[jointTag]->setConstraintVector(constraintVector);
 }
 
 void BuildingModelerAPI::setFloorNo(int jointTag, int floorNumber)
 {
     if (!jointExists(jointTag)) {
-        // To do: exception
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
     }
-    else if (floorExists(floorNumber)) {
-        // To do: exception
+    
+    if (!floorExists(floorNumber)) {
+        throw EntityNotFoundException("Floor number " + std::to_string(floorNumber) + " does not exist.");
     }
-    else {
-        physicalModel::Building::getInstance().m_joints[jointTag]->setFloorNo(floorNumber);
-        physicalModel::Building::getInstance().m_floors[floorNumber]->addJoint(jointTag);
-    }
+    
+    physicalModel::Building::getInstance().m_joints[jointTag]->setFloorNo(floorNumber);
+    physicalModel::Building::getInstance().m_floors[floorNumber]->addJoint(jointTag);
 }
 
 void BuildingModelerAPI::includeMassFromMembers(bool includeMassFromMembers)
@@ -66,116 +61,117 @@ void BuildingModelerAPI::includeMassFromMembers(bool includeMassFromMembers)
 void BuildingModelerAPI::addElasticMaterial(int materialTag, double E, double G, double rho)
 {
     if (materialExists(materialTag)) {
-        // To do: exception
+        throw EntityFoundException("Material with tag " + std::to_string(materialTag) + " already exists.");
     }
-    else {
-        physicalModel::Building::getInstance().m_materials[materialTag] = std::make_unique<physicalModel::ElasticMaterial>(materialTag, E, G, rho);
-    }
+    
+    physicalModel::Building::getInstance().m_materials[materialTag] = std::make_unique<physicalModel::ElasticMaterial>(materialTag, E, G, rho);
 }
 
 void BuildingModelerAPI::addElasticSection1D(int sectionTag, int materialTag, double A, double Iyy, double Izz, double J)
 {
     if (sectionExists(sectionTag)) {
-        // To do: exception
+        throw EntityFoundException("Section with tag " + std::to_string(sectionTag) + " already exists.");
     }
-    else if (!materialExists(materialTag)) {
-        // To do: exception
+
+    if (!materialExists(materialTag)) {
+        throw EntityNotFoundException("Material with tag " + std::to_string(materialTag) + " does not exist.");
     }
-    else {
-        std::shared_ptr<physicalModel::Material> material = physicalModel::Building::getInstance().m_materials[materialTag];
-        physicalModel::Building::getInstance().m_sections[sectionTag] = std::make_unique<physicalModel::ElasticSection1D>(sectionTag, material, A, Iyy, Izz, J);
-    }
+    
+    std::shared_ptr<physicalModel::Material> material = physicalModel::Building::getInstance().m_materials[materialTag];
+    physicalModel::Building::getInstance().m_sections[sectionTag] = std::make_unique<physicalModel::ElasticSection1D>(sectionTag, material, A, Iyy, Izz, J);
 }
 
 void BuildingModelerAPI::addElasticSection2D(int sectionTag, int materialTag, double thickness)
 {
     if (sectionExists(sectionTag)) {
-        // To do: exception
+        throw EntityFoundException("Section with tag " + std::to_string(sectionTag) + " already exists.");
     }
-    else if (!materialExists(materialTag)) {
-        // To do: exception
+
+    if (!materialExists(materialTag)) {
+        throw EntityNotFoundException("Material with tag " + std::to_string(materialTag) + " does not exist.");
     }
-    else {
-        std::shared_ptr<physicalModel::Material> material = physicalModel::Building::getInstance().m_materials[materialTag];
-        physicalModel::Building::getInstance().m_sections[sectionTag] = std::make_unique<physicalModel::ElasticSection2D>(sectionTag, material, thickness);
-    }
+    
+    std::shared_ptr<physicalModel::Material> material = physicalModel::Building::getInstance().m_materials[materialTag];
+    physicalModel::Building::getInstance().m_sections[sectionTag] = std::make_unique<physicalModel::ElasticSection2D>(sectionTag, material, thickness);
 }
 
 void BuildingModelerAPI::addBeam(int elementTag, std::vector<int> jointTags, int sectionTag,
     physicalModel::LineElementFormulation lineElementFormulation)
 {
     if (lineElementExists(elementTag)) {
-        // To do: exception
+        throw EntityFoundException("Line element with tag " + std::to_string(elementTag) + " already exists.");
     }
-    else if (jointTags.size() != 2) {
-        // To do: exception
+
+    if (jointTags.size() != 2) {
+        throw InvalidInputException("Number of joints must be two to create a line element with tag " + std::to_string(elementTag) + ".");
     }
-    else if (!jointExists(jointTags[0]) || !jointExists(jointTags[1])) {
-        // To do: exception
+
+    if (!jointExists(jointTags[0]) || !jointExists(jointTags[1])) {
+        throw InvalidInputException("Joints do not exists to create line element with tag " + std::to_string(elementTag) + " .");
     }
-    else if (!sectionExists(sectionTag)) {
-        // To do: exception
+
+    if (!sectionExists(sectionTag)) {
+        throw EntityNotFoundException("Section with tag " + std::to_string(sectionTag) + " does not exist.");
     }
-    else {
-        std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
-        physicalModel::Building::getInstance().m_lineElements[elementTag] = std::make_unique<physicalModel::BeamElement>(elementTag, jointTags, section, lineElementFormulation);
-        physicalModel::Building::getInstance().m_joints[jointTags[0]]->addConnectedBeam(elementTag);
-        physicalModel::Building::getInstance().m_joints[jointTags[1]]->addConnectedBeam(elementTag);
-    }
+
+    std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
+    physicalModel::Building::getInstance().m_lineElements[elementTag] = std::make_unique<physicalModel::BeamElement>(elementTag, jointTags, section, lineElementFormulation);
+    physicalModel::Building::getInstance().m_joints[jointTags[0]]->addConnectedBeam(elementTag);
+    physicalModel::Building::getInstance().m_joints[jointTags[1]]->addConnectedBeam(elementTag);
 }
 
 void BuildingModelerAPI::addColumn(int elementTag, std::vector<int> jointTags, int sectionTag,
     physicalModel::LineElementFormulation lineElementFormulation)
 {
     if (lineElementExists(elementTag)) {
-        // To do: exception
+        throw EntityFoundException("Line element with tag " + std::to_string(elementTag) + " already exists.");
     }
-    else if (jointTags.size() != 2) {
-        // To do: exception
+
+    if (jointTags.size() != 2) {
+        throw InvalidInputException("Number of joints must be two to create a line element with tag " + std::to_string(elementTag) + ".");
     }
-    else if (!jointExists(jointTags[0]) || !jointExists(jointTags[1])) {
-        // To do: exception
+
+    if (!jointExists(jointTags[0]) || !jointExists(jointTags[1])) {
+        throw InvalidInputException("Joints do not exists to create line element with tag " + std::to_string(elementTag) + " .");
     }
-    else if (!sectionExists(sectionTag)) {
-        // To do: exception
+
+    if (!sectionExists(sectionTag)) {
+        throw EntityNotFoundException("Section with tag " + std::to_string(sectionTag) + " does not exist.");
     }
-    else {
-        std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
-        physicalModel::Building::getInstance().m_lineElements[elementTag] = std::make_unique<physicalModel::ColumnElement>(elementTag, jointTags, section, lineElementFormulation);
-        physicalModel::Building::getInstance().m_joints[jointTags[0]]->addConnectedColumn(elementTag);
-        physicalModel::Building::getInstance().m_joints[jointTags[1]]->addConnectedColumn(elementTag);
-    }
+
+    std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
+    physicalModel::Building::getInstance().m_lineElements[elementTag] = std::make_unique<physicalModel::ColumnElement>(elementTag, jointTags, section, lineElementFormulation);
+    physicalModel::Building::getInstance().m_joints[jointTags[0]]->addConnectedColumn(elementTag);
+    physicalModel::Building::getInstance().m_joints[jointTags[1]]->addConnectedColumn(elementTag);
 }
 
 void BuildingModelerAPI::setSegmentRatios(int elementTag, std::vector<double> segmentRatios)
 {
     if (!lineElementExists(elementTag)) {
-        // To do: exception
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
     }
-    else {
-        physicalModel::Building::getInstance().m_lineElements[elementTag]->setSegmentRelativeLengths(segmentRatios);
-        invalidateAreaMeshAlongLineElement(elementTag);
-    }
+    
+    physicalModel::Building::getInstance().m_lineElements[elementTag]->setSegmentRelativeLengths(segmentRatios);
+    invalidateAreaMeshAlongLineElement(elementTag);
 }
 
 void BuildingModelerAPI::setSection(int elementTag, int segmentNo, int sectionTag)
 {
     if (!lineElementExists(elementTag)) {
-        // To do: exception
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
     }
     else if (!sectionExists(sectionTag)) {
-        // To do: exception
+        throw EntityNotFoundException("Section with tag " + std::to_string(sectionTag) + " does not exist.");
     }
-    else {
-        std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
-        physicalModel::Building::getInstance().m_lineElements[elementTag]->setSection(segmentNo, section);
-    }
+    
+    std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
+    physicalModel::Building::getInstance().m_lineElements[elementTag]->setSection(segmentNo, section);
 }
 
 void BuildingModelerAPI::setSectionModifiers(int elementTag, int segmentNo, double modifierA, double modifierIyy, double modifierIzz, double modifierJ)
 {
     if (!lineElementExists(elementTag)) {
-        // To do: exception
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
     }
     
     physicalModel::Building::getInstance().m_lineElements[elementTag]->setSectionModifiers(segmentNo, std::make_shared<physicalModel::SectionModifiers>(modifierA, modifierIyy, modifierIzz, modifierJ));
@@ -185,11 +181,11 @@ void BuildingModelerAPI::addShearWall(int elementTag, std::vector<int> jointTags
     physicalModel::AreaElementFormulation areaElementFormulation)
 {
     if (areaElementExists(elementTag)) {
-        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
+        throw EntityFoundException("Area element with tag " + std::to_string(elementTag) + " already exists.");
     }
 
     if (jointTags.size() != 4) {
-        throw InvalidInputException("Number of joints must be four to create an area element.");
+        throw InvalidInputException("Number of joints must be four to create an area element with tag " + std::to_string(elementTag) + ".");
     }
 
     if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2])) {
@@ -230,11 +226,11 @@ void BuildingModelerAPI::addSlab(int elementTag, std::vector<int> jointTags, int
     physicalModel::AreaElementFormulation areaElementFormulation)
 {
     if (areaElementExists(elementTag)) {
-        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
+        throw EntityFoundException("Area element with tag " + std::to_string(elementTag) + " already exists.");
     }
 
     if (jointTags.size() != 4) {
-        throw InvalidInputException("Number of joints must be four to create an area element.");
+        throw InvalidInputException("Number of joints must be four to create an area element with tag " + std::to_string(elementTag) + ".");
     }
 
     if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2])) {
@@ -365,18 +361,18 @@ void BuildingModelerAPI::disableMeshForAreaElement(int elementTag)
 void BuildingModelerAPI::addFloor(int floorNumber, double height)
 {
     if (floorNumber < 0) {
-        // To do: exception
+        throw InvalidInputException("Floor number cannot be less than zero.");
     }
-    else if (floorExists(floorNumber)) {
-        // To do: exception
+
+    if (floorExists(floorNumber)) {
+        throw EntityFoundException("Floor number " + std::to_string(floorNumber) + " already exists.");
+    }
+    
+    if (floorNumber == 0) {
+        physicalModel::Building::getInstance().m_floors[floorNumber] = std::make_unique<physicalModel::Floor>(floorNumber);
     }
     else {
-        if (floorNumber == 0) {
-            physicalModel::Building::getInstance().m_floors[floorNumber] = std::make_unique<physicalModel::Floor>(floorNumber);
-        }
-        else {
-            physicalModel::Building::getInstance().m_floors[floorNumber] = std::make_unique<physicalModel::Floor>(floorNumber, height);
-        }
+        physicalModel::Building::getInstance().m_floors[floorNumber] = std::make_unique<physicalModel::Floor>(floorNumber, height);
     }
 }
 
@@ -499,10 +495,6 @@ bool BuildingModelerAPI::sectionExists(int sectionTag)
 
 void BuildingModelerAPI::invalidateAreaMeshAlongLineElement(int elementTag)
 {
-    if (!lineElementExists(elementTag)) {
-        // To do: exception
-    }
-
     auto lineElement = physicalModel::Building::getInstance().getLineElement(elementTag);
     auto jointI = physicalModel::Building::getInstance().getJoint(lineElement->getIJointTag());
     auto jointJ = physicalModel::Building::getInstance().getJoint(lineElement->getJJointTag());

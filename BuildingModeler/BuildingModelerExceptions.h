@@ -19,6 +19,13 @@ namespace buildingModeler
             : BuildingModelerException(message) {}
     };
 
+    // Exception for already existent entities
+    class EntityFoundException : public BuildingModelerException {
+    public:
+        explicit EntityFoundException(const std::string& message)
+            : BuildingModelerException(message) {}
+    };
+
     // Exception for invalid inputs
     class InvalidInputException : public BuildingModelerException {
     public:
