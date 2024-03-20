@@ -57,6 +57,7 @@ namespace physicalModel
 		void addAnalyticalNodeTags(std::vector<int> analyticalNodeTags);
 		void addAnalyticalElementTag(int analyticalElementTag);
 
+		// physical model getters
 		int getElementTag() const;
 		int getIJointTag() const;
 		int getJJointTag() const;
@@ -70,10 +71,12 @@ namespace physicalModel
 		std::pair<int, int> getMeshDivisions() const;
 		const std::vector<int>& getSurroundingLineElementTags();
 		const std::shared_ptr<Section> getSection() const;
-		const std::vector<std::vector<int>>& getAnalyticalNodeTags() const;
-		const std::vector < std::vector<utility::Vector3>>& getAnalyticalNodeCoords() const;
-		const std::vector<int>& getAnalyticalElementTags() const;
 		AreaElementType getAreaElementType() const;
 		AreaElementFormulation getAreaElementFormulation() const;
+
+		//analytical model getters
+		const std::vector<std::vector<int>>& getAnalyticalNodeTags() const;
+		const std::vector<std::vector<utility::Vector3>>& getAnalyticalNodeCoords() const;
+		const std::vector<int>& getAnalyticalElementTags() const;
 	};
 }

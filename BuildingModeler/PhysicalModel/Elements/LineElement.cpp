@@ -117,6 +117,16 @@ const std::shared_ptr<SectionModifiers> LineElement::getSectionModifiers(int seg
 	return m_sectionModifiers[segmentNo];
 }
 
+LineElementType LineElement::getLineElementType() const
+{
+	return m_lineElementType;
+}
+
+LineElementFormulation LineElement::getLineElementFormulation() const
+{
+	return m_lineElementFormulation;
+}
+
 std::vector<int> LineElement::getAnalyticalNodeTags() const
 {
 	return m_analyticalNodeTags;
@@ -127,18 +137,7 @@ const std::vector<utility::Vector3>& LineElement::getAnalyticalNodeCoords() cons
 	return m_analyticalNodeCoords;
 }
 
-
 const std::vector<int>& LineElement::getAnalyticalElementTags() const
 {
 	return m_analyticalElementTags;
-}
-
-LineElementType LineElement::getLineElementType() const
-{
-	return m_lineElementType;
-}
-
-LineElementFormulation LineElement::getLineElementFormulation() const
-{
-	return m_lineElementFormulation;
 }

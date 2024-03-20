@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Utilities/Vector2.h"
+#include "../Utilities/Vector3.h"
 
 #include <optional>
 
@@ -14,7 +15,9 @@ namespace physicalModel
 		double m_mass;
 		bool m_isRigid;
 		int m_masterJoint = -1;
+		bool m_confineFloorMassOnDiaphragmNode = false;
 		std::vector<int> m_jointTags;
+		std::optional<utility::Vector3> m_diaphragmMass;
 		std::optional<utility::Vector2> m_massCenter;
 		std::optional<utility::Vector2> m_stiffnessCenter;
 
@@ -30,6 +33,7 @@ namespace physicalModel
 		void makeFlexible();
 		bool updateMassCenter();
 		void updateStiffnessCenter();
+		void confineFloorMassOnDiaphragmNode(bool confineFloorMassOnDiaphragmNode);
 
 		int getFloorNumber() const;
 		double getFloorHeight() const;
@@ -37,7 +41,9 @@ namespace physicalModel
 		bool isRigid() const;
 		int getMassCenterJointTag() const;
 		const std::vector<int>& getJoints() const;
+		std::optional<utility::Vector3> getDiaphragmMass() const;
 		std::optional<utility::Vector2> getMassCenter() const;
 		std::optional<utility::Vector2> getStiffnessCenter() const;
+		bool floorMassConfinedOnDiaphragmNode() const;
 	};
 }

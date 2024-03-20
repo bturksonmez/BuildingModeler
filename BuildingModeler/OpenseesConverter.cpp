@@ -15,9 +15,10 @@ void OpenseesConverter::toNodeMassConstraint(const physicalModel::Joint* joint)
     
     opensees::OpenseesModel::getInstance().m_nodes[nodeTag] = std::make_unique<opensees::Node>(nodeTag, joint->getCoords());
 
+    auto isValid = !physicalModel::Building::getInstance().getFloor(joint->getFloorNo())->floorMassConfinedOnDiaphragmNode();
     auto translationalMass = joint->getTranslationalMass();
     auto rotationalMass = joint->getRotationalMass();
-    if (translationalMass != std::nullopt || rotationalMass != std::nullopt) {
+    if ((translationalMass != std::nullopt || rotationalMass != std::nullopt) && isValid) {
         opensees::OpenseesModel::getInstance().m_masses[nodeTag] = std::make_unique<opensees::Mass>(nodeTag);
         if (translationalMass != std::nullopt) {
             opensees::OpenseesModel::getInstance().m_masses[nodeTag]->addTranslationalMass(translationalMass.value());
@@ -302,6 +303,20 @@ void OpenseesConverter::toRigidDiaphragm(physicalModel::Floor* floor)
 
     if (floor->isRigid()) {
         auto masterNodeTag = floor->getMassCenterJointTag();
+        auto masterJoint = physicalModel::Building::getInstance().getJoint(masterNodeTag);
+        
+        auto translationalMass = masterJoint->getTranslationalMass();
+        auto rotationalMass = masterJoint->getRotationalMass();
+        if ((translationalMass != std::nullopt || rotationalMass != std::nullopt)) {
+            opensees::OpenseesModel::getInstance().m_masses[masterNodeTag] = std::make_unique<opensees::Mass>(masterNodeTag);
+            if (translationalMass != std::nullopt) {
+                opensees::OpenseesModel::getInstance().m_masses[masterNodeTag]->addTranslationalMass(translationalMass.value());
+            }
+            if (rotationalMass != std::nullopt) {
+                opensees::OpenseesModel::getInstance().m_masses[masterNodeTag]->addRotationalMass(rotationalMass.value());
+            }
+        }
+
         auto slaveNodeTags = floor->getJoints();
         opensees::OpenseesModel::getInstance().m_contraintsDiaphragm[floorNumber] = std::make_unique<opensees::DiaphragmConstraint>(masterNodeTag, slaveNodeTags, 3);
     }

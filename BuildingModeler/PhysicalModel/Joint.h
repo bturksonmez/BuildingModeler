@@ -36,6 +36,7 @@ namespace physicalModel
 		void setConstraintVector(std::vector<int> constraintVector);
 		void setFloorNo(int floorNo);
 
+		// physical model getters
 		int getJointTag() const;
 		utility::Vector3 getCoords() const;
 		std::optional<utility::Vector3> getTranslationalMass() const;
@@ -46,5 +47,9 @@ namespace physicalModel
 		const std::vector<int>& getConnectedWallTags() const;
 		std::optional<std::vector<int>> getConstraintVector() const;
 		int getFloorNo() const;
+
+		//analytical model getters
+		const utility::Vector3& getTranslationalMassFromAnalyticalNode() const;
+		const utility::Vector3& getRotationalMassFromAnalyticalNode() const;
 	};
 }

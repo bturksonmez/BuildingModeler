@@ -32,6 +32,10 @@ namespace buildingModeler
         static void setConstraintVector(int jointTag, std::vector<int> constraintVector);
         static void setFloorNo(int jointTag, int floorNo);
         static void includeMassFromMembers(bool includeMassFromMembers);
+        static utility::Vector3 getTranslationalMassForJointFromAnalyticalModel(int jointTag);
+        static std::optional<utility::Vector3> getTranslationalMassForJointFromPhysicalModel(int jointTag);
+        static utility::Vector3 getRotationalMassForJointFromAnalyticalModel(int jointTag);
+        static std::optional<utility::Vector3> getRotationalMassForJointFromPhysicalModel(int jointTag);
 
         // Material API
         static void addElasticMaterial(int materialTag, double E, double G, double rho);
@@ -63,6 +67,9 @@ namespace buildingModeler
         static void addFloor(int floorNumber, double height);
         static void makeRigid(int floorNumber, int masterJointTag);
         static void makeFlexible(int floorNumber);
+        static void confineFloorMassOnDiaphragmNode(int floorNumber, bool confineFloorMassOnDiaphragmNode);
+        static std::optional<utility::Vector3> getDiaphragmMass(int floorNumber);
+        static std::optional<utility::Vector2> getMassCenter(int floorNumber);
 
         // Building API
         static void includePDeltaEffects(bool includePDeltEffects);

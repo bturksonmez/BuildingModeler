@@ -1,4 +1,5 @@
 #include "Joint.h"
+#include "../OpenSeesWrapper/OpenseesModel.h"
 
 using namespace physicalModel;
 using namespace utility;
@@ -105,4 +106,26 @@ std::optional<std::vector<int>> Joint::getConstraintVector() const
 int Joint::getFloorNo() const
 {
 	return m_floorNo;
+}
+
+const utility::Vector3& Joint::getTranslationalMassFromAnalyticalNode() const
+{
+	auto mass = opensees::OpenseesModel::getInstance().getMass(m_jointTag);
+
+	if (mass != nullptr) {
+		return mass->getTranslationalMass();
+	}
+
+	return {};
+}
+
+const utility::Vector3& Joint::getRotationalMassFromAnalyticalNode() const
+{
+	auto mass = opensees::OpenseesModel::getInstance().getMass(m_jointTag);
+
+	if (mass != nullptr) {
+		return mass->getRotationalMass();
+	}
+
+	return {};
 }

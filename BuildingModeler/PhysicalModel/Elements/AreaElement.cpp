@@ -137,6 +137,16 @@ const std::shared_ptr<Section> AreaElement::getSection() const
 	return m_section;
 }
 
+AreaElementType AreaElement::getAreaElementType() const
+{
+	return m_areaElementType;
+}
+
+AreaElementFormulation AreaElement::getAreaElementFormulation() const
+{
+	return m_areaElementFormulation;
+}
+
 const std::vector<std::vector<int>>& AreaElement::getAnalyticalNodeTags() const
 {
 	return m_analyticalNodeTags;
@@ -150,14 +160,4 @@ const std::vector<std::vector<utility::Vector3>>& AreaElement::getAnalyticalNode
 const std::vector<int>& AreaElement::getAnalyticalElementTags() const
 {
 	return m_analyticalElementTags;
-}
-
-AreaElementType AreaElement::getAreaElementType() const
-{
-	return m_areaElementType;
-}
-
-AreaElementFormulation AreaElement::getAreaElementFormulation() const
-{
-	return m_areaElementFormulation;
 }

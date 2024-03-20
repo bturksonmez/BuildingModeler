@@ -34,8 +34,11 @@ bool Floor::updateMassCenter()
 {
 	double sumMassX = 0.0;
 	double sumMassY = 0.0;
+	double sumCoordsX = 0.0;
+	double sumCoordsY = 0.0;
 	double sumMassMomentX = 0.0;
 	double sumMassMomentY = 0.0;
+	double rotationalInertia = 0.0;
 
 	for (auto jointTag : m_jointTags) {
 		auto joint = Building::getInstance().getJoint(jointTag);
@@ -45,17 +48,35 @@ bool Floor::updateMassCenter()
 		if (mass != std::nullopt) {
 			sumMassX += mass.value().x;
 			sumMassY += mass.value().y;
-			sumMassMomentX += (mass.value().x * coords.x);
-			sumMassMomentY += (mass.value().y * coords.y);
+			sumCoordsX += coords.x;
+			sumCoordsY += coords.y;
+			sumMassMomentX += (mass.value().x * coords.y);
+			sumMassMomentY += (mass.value().y * coords.x);
+			rotationalInertia += (mass.value().x * coords.y * coords.y);
+			rotationalInertia += (mass.value().y * coords.x * coords.x);
 		}
 	}
 
-	if (sumMassX < 1e-10 || sumMassY < 1e-10) {
+	if (sumMassX < 1e-10 && sumMassY < 1e-10) {
 		return false;
 	}
-
-	m_massCenter.value().x = sumMassMomentX / sumMassX;
-	m_massCenter.value().y = sumMassMomentY / sumMassY;
+	else if (sumMassX < 1e-10) {
+		m_massCenter.value().x = sumMassMomentY / sumMassY;
+		m_massCenter.value().y = sumCoordsY / m_jointTags.size();
+		m_diaphragmMass.value().y = sumMassY;
+	}
+	else if (sumMassY < 1e-10) {
+		m_massCenter.value().x = sumCoordsX / m_jointTags.size();
+		m_massCenter.value().y = sumMassMomentX / sumMassX;
+		m_diaphragmMass.value().x = sumMassX;
+	}
+	else {
+		m_massCenter.value().x = sumMassMomentY / sumMassY;
+		m_massCenter.value().y = sumMassMomentX / sumMassX;
+		m_diaphragmMass.value().x = sumMassX;
+		m_diaphragmMass.value().y = sumMassY;
+		m_diaphragmMass.value().z = rotationalInertia;
+	}
 
 	return true;
 }
@@ -63,6 +84,11 @@ bool Floor::updateMassCenter()
 void Floor::updateStiffnessCenter()
 {
 	// To be implemented
+}
+
+void Floor::confineFloorMassOnDiaphragmNode(bool confineFloorMassOnDiaphragmNode)
+{
+	m_confineFloorMassOnDiaphragmNode = confineFloorMassOnDiaphragmNode;
 }
 
 int Floor::getFloorNumber() const
@@ -95,6 +121,11 @@ const std::vector<int>& Floor::getJoints() const
 	return m_jointTags;
 }
 
+std::optional<utility::Vector3> Floor::getDiaphragmMass() const
+{
+	return m_diaphragmMass;
+}
+
 std::optional<utility::Vector2> Floor::getMassCenter() const
 {
 	return m_massCenter;
@@ -103,5 +134,10 @@ std::optional<utility::Vector2> Floor::getMassCenter() const
 std::optional<utility::Vector2> Floor::getStiffnessCenter() const
 {
 	return m_stiffnessCenter;
+}
+
+bool Floor::floorMassConfinedOnDiaphragmNode() const
+{
+	return m_confineFloorMassOnDiaphragmNode;
 }
 
