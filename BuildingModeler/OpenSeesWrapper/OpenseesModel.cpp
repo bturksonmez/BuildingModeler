@@ -14,6 +14,20 @@ OpenseesModel& OpenseesModel::getInstance()
     return instance;
 }
 
+void OpenseesModel::clear()
+{
+    m_nodes.clear();
+    m_masses.clear();
+    m_contraintsSP.clear();
+    m_contraintsDiaphragm.clear();
+    m_beamColumnElements.clear();
+    m_quadrilateralElements.clear();
+    m_materials.clear();
+    m_geometricTransformation.clear();
+    m_sections.clear();
+    m_divisionsBetweenNodes.clear();
+}
+
 Node* OpenseesModel::getNode(int nodeTag) const
 {
     auto it = m_nodes.find(nodeTag);

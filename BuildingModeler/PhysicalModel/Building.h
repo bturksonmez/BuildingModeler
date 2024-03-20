@@ -58,6 +58,7 @@ namespace physicalModel
         void deleteJoint(int jointTag);
 
         static Building& getInstance();
+        void clear();
         Joint* getJoint(int jointTag) const;
         LineElement* getLineElement(int elementTag) const;
         AreaElement* getAreaElement(int elementTag) const;

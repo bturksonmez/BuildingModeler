@@ -19,6 +19,18 @@ Building& Building::getInstance()
     return instance;
 }
 
+void Building::clear()
+{
+    m_includeMassFromMembers = true;
+    m_includePDeltaEffects = false;
+    m_joints.clear();
+    m_lineElements.clear();
+    m_areaElements.clear();
+    m_floors.clear();
+    m_materials.clear();
+    m_sections.clear();
+}
+
 Joint* Building::getJoint(int jointTag) const
 {
     auto it = m_joints.find(jointTag);

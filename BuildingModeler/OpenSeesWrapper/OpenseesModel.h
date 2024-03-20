@@ -47,6 +47,7 @@ namespace opensees
 		OpenseesModel & operator=(OpenseesModel&&) = delete;
 
 		static OpenseesModel& getInstance();
+		void clear();
 		Node* getNode(int nodeTag) const;
 		Mass* getMass(int nodeTag) const;
 		Constraint* getSPConstraint(int nodeTag) const;
