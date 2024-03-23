@@ -25,5 +25,6 @@ namespace utility
 		friend Vector2 operator-(const Vector2& v1, const Vector2& v2);
 		friend Vector2 operator/(const Vector2& v1, const double c);
 		friend Vector2 operator*(const double c, const Vector2& v1);
+		friend bool operator== (const Vector2& v1, const Vector2& v2);
 	};
 }

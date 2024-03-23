@@ -55,3 +55,16 @@ Vector2 utility::operator*(const double c, const Vector2& v1)
 
 	return result;
 }
+
+bool utility::operator==(const Vector2& v1, const Vector2& v2)
+{
+	if (v1.x < v2.x - 1e-10 && v1.x > v2.x + 1e-10) {
+		return false;
+	}
+
+	if (v1.y < v2.y - 1e-10 && v1.y > v2.y + 1e-10) {
+		return false;
+	}
+
+	return true;
+}

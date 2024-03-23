@@ -18,7 +18,7 @@ namespace physicalModel
 		std::vector<int> m_connectedSlabTags;
 		std::vector<int> m_connectedWallTags;
 		std::optional<std::vector<int>> m_constraintVector;
-		int m_floorNo;
+		int m_floorNo = -1;
 
 	public:
 		Joint(int jointTag, utility::Vector3 coords);

@@ -486,7 +486,7 @@ void BuildingModelerAPI::makeRigid(int floorNumber, int masterJointTag)
 
     auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
     if (floor->isRigid()) {
-        throw InvalidOperationException("Floor " + std::to_string(floorNumber) + "is already rigid.");
+        throw InvalidOperationException("Floor " + std::to_string(floorNumber) + " is already rigid.");
     }
 
     if (floor->getMassCenterJointTag() != -1) {
@@ -498,7 +498,7 @@ void BuildingModelerAPI::makeRigid(int floorNumber, int masterJointTag)
     if (massCenter == std::nullopt)
     {
         if (!floor->updateMassCenter()) {
-            throw InvalidOperationException("Floor " + std::to_string(floorNumber) + "either has no mass.");
+            throw InvalidOperationException("Floor " + std::to_string(floorNumber) + " has no mass.");
         }
         massCenter = floor->getMassCenter();
         mass = floor->getDiaphragmMass();
@@ -512,6 +512,7 @@ void BuildingModelerAPI::makeRigid(int floorNumber, int masterJointTag)
     physicalModel::Building::getInstance().m_joints[masterJointTag] = std::make_unique<physicalModel::Joint>(masterJointTag, coords);
 
     auto joint = physicalModel::Building::getInstance().getJoint(masterJointTag);
+    joint->setFloorNo(floorNumber);
     joint->setConstraintVector({0, 0, 1, 1, 1, 0});
 
     if (mass != std::nullopt) {
@@ -520,7 +521,7 @@ void BuildingModelerAPI::makeRigid(int floorNumber, int masterJointTag)
 
         if (mass.value().z > 1e-10 || mass.value().z < -1e-10) {
             utility::Vector3 rotationalMass{0, 0, mass.value().z };
-            joint->addTranslationalMass(tranlationalMass);
+            joint->addRotationalMass(rotationalMass);
         }
     }
 
@@ -533,7 +534,7 @@ void BuildingModelerAPI::makeFlexible(int floorNumber)
         throw EntityNotFoundException("Floor number " + std::to_string(floorNumber) + " does not exist.");
     }
     else if (!physicalModel::Building::getInstance().m_floors[floorNumber]->isRigid()) {
-        throw InvalidOperationException("Floor number " + std::to_string(floorNumber) + "is already flexible.");
+        throw InvalidOperationException("Floor number " + std::to_string(floorNumber) + " is already flexible.");
     }
     else {
         auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
@@ -553,7 +554,7 @@ void BuildingModelerAPI::confineFloorMassOnDiaphragmNode(int floorNumber, bool c
     auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
     if (!floor->isRigid() && confineFloorMassOnDiaphragmNode) {
         throw InvalidOperationException("Floor mass can be confined into diaphragm node only in rigid floors. Floor " 
-            + std::to_string(floorNumber) + "is not rigid.");
+            + std::to_string(floorNumber) + " is not rigid.");
     }
 
     floor->confineFloorMassOnDiaphragmNode(confineFloorMassOnDiaphragmNode);

@@ -17,7 +17,8 @@ add_subdirectory(external/googletest)
 add_executable(Tests
 	"Tests/TestMain.cpp"
 	"Tests/QuadMesherTests.cpp"
-  "Tests/FrameMesherTests.cpp")
+	"Tests/FrameMesherTests.cpp"
+	"Tests/RigidDiaphragmTests.cpp")
 
 target_link_libraries(Tests 
 	gtest 

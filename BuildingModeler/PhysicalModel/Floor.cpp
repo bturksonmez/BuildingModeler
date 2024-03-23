@@ -7,8 +7,6 @@ using namespace utility;
 Floor::Floor(int floorNumber, double height) : m_floorNumber(floorNumber), m_height(height)
 {
 	m_isRigid = false;
-	m_massCenter.value().x = -1;
-	m_massCenter.value().y = -1;
 }
 
 void Floor::addJoint(int jointTag)
@@ -26,8 +24,7 @@ void Floor::makeFlexible()
 {
 	m_isRigid = false;
 	m_masterJoint = -1;
-	m_massCenter.value().x = -1;
-	m_massCenter.value().y = -1;
+	m_massCenter = std::nullopt;
 }
 
 bool Floor::updateMassCenter()
@@ -38,7 +35,6 @@ bool Floor::updateMassCenter()
 	double sumCoordsY = 0.0;
 	double sumMassMomentX = 0.0;
 	double sumMassMomentY = 0.0;
-	double rotationalInertia = 0.0;
 
 	for (auto jointTag : m_jointTags) {
 		auto joint = Building::getInstance().getJoint(jointTag);
@@ -52,8 +48,6 @@ bool Floor::updateMassCenter()
 			sumCoordsY += coords.y;
 			sumMassMomentX += (mass.value().x * coords.y);
 			sumMassMomentY += (mass.value().y * coords.x);
-			rotationalInertia += (mass.value().x * coords.y * coords.y);
-			rotationalInertia += (mass.value().y * coords.x * coords.x);
 		}
 	}
 
@@ -61,21 +55,29 @@ bool Floor::updateMassCenter()
 		return false;
 	}
 	else if (sumMassX < 1e-10) {
-		m_massCenter.value().x = sumMassMomentY / sumMassY;
-		m_massCenter.value().y = sumCoordsY / m_jointTags.size();
-		m_diaphragmMass.value().y = sumMassY;
+		m_massCenter = { sumMassMomentY / sumMassY,  sumCoordsY / m_jointTags.size() };
+		m_diaphragmMass = { 0, sumMassY, 0 };
 	}
 	else if (sumMassY < 1e-10) {
-		m_massCenter.value().x = sumCoordsX / m_jointTags.size();
-		m_massCenter.value().y = sumMassMomentX / sumMassX;
-		m_diaphragmMass.value().x = sumMassX;
+		m_massCenter = { sumCoordsX / m_jointTags.size(), sumMassMomentX / sumMassX };
+		m_diaphragmMass = { sumMassX, 0, 0 };
 	}
 	else {
-		m_massCenter.value().x = sumMassMomentY / sumMassY;
-		m_massCenter.value().y = sumMassMomentX / sumMassX;
-		m_diaphragmMass.value().x = sumMassX;
-		m_diaphragmMass.value().y = sumMassY;
-		m_diaphragmMass.value().z = rotationalInertia;
+		m_massCenter = { sumMassMomentY / sumMassY, sumMassMomentX / sumMassX };
+
+		double rotationalInertia = 0.0;
+		for (auto jointTag : m_jointTags) {
+			auto joint = Building::getInstance().getJoint(jointTag);
+			auto coords = joint->getCoords();
+
+			auto mass = joint->getTranslationalMass();
+			if (mass != std::nullopt) {
+				rotationalInertia += (mass.value().x * (m_massCenter.value().y - coords.y) * (m_massCenter.value().y - coords.y));
+				rotationalInertia += (mass.value().y * (m_massCenter.value().x - coords.x) * (m_massCenter.value().x - coords.x));
+			}
+		}
+
+		m_diaphragmMass = { sumMassX, sumMassY, rotationalInertia };
 	}
 
 	return true;

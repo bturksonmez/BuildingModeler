@@ -15,7 +15,14 @@ void OpenseesConverter::toNodeMassConstraint(const physicalModel::Joint* joint)
     
     opensees::OpenseesModel::getInstance().m_nodes[nodeTag] = std::make_unique<opensees::Node>(nodeTag, joint->getCoords());
 
-    auto isValid = !physicalModel::Building::getInstance().getFloor(joint->getFloorNo())->floorMassConfinedOnDiaphragmNode();
+    bool isValid;
+    if (joint->getFloorNo() == -1) {
+        isValid = true;
+    }
+    else {
+        isValid = !physicalModel::Building::getInstance().getFloor(joint->getFloorNo())->floorMassConfinedOnDiaphragmNode();
+    }
+
     auto translationalMass = joint->getTranslationalMass();
     auto rotationalMass = joint->getRotationalMass();
     if ((translationalMass != std::nullopt || rotationalMass != std::nullopt) && isValid) {
