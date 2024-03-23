@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
 #include "../Materials/Material.h"
 
@@ -19,10 +20,10 @@ namespace physicalModel
 		int m_sectionTag;
 		SectionType m_sectionType;
 		std::shared_ptr<Material> m_material;
-		double m_A;
-		double m_Iyy;
-		double m_Izz;
-		double m_J;
+		std::optional<double> m_A;
+		std::optional<double> m_Iyy;
+		std::optional<double> m_Izz;
+		std::optional<double> m_J;
 
 		Section(int sectionTag, std::shared_ptr<Material> material) : m_sectionTag(sectionTag), m_material(material){}
 
@@ -35,10 +36,10 @@ namespace physicalModel
 		int getSectionTag() const;
 		SectionType getSectionType() const;
 		const std::shared_ptr<Material> getMaterial() const;
-		double getA() const;
-		double getIyy() const;
-		double getIzz() const;
-		double getJ() const;
+		std::optional<double> getA() const;
+		std::optional<double> getIyy() const;
+		std::optional<double> getIzz() const;
+		std::optional<double> getJ() const;
 	};
 }
 

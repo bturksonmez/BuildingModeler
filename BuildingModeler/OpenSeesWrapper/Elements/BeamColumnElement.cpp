@@ -2,10 +2,10 @@
 
 using namespace opensees;
 
-BeamColumnElement::BeamColumnElement(int elementTag, std::vector<int> nodeTags, std::shared_ptr<Section> section, std::shared_ptr<GeometricTransformation> transf) : Element(elementTag, nodeTags, section)
+BeamColumnElement::BeamColumnElement(int elementTag, std::vector<int> nodeTags, std::shared_ptr<Section> section, std::vector<double> modifiers, std::shared_ptr<GeometricTransformation> transf) : Element(elementTag, nodeTags, section)
 {
+	m_modifiers = modifiers;
 	m_transf = transf;
-
 	m_elementType = ElementType::BEAMCOLUMN;
 }
 
@@ -17,6 +17,11 @@ int BeamColumnElement::getINodeTag() const
 int BeamColumnElement::getJNodeTag() const
 {
 	return m_nodeTags[1];
+}
+
+const std::vector<double>& BeamColumnElement::getModifiers() const
+{
+	return m_modifiers;
 }
 
 const std::shared_ptr<GeometricTransformation> BeamColumnElement::getGeometricTransf() const

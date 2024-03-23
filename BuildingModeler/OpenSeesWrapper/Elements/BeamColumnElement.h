@@ -17,16 +17,18 @@ namespace opensees
 	class BeamColumnElement : public Element
 	{
 	protected:
+		std::vector<double> m_modifiers;
 		std::shared_ptr<GeometricTransformation> m_transf;
 		BeamColumnElementType m_beamColumnElementType;
 
-		BeamColumnElement(int elementTag, std::vector<int> nodeTags, std::shared_ptr<Section> section, std::shared_ptr<GeometricTransformation> transf);
+		BeamColumnElement(int elementTag, std::vector<int> nodeTags, std::shared_ptr<Section> section, std::vector<double> modifiers, std::shared_ptr<GeometricTransformation> transf);
 	public:
 		BeamColumnElement() = delete;
 		~BeamColumnElement() {}
 
 		int getINodeTag() const;
 		int getJNodeTag() const;
+		const std::vector<double>& getModifiers() const;
 		const std::shared_ptr<GeometricTransformation> getGeometricTransf() const;
 		BeamColumnElementType getBeamColumnElementType() const;
 	};

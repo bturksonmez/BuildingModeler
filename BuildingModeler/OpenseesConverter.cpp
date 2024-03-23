@@ -73,7 +73,7 @@ void OpenseesConverter::toSection(const physicalModel::Section* section)
     {
     case physicalModel::SectionType::ELASTIC1D:
         opensees::OpenseesModel::getInstance().m_sections[sectionTag]
-            = std::make_unique<opensees::ElasticSection>(sectionTag, materialAnalytical, section->getA(), section->getIyy(), section->getIzz(), section->getJ());
+            = std::make_unique<opensees::ElasticSection>(sectionTag, materialAnalytical, section->getA().value(), section->getIyy().value(), section->getIzz().value(), section->getJ().value());
         break;
     case physicalModel::SectionType::ELASTIC2D: {
         auto section2D = dynamic_cast<const physicalModel::ElasticSection2D*>(section);
@@ -134,12 +134,14 @@ void OpenseesConverter::toBeamColumnElement(physicalModel::LineElement* element)
     for (int i = 0; i < element->getSegmentLengths().size(); ++i) {
 
         auto section = opensees::OpenseesModel::getInstance().m_sections[element->getSection(i)->getSectionTag()];
+        auto sectionModifiers = element->getSectionModifiers(i);
+        auto modifiers = std::vector<double>{ sectionModifiers->m_modifierA, sectionModifiers->m_modifierIyy, sectionModifiers->m_modifierIzz, sectionModifiers->m_modifierJ };
 
         switch (element->getLineElementFormulation())
         {
         case physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI:
             opensees::OpenseesModel::getInstance().m_beamColumnElements[elementTag]
-                = std::make_unique<opensees::ElasticBeamColumnElement>(elementTag, std::vector<int>{nodes[i], nodes[i + 1]}, section, transf);
+                = std::make_unique<opensees::ElasticBeamColumnElement>(elementTag, std::vector<int>{nodes[i], nodes[i + 1]}, section, modifiers, transf);
             break;
         default:
             break;

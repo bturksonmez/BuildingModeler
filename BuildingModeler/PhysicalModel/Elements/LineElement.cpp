@@ -85,7 +85,7 @@ double LineElement::getMass() const
 
 	for (int i = 0; i < m_segmentLengths.size(); ++i) {
 
-		auto segmentMass = m_sections[i]->getMaterial()->getRho() * m_segmentLengths[i] * m_sections[i]->getA();
+		auto segmentMass = m_sections[i]->getMaterial()->getRho() * m_segmentLengths[i] * m_sections[i]->getA().value();
 		elementMass += segmentMass;
 	}
 
