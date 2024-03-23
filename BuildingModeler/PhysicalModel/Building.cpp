@@ -142,8 +142,8 @@ void Building::addMemberMasses()
 
         auto jointI = it->second->getIJointTag();
         auto jointJ = it->second->getJJointTag();
-        auto jointK = it->second->getIJointTag();
-        auto jointL = it->second->getJJointTag();
+        auto jointK = it->second->getKJointTag();
+        auto jointL = it->second->getLJointTag();
         auto mass = it->second->getMass() / 4.0;
 
         utility::Vector3 translationalMass(mass, mass, 0.0);

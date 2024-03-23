@@ -66,6 +66,73 @@ void BuildingModelerAPI::includeMassFromMembers(bool includeMassFromMembers)
     physicalModel::Building::getInstance().m_includeMassFromMembers = includeMassFromMembers;
 }
 
+std::vector<int> BuildingModelerAPI::getConstraintVectorFromAnalyticalModel(int jointTag)
+{
+    if (!jointExists(jointTag)) {
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
+    }
+
+    auto joint = physicalModel::Building::getInstance().getJoint(jointTag);
+
+    return joint->getConstraintVectorFromAnalyticalNode();
+}
+
+std::optional<std::vector<int>> BuildingModelerAPI::getConstraintVectorFromPhysicalModel(int jointTag)
+{
+    if (!jointExists(jointTag)) {
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
+    }
+
+    auto joint = physicalModel::Building::getInstance().getJoint(jointTag);
+
+    return joint->getConstraintVector();
+}
+
+std::vector<std::vector<int>> BuildingModelerAPI::getConstraintVectorForNodesBetween(int jointTagA, int jointTagB)
+{
+    if (!jointExists(jointTagA)) {
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTagA) + " does not exist.");
+    }
+
+    if (!jointExists(jointTagB)) {
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTagB) + " does not exist.");
+    }
+
+    auto nodesAB = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(jointTagA, jointTagB);
+    if (nodesAB.empty()) {
+        nodesAB = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(jointTagB, jointTagA);
+
+        if (nodesAB.empty()) {
+            nodesAB = { jointTagA, jointTagB };
+        }
+        else {
+            std::reverse(nodesAB.begin(), nodesAB.end());
+        }
+    }
+
+    std::vector<std::vector<int>> constraintVectors;
+    for (auto nodeTag : nodesAB) {
+
+        auto constraint = opensees::OpenseesModel::getInstance().getSPConstraint(nodeTag);
+
+        if (constraint != nullptr) {
+
+            auto constraintSP = dynamic_cast<opensees::SingleConstraint*>(constraint);
+            if (constraintSP != nullptr) {
+                constraintVectors.push_back(constraintSP->getFixedDOFs());
+            }
+            else {
+                constraintVectors.push_back({});
+            }
+        }
+        else {
+            constraintVectors.push_back({});
+        }
+    }
+    
+    return constraintVectors;
+}
+
 utility::Vector3 BuildingModelerAPI::getTranslationalMassForJointFromAnalyticalModel(int jointTag)
 {
     if (!jointExists(jointTag)) {

@@ -32,6 +32,9 @@ namespace buildingModeler
         static void setConstraintVector(int jointTag, std::vector<int> constraintVector);
         static void setFloorNo(int jointTag, int floorNo);
         static void includeMassFromMembers(bool includeMassFromMembers);
+        static std::vector<int> getConstraintVectorFromAnalyticalModel(int jointTag);
+        static std::optional<std::vector<int>> getConstraintVectorFromPhysicalModel(int jointTag);
+        static std::vector<std::vector<int>> getConstraintVectorForNodesBetween(int jointTagA, int jointTagB);
         static utility::Vector3 getTranslationalMassForJointFromAnalyticalModel(int jointTag);
         static std::optional<utility::Vector3> getTranslationalMassForJointFromPhysicalModel(int jointTag);
         static utility::Vector3 getRotationalMassForJointFromAnalyticalModel(int jointTag);

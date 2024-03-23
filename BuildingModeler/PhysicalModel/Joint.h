@@ -49,6 +49,7 @@ namespace physicalModel
 		int getFloorNo() const;
 
 		//analytical model getters
+		const std::vector<int>& getConstraintVectorFromAnalyticalNode() const;
 		const utility::Vector3& getTranslationalMassFromAnalyticalNode() const;
 		const utility::Vector3& getRotationalMassFromAnalyticalNode() const;
 	};

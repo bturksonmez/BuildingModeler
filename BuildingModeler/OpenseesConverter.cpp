@@ -412,7 +412,7 @@ std::vector<int> OpenseesConverter::createNodesBetweenTwoJoints(int jointTagA, i
     auto constraintB = opensees::OpenseesModel::getInstance().getSPConstraint(jointTagB);
     auto assignConstraint = false;
     std::vector<int> constraintVector;
-    if ((constraintA && constraintB) && (constraintA == constraintB)) {
+    if ((constraintA && constraintB) && (*constraintA == *constraintB)) {
         assignConstraint = true;
         constraintVector = dynamic_cast<opensees::SingleConstraint*>(constraintA)->getFixedDOFs();
     }

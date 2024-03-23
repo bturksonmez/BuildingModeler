@@ -5,7 +5,9 @@ file(GLOB_RECURSE BUILDING_MODELER_SOURCES
      "${CMAKE_CURRENT_SOURCE_DIR}/OpenSeesWrapper/*.cpp"
      "${CMAKE_CURRENT_SOURCE_DIR}/PhysicalModel/*.cpp"
      "${CMAKE_CURRENT_SOURCE_DIR}/Utilities/*.cpp"
-     "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+     "${CMAKE_CURRENT_SOURCE_DIR}/BuildingModelerAPI.cpp"
+     "${CMAKE_CURRENT_SOURCE_DIR}/BuildingModelerExceptions.cpp"
+     "${CMAKE_CURRENT_SOURCE_DIR}/OpenseesConverter.cpp"
 )
 
 add_library(BuildingModelerLib ${BUILDING_MODELER_SOURCES})
@@ -19,3 +21,5 @@ target_include_directories(BuildingModeler PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/PhysicalModel
     ${CMAKE_CURRENT_SOURCE_DIR}/Utilities
 )
+
+target_link_libraries(BuildingModeler PRIVATE BuildingModelerLib)

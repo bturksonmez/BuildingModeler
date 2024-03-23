@@ -713,6 +713,200 @@ TEST(QuadMesherTests, MeshWithN1nN2FiveElementsSuccess) {
     }
 }
 
+TEST(QuadMesherTests, MeshWithN1nN2FiveElementsWithConstraintSuccess) {
+    typedef buildingModeler::BuildingModelerAPI api;
+
+    // add quad joints
+    api::addJoint(1, { 0, 0, 0 });
+    api::addJoint(2, { 3, 0, 0 });
+    api::addJoint(3, { 6, 0, 0 });
+    api::addJoint(4, { 0, 2, 0 });
+    api::addJoint(5, { 3, 2, 0 });
+    api::addJoint(6, { 6, 2, 0 });
+    api::addJoint(7, { 0, 4, 0 });
+    api::addJoint(8, { 3, 4, 0 });
+    api::addJoint(9, { 6, 4, 0 });
+    api::addJoint(10, { 9, 2, 0 });
+    api::addJoint(11, { 9, 4, 0 });
+
+    // add constraint
+    api::setConstraintVector(1, { 1, 1, 1, 1, 1, 1 });
+    api::setConstraintVector(2, { 1, 1, 1, 1, 1, 1 });
+    api::setConstraintVector(3, { 1, 1, 1, 0, 0, 0 });
+    api::setConstraintVector(4, { 1, 1, 1, 1, 1, 1 });
+    api::setConstraintVector(7, { 1, 1, 1, 0, 0, 0 });
+
+    // add material
+    api::addElasticMaterial(1, 20, 20, 2);
+
+    // add section 2D
+    api::addElasticSection2D(1, 1, 2.0);
+
+    // add area element
+    api::addShearWall(1, { 1, 2, 5, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(2, { 2, 3, 6, 5 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(3, { 4, 5, 8, 7 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(4, { 5, 6, 9, 8 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(5, { 6, 10, 11, 9 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+
+    //mesh the element
+    api::meshAreaElement(1, 3, 2);
+    api::meshAreaElement(2, 3, 2);
+    api::meshAreaElement(3, 3, 2);
+    api::meshAreaElement(4, 3, 2);
+    api::meshAreaElement(5, 3, 2);
+
+    // create analytical model
+    physicalModel::Building::getInstance().toAnalyticalModel();
+
+    // retrieve node coords
+    auto nodeCoords1 = api::getNodeCoordinatesOfAreaElement(1);
+    auto nodeCoords2 = api::getNodeCoordinatesOfAreaElement(2);
+    auto nodeCoords3 = api::getNodeCoordinatesOfAreaElement(3);
+    auto nodeCoords4 = api::getNodeCoordinatesOfAreaElement(4);
+    auto nodeCoords5 = api::getNodeCoordinatesOfAreaElement(5);
+
+    // expected values
+    std::vector<std::vector<utility::Vector3>> expectedCoords1{ { {0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}, {1.0, 1.0, 0.0}, {0.0, 1.0, 0.0} },
+                                                                { {1.0, 0.0, 0.0}, {2.0, 0.0, 0.0}, {2.0, 1.0, 0.0}, {1.0, 1.0, 0.0} },
+                                                                { {2.0, 0.0, 0.0}, {3.0, 0.0, 0.0}, {3.0, 1.0, 0.0}, {2.0, 1.0, 0.0} },
+                                                                { {0.0, 1.0, 0.0}, {1.0, 1.0, 0.0}, {1.0, 2.0, 0.0}, {0.0, 2.0, 0.0} },
+                                                                { {1.0, 1.0, 0.0}, {2.0, 1.0, 0.0}, {2.0, 2.0, 0.0}, {1.0, 2.0, 0.0} },
+                                                                { {2.0, 1.0, 0.0}, {3.0, 1.0, 0.0}, {3.0, 2.0, 0.0}, {2.0, 2.0, 0.0} } };
+
+    std::vector<std::vector<utility::Vector3>> expectedCoords2{ { {3.0, 0.0, 0.0}, {4.0, 0.0, 0.0}, {4.0, 1.0, 0.0}, {3.0, 1.0, 0.0} },
+                                                                { {4.0, 0.0, 0.0}, {5.0, 0.0, 0.0}, {5.0, 1.0, 0.0}, {4.0, 1.0, 0.0} },
+                                                                { {5.0, 0.0, 0.0}, {6.0, 0.0, 0.0}, {6.0, 1.0, 0.0}, {5.0, 1.0, 0.0} },
+                                                                { {3.0, 1.0, 0.0}, {4.0, 1.0, 0.0}, {4.0, 2.0, 0.0}, {3.0, 2.0, 0.0} },
+                                                                { {4.0, 1.0, 0.0}, {5.0, 1.0, 0.0}, {5.0, 2.0, 0.0}, {4.0, 2.0, 0.0} },
+                                                                { {5.0, 1.0, 0.0}, {6.0, 1.0, 0.0}, {6.0, 2.0, 0.0}, {5.0, 2.0, 0.0} } };
+
+    std::vector<std::vector<utility::Vector3>> expectedCoords3{ { {0.0, 2.0, 0.0}, {1.0, 2.0, 0.0}, {1.0, 3.0, 0.0}, {0.0, 3.0, 0.0} },
+                                                                { {1.0, 2.0, 0.0}, {2.0, 2.0, 0.0}, {2.0, 3.0, 0.0}, {1.0, 3.0, 0.0} },
+                                                                { {2.0, 2.0, 0.0}, {3.0, 2.0, 0.0}, {3.0, 3.0, 0.0}, {2.0, 3.0, 0.0} },
+                                                                { {0.0, 3.0, 0.0}, {1.0, 3.0, 0.0}, {1.0, 4.0, 0.0}, {0.0, 4.0, 0.0} },
+                                                                { {1.0, 3.0, 0.0}, {2.0, 3.0, 0.0}, {2.0, 4.0, 0.0}, {1.0, 4.0, 0.0} },
+                                                                { {2.0, 3.0, 0.0}, {3.0, 3.0, 0.0}, {3.0, 4.0, 0.0}, {2.0, 4.0, 0.0} } };
+
+    std::vector<std::vector<utility::Vector3>> expectedCoords4{ { {3.0, 2.0, 0.0}, {4.0, 2.0, 0.0}, {4.0, 3.0, 0.0}, {3.0, 3.0, 0.0} },
+                                                                { {4.0, 2.0, 0.0}, {5.0, 2.0, 0.0}, {5.0, 3.0, 0.0}, {4.0, 3.0, 0.0} },
+                                                                { {5.0, 2.0, 0.0}, {6.0, 2.0, 0.0}, {6.0, 3.0, 0.0}, {5.0, 3.0, 0.0} },
+                                                                { {3.0, 3.0, 0.0}, {4.0, 3.0, 0.0}, {4.0, 4.0, 0.0}, {3.0, 4.0, 0.0} },
+                                                                { {4.0, 3.0, 0.0}, {5.0, 3.0, 0.0}, {5.0, 4.0, 0.0}, {4.0, 4.0, 0.0} },
+                                                                { {5.0, 3.0, 0.0}, {6.0, 3.0, 0.0}, {6.0, 4.0, 0.0}, {5.0, 4.0, 0.0} } };
+
+    std::vector<std::vector<utility::Vector3>> expectedCoords5{ { {6.0, 2.0, 0.0}, {7.0, 2.0, 0.0}, {7.0, 3.0, 0.0}, {6.0, 3.0, 0.0} },
+                                                                { {7.0, 2.0, 0.0}, {8.0, 2.0, 0.0}, {8.0, 3.0, 0.0}, {7.0, 3.0, 0.0} },
+                                                                { {8.0, 2.0, 0.0}, {9.0, 2.0, 0.0}, {9.0, 3.0, 0.0}, {8.0, 3.0, 0.0} },
+                                                                { {6.0, 3.0, 0.0}, {7.0, 3.0, 0.0}, {7.0, 4.0, 0.0}, {6.0, 4.0, 0.0} },
+                                                                { {7.0, 3.0, 0.0}, {8.0, 3.0, 0.0}, {8.0, 4.0, 0.0}, {7.0, 4.0, 0.0} },
+                                                                { {8.0, 3.0, 0.0}, {9.0, 3.0, 0.0}, {9.0, 4.0, 0.0}, {8.0, 4.0, 0.0} } };
+
+    // ensure the vectors have the same length
+    ASSERT_EQ(nodeCoords1.size(), expectedCoords1.size()) << "Vectors differ in size.";
+    ASSERT_EQ(nodeCoords2.size(), expectedCoords2.size()) << "Vectors differ in size.";
+    ASSERT_EQ(nodeCoords3.size(), expectedCoords3.size()) << "Vectors differ in size.";
+    ASSERT_EQ(nodeCoords4.size(), expectedCoords4.size()) << "Vectors differ in size.";
+    ASSERT_EQ(nodeCoords5.size(), expectedCoords5.size()) << "Vectors differ in size.";
+
+    // floating-point comparison tolerance
+    const double epsilon = 1e-6;
+
+    for (size_t i = 0; i < nodeCoords1.size(); ++i) {
+        for (size_t j = 0; j < nodeCoords1[i].size(); ++j) {
+            EXPECT_NEAR(expectedCoords1[i][j].x, nodeCoords1[i][j].x, epsilon) << "X coordinate mismatch at index " << i << "," << j;
+            EXPECT_NEAR(expectedCoords1[i][j].y, nodeCoords1[i][j].y, epsilon) << "Y coordinate mismatch at index " << i << "," << j;
+            EXPECT_NEAR(expectedCoords1[i][j].z, nodeCoords1[i][j].z, epsilon) << "Z coordinate mismatch at index " << i << "," << j;
+        }
+    }
+
+    for (size_t i = 0; i < nodeCoords2.size(); ++i) {
+        for (size_t j = 0; j < nodeCoords2[i].size(); ++j) {
+            EXPECT_NEAR(expectedCoords2[i][j].x, nodeCoords2[i][j].x, epsilon) << "X coordinate mismatch at index " << i << "," << j;
+            EXPECT_NEAR(expectedCoords2[i][j].y, nodeCoords2[i][j].y, epsilon) << "Y coordinate mismatch at index " << i << "," << j;
+            EXPECT_NEAR(expectedCoords2[i][j].z, nodeCoords2[i][j].z, epsilon) << "Z coordinate mismatch at index " << i << "," << j;
+        }
+    }
+
+    for (size_t i = 0; i < nodeCoords3.size(); ++i) {
+        for (size_t j = 0; j < nodeCoords3[i].size(); ++j) {
+            EXPECT_NEAR(expectedCoords3[i][j].x, nodeCoords3[i][j].x, epsilon) << "X coordinate mismatch at index " << i << "," << j;
+            EXPECT_NEAR(expectedCoords3[i][j].y, nodeCoords3[i][j].y, epsilon) << "Y coordinate mismatch at index " << i << "," << j;
+            EXPECT_NEAR(expectedCoords3[i][j].z, nodeCoords3[i][j].z, epsilon) << "Z coordinate mismatch at index " << i << "," << j;
+        }
+    }
+
+    for (size_t i = 0; i < nodeCoords4.size(); ++i) {
+        for (size_t j = 0; j < nodeCoords4[i].size(); ++j) {
+            EXPECT_NEAR(expectedCoords4[i][j].x, nodeCoords4[i][j].x, epsilon) << "X coordinate mismatch at index " << i << "," << j;
+            EXPECT_NEAR(expectedCoords4[i][j].y, nodeCoords4[i][j].y, epsilon) << "Y coordinate mismatch at index " << i << "," << j;
+            EXPECT_NEAR(expectedCoords4[i][j].z, nodeCoords4[i][j].z, epsilon) << "Z coordinate mismatch at index " << i << "," << j;
+        }
+    }
+
+    for (size_t i = 0; i < nodeCoords5.size(); ++i) {
+        for (size_t j = 0; j < nodeCoords5[i].size(); ++j) {
+            EXPECT_NEAR(expectedCoords5[i][j].x, nodeCoords5[i][j].x, epsilon) << "X coordinate mismatch at index " << i << "," << j;
+            EXPECT_NEAR(expectedCoords5[i][j].y, nodeCoords5[i][j].y, epsilon) << "Y coordinate mismatch at index " << i << "," << j;
+            EXPECT_NEAR(expectedCoords5[i][j].z, nodeCoords5[i][j].z, epsilon) << "Z coordinate mismatch at index " << i << "," << j;
+        }
+    }
+
+    // retrieve constraint vectors
+    auto constraints12 = api::getConstraintVectorForNodesBetween(1, 2);
+    auto constraints23 = api::getConstraintVectorForNodesBetween(2, 3);
+    auto constraints14 = api::getConstraintVectorForNodesBetween(1, 4);
+    auto constraints47 = api::getConstraintVectorForNodesBetween(4, 7);
+    auto constraints78 = api::getConstraintVectorForNodesBetween(7, 8);
+    auto constraints13 = api::getConstraintVectorForNodesBetween(1, 3);
+    auto constraints1011 = api::getConstraintVectorForNodesBetween(10, 11);
+
+    // expected constraint vectors
+    auto expectedFixed = std::vector<int>{ 1, 1, 1, 1, 1, 1 };
+    auto expectedPinned = std::vector<int>{ 1, 1, 1, 0, 0, 0 };
+    auto expectedFree = std::vector<int>{};
+
+    // Joints 1 & 2
+    for (auto vec : constraints12) {
+        ASSERT_EQ(expectedFixed, vec);
+    }
+
+    // Joints 2 & 3
+    ASSERT_EQ(expectedFixed, constraints23[0]);
+    for (int i = 1; i < constraints23.size() - 1; ++i) {
+        ASSERT_EQ(expectedFree, constraints23[i]);
+    }
+    ASSERT_EQ(expectedPinned, constraints23[constraints23.size() - 1]);
+
+    // Joints 1 & 4
+    for (auto vec : constraints14) {
+        ASSERT_EQ(expectedFixed, vec);
+    }
+
+    // Joints 4 & 7
+    ASSERT_EQ(expectedFixed, constraints47[0]);
+    for (int i = 1; i < constraints47.size() - 1; ++i) {
+        ASSERT_EQ(expectedFree, constraints47[i]);
+    }
+    ASSERT_EQ(expectedPinned, constraints47[constraints47.size() - 1]);
+
+    // Joints 7 & 8
+    ASSERT_EQ(expectedPinned, constraints78[0]);
+    for (int i = 1; i < constraints78.size(); ++i) {
+        ASSERT_EQ(expectedFree, constraints78[i]);
+    }
+
+    // Joints 1 & 3
+    ASSERT_EQ(2, constraints13.size());
+    ASSERT_EQ(expectedFixed, constraints13[0]);
+    ASSERT_EQ(expectedPinned, constraints13[1]);
+
+    // Joints 10 & 11
+    for (int i = 0; i < constraints1011.size(); ++i) {
+        ASSERT_EQ(expectedFree, constraints1011[i]);
+    }
+}
+
 TEST(QuadMesherTests, MeshWithSurroundingElementsFiveElementsSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
