@@ -654,6 +654,13 @@ void BuildingModelerAPI::includePDeltaEffects(bool includePDeltaEffects)
     physicalModel::Building::getInstance().m_includePDeltaEffects = includePDeltaEffects;
 }
 
+void BuildingModelerAPI::updateMassSourceFromMembers()
+{
+    if (physicalModel::Building::getInstance().m_includeMassFromMembers) {
+        physicalModel::Building::getInstance().addMemberMasses();
+    }
+}
+
 void BuildingModelerAPI::updateAreaElementProperties()
 {
     physicalModel::Building::getInstance().updateSurroundingLineElements();

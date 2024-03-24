@@ -113,9 +113,6 @@ void Building::updateSurroundingLineElements()
 
 void Building::toAnalyticalModel()
 {
-    if (m_includeMassFromMembers) {
-        addMemberMasses();
-    }
     convertJoints();
     convertMaterials();
     convertSections();

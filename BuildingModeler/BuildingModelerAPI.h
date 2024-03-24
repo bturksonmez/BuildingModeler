@@ -78,6 +78,7 @@ namespace buildingModeler
         static void includePDeltaEffects(bool includePDeltEffects);
 
         // Preprocessing
+        static void updateMassSourceFromMembers();
         static void updateAreaElementProperties();
 
         // Input File Generation

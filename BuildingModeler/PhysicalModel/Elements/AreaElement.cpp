@@ -34,7 +34,7 @@ double AreaElement::calculateArea()
 	auto d = (pointI - pointL).norm2();
 	auto s = (a + b + c + d) / 2.0;
 
-	return std::sqrt((s - a) * (s - b) * (s - c) * (s - d) - a * b * c * d * std::pow(theta / 2.0, 2));
+	return std::sqrt((s - a) * (s - b) * (s - c) * (s - d) - a * b * c * d * std::pow(std::cos(theta / 2.0), 2));
 }
 
 void AreaElement::addSurroundingLineElement(int index, int surroundingLineElementTag)
