@@ -73,6 +73,8 @@ namespace physicalModel
 		const std::shared_ptr<Section> getSection() const;
 		AreaElementType getAreaElementType() const;
 		AreaElementFormulation getAreaElementFormulation() const;
+		double getWeight() const;
+		std::pair<double, double> getTributaryLineLength() const; // to be called only for rectangle areas
 
 		//analytical model getters
 		const std::vector<std::vector<int>>& getAnalyticalNodeTags() const;

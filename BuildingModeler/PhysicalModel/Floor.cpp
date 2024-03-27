@@ -14,6 +14,11 @@ void Floor::addJoint(int jointTag)
 	m_jointTags.push_back(jointTag);
 }
 
+void Floor::addSlab(int slabTag)
+{
+	m_slabTags.push_back(slabTag);
+}
+
 void Floor::makeRigid(int masterJoint)
 {
 	m_isRigid = true;
@@ -93,6 +98,11 @@ void Floor::confineFloorMassOnDiaphragmNode(bool confineFloorMassOnDiaphragmNode
 	m_confineFloorMassOnDiaphragmNode = confineFloorMassOnDiaphragmNode;
 }
 
+void Floor::setLiveLoadPerArea(double liveLoadPerArea)
+{
+	m_liveLoadPerArea = liveLoadPerArea;
+}
+
 int Floor::getFloorNumber() const
 {
 	return m_floorNumber;
@@ -123,6 +133,11 @@ const std::vector<int>& Floor::getJoints() const
 	return m_jointTags;
 }
 
+const std::vector<int>& Floor::getSlabTags() const
+{
+	return m_slabTags;
+}
+
 std::optional<utility::Vector3> Floor::getDiaphragmMass() const
 {
 	return m_diaphragmMass;
@@ -143,3 +158,7 @@ bool Floor::floorMassConfinedOnDiaphragmNode() const
 	return m_confineFloorMassOnDiaphragmNode;
 }
 
+const std::optional<double> Floor::getLiveLoadPerArea() const
+{
+	return m_liveLoadPerArea;
+}

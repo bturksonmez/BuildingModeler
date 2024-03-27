@@ -9,6 +9,8 @@
 #include "Elements/ShearWallElement.h"
 #include "Elements/SlabElement.h"
 #include "Floor.h"
+#include "Load/LoadCombination.h"
+
 
 #include <map>
 #include <utility>
@@ -31,12 +33,21 @@ namespace physicalModel
     private:
         bool m_includeMassFromMembers = true;
         bool m_includePDeltaEffects = false;
+        bool m_disableSlabElements = false;
+        bool m_includeDeadLoadFromMembers = true;
+        bool m_gravityThroughLineElements = true;
         std::map<int, std::unique_ptr<Joint>> m_joints;
         std::map<int, std::unique_ptr<LineElement>> m_lineElements;
         std::map<int, std::unique_ptr<AreaElement>> m_areaElements;
         std::map<int, std::unique_ptr<Floor>> m_floors;
         std::map<int, std::shared_ptr<Material>> m_materials;
         std::map<int, std::shared_ptr<Section>> m_sections;
+        std::map<int, std::shared_ptr<Load>> m_pointLoads;
+        std::map<int, std::shared_ptr<Load>> m_distributedLineLoads;
+        std::map<int, std::shared_ptr<Load>> m_distributedAreaLoads;
+        std::map<std::string, std::shared_ptr<LoadCase>> m_loadCases;
+        std::map<std::string, std::shared_ptr<LoadCombination>> m_loadCombinations;
+
 
         Building() {}
 
@@ -65,6 +76,11 @@ namespace physicalModel
         Floor* getFloor(int floorNumber) const;
         std::shared_ptr<Material> getMaterial(int materialTag) const;
         std::shared_ptr<Section> getSection(int sectionTag) const;
+        std::shared_ptr<Load> getPointLoad(int loadID) const;
+        std::shared_ptr<Load> getDistributedLineLoad(int loadID) const;
+        std::shared_ptr<Load> getDistributedAreaLoad(int loadID) const;
+        std::shared_ptr<LoadCase> getLoadCase(std::string loadCaseTag) const;
+        std::shared_ptr<LoadCombination> getLoadCombination(std::string loadCombinationTag) const;
 
         void updateSurroundingLineElements(); // for area elements
         void toAnalyticalModel();

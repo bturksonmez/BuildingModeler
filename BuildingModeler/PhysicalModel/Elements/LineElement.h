@@ -80,6 +80,7 @@ namespace physicalModel
 		const std::shared_ptr<SectionModifiers> getSectionModifiers(int segmentNo) const;
 		LineElementType getLineElementType() const;
 		LineElementFormulation getLineElementFormulation() const;
+		double getWeight() const;
 
 		//analytical model getters
 		std::vector<int> getAnalyticalNodeTags() const;

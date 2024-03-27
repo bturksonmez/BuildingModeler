@@ -15,14 +15,17 @@ namespace physicalModel
 	class Load
 	{
 	protected:
+		int m_uniqueID;
 		LoadType m_loadType;
 		std::vector<double> m_loadVector;
+		static int counter;
 
 		Load() {}
 
 	public:
 		virtual ~Load() {}
 
+		int getUniqueID() const;
 		LoadType getLoadType() const;
 		const std::vector<double>& getLoadVector() const;
 	};

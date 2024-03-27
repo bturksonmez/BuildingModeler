@@ -67,6 +67,36 @@ std::shared_ptr<Section> Building::getSection(int sectionTag) const
     return (it != m_sections.end()) ? it->second : nullptr;
 }
 
+std::shared_ptr<Load> Building::getPointLoad(int loadID) const
+{
+    auto it = m_pointLoads.find(loadID);
+    return (it != m_pointLoads.end()) ? it->second : nullptr;
+}
+
+std::shared_ptr<Load> Building::getDistributedLineLoad(int loadID) const
+{
+    auto it = m_distributedLineLoads.find(loadID);
+    return (it != m_distributedLineLoads.end()) ? it->second : nullptr;
+}
+
+std::shared_ptr<Load> Building::getDistributedAreaLoad(int loadID) const
+{
+    auto it = m_distributedAreaLoads.find(loadID);
+    return (it != m_distributedAreaLoads.end()) ? it->second : nullptr;
+}
+
+std::shared_ptr<LoadCase> Building::getLoadCase(std::string loadCaseTag) const
+{
+    auto it = m_loadCases.find(loadCaseTag);
+    return (it != m_loadCases.end()) ? it->second : nullptr;
+}
+
+std::shared_ptr<LoadCombination> Building::getLoadCombination(std::string loadCombinationTag) const
+{
+    auto it = m_loadCombinations.find(loadCombinationTag);
+    return (it != m_loadCombinations.end()) ? it->second : nullptr;
+}
+
 void Building::updateSurroundingLineElements()
 {
     for (auto it = m_areaElements.begin(); it != m_areaElements.end(); it++) {
@@ -185,7 +215,10 @@ void Building::convertLineElements()
 void Building::convertAreaElements()
 {
     for (auto it = m_areaElements.begin(); it != m_areaElements.end(); it++) {
-        buildingModeler::OpenseesConverter::toQuadrilateralElement(it->second.get());
+
+        if (it->second->getAreaElementType() == physicalModel::AreaElementType::SHEARWALL || !m_disableSlabElements) {
+            buildingModeler::OpenseesConverter::toQuadrilateralElement(it->second.get());
+        }    
     }
 }
 

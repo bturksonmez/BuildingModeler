@@ -147,6 +147,35 @@ AreaElementFormulation AreaElement::getAreaElementFormulation() const
 	return m_areaElementFormulation;
 }
 
+double AreaElement::getWeight() const
+{
+	double weight = m_area * m_thickness * m_section->getMaterial()->getRho();
+
+	return weight;
+}
+
+std::pair<double, double> AreaElement::getTributaryLineLength() const
+{
+	auto coordA = Building::getInstance().getJoint(m_jointTags[0])->getCoords();
+	auto coordB = Building::getInstance().getJoint(m_jointTags[1])->getCoords();
+	auto coordC = Building::getInstance().getJoint(m_jointTags[2])->getCoords();
+
+	auto l1 = (coordB - coordA).norm2();
+	auto l2 = (coordC - coordB).norm2();
+
+	auto lx = std::min(l1, l2);
+	auto ly = std::min(l1, l2);
+
+	auto wx = lx / 4.0;
+	auto wy = (2.0 * ly - lx) * (lx / 2.0) / ly / 2.0;
+
+	if (l1 > l2) {
+		return std::make_pair(wy, wx);
+	}
+
+	return std::make_pair(wx, wy);
+}
+
 const std::vector<std::vector<int>>& AreaElement::getAnalyticalNodeTags() const
 {
 	return m_analyticalNodeTags;

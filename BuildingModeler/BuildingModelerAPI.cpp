@@ -183,7 +183,7 @@ void BuildingModelerAPI::addElasticMaterial(int materialTag, double E, double G,
         throw EntityFoundException("Material with tag " + std::to_string(materialTag) + " already exists.");
     }
     
-    physicalModel::Building::getInstance().m_materials[materialTag] = std::make_unique<physicalModel::ElasticMaterial>(materialTag, E, G, rho);
+    physicalModel::Building::getInstance().m_materials[materialTag] = std::make_shared<physicalModel::ElasticMaterial>(materialTag, E, G, rho);
 }
 
 void BuildingModelerAPI::addElasticSection1D(int sectionTag, int materialTag, double A, double Iyy, double Izz, double J)
@@ -197,7 +197,7 @@ void BuildingModelerAPI::addElasticSection1D(int sectionTag, int materialTag, do
     }
     
     std::shared_ptr<physicalModel::Material> material = physicalModel::Building::getInstance().m_materials[materialTag];
-    physicalModel::Building::getInstance().m_sections[sectionTag] = std::make_unique<physicalModel::ElasticSection1D>(sectionTag, material, A, Iyy, Izz, J);
+    physicalModel::Building::getInstance().m_sections[sectionTag] = std::make_shared<physicalModel::ElasticSection1D>(sectionTag, material, A, Iyy, Izz, J);
 }
 
 void BuildingModelerAPI::addElasticSection2D(int sectionTag, int materialTag, double thickness)
@@ -211,7 +211,7 @@ void BuildingModelerAPI::addElasticSection2D(int sectionTag, int materialTag, do
     }
     
     std::shared_ptr<physicalModel::Material> material = physicalModel::Building::getInstance().m_materials[materialTag];
-    physicalModel::Building::getInstance().m_sections[sectionTag] = std::make_unique<physicalModel::ElasticSection2D>(sectionTag, material, thickness);
+    physicalModel::Building::getInstance().m_sections[sectionTag] = std::make_shared<physicalModel::ElasticSection2D>(sectionTag, material, thickness);
 }
 
 void BuildingModelerAPI::addBeam(int elementTag, std::vector<int> jointTags, int sectionTag,
@@ -378,6 +378,15 @@ void BuildingModelerAPI::addSlab(int elementTag, std::vector<int> jointTags, int
         throw EntityNotFoundException("Section with tag " + std::to_string(sectionTag) + " does not exist.");
     }
 
+    auto floorI = physicalModel::Building::getInstance().getJoint(jointTags[0])->getFloorNo();
+    auto floorJ = physicalModel::Building::getInstance().getJoint(jointTags[1])->getFloorNo();
+    auto floorK = physicalModel::Building::getInstance().getJoint(jointTags[2])->getFloorNo();
+    auto floorL = physicalModel::Building::getInstance().getJoint(jointTags[3])->getFloorNo();
+
+    if (floorI != floorJ || floorJ != floorK || floorK != floorL) {
+        throw InvalidInputException("Joints do not belong to same floor.");
+    }
+
     std::vector<utility::Vector3> joints;
     joints.push_back(physicalModel::Building::getInstance().getJoint(jointTags[0])->getCoords());
     joints.push_back(physicalModel::Building::getInstance().getJoint(jointTags[1])->getCoords());
@@ -511,6 +520,11 @@ void BuildingModelerAPI::disableMeshForAreaElement(int elementTag)
 
     auto areaElement = physicalModel::Building::getInstance().getAreaElement(elementTag);
     areaElement->setMeshable(false);
+}
+
+void BuildingModelerAPI::disableSlabElements(bool disableSlabElements)
+{
+    physicalModel::Building::getInstance().m_disableSlabElements = disableSlabElements;
 }
 
 const std::vector<std::vector<utility::Vector3>>& BuildingModelerAPI::getNodeCoordinatesOfAreaElement(int elementTag)
@@ -654,6 +668,111 @@ void BuildingModelerAPI::includePDeltaEffects(bool includePDeltaEffects)
     physicalModel::Building::getInstance().m_includePDeltaEffects = includePDeltaEffects;
 }
 
+void BuildingModelerAPI::includeDeadLoadFromMembers(bool includeDeadLoadFromMembers)
+{
+    physicalModel::Building::getInstance().m_includeDeadLoadFromMembers = includeDeadLoadFromMembers;
+}
+
+void BuildingModelerAPI::applyGravityLoadThroughLineElements(bool m_gravityThroughLineElements)
+{
+    physicalModel::Building::getInstance().m_gravityThroughLineElements = m_gravityThroughLineElements;
+}
+
+void BuildingModelerAPI::setLiveLoadForFloor(int floorNumber, double liveLoadPerArea)
+{
+    if (!floorExists(floorNumber)) {
+        throw EntityNotFoundException("Floor number " + std::to_string(floorNumber) + " does not exist.");
+    }
+
+    auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
+
+    floor->setLiveLoadPerArea(liveLoadPerArea);
+}
+
+void BuildingModelerAPI::addLoadCase(std::string loadCaseTag, physicalModel::LoadCaseType loadCaseType)
+{
+    if (loadCaseExists(loadCaseTag)) {
+        throw EntityFoundException("Load case: " + loadCaseTag + " already exists.");
+    }
+
+    physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_shared<physicalModel::LoadCase>(loadCaseTag, loadCaseType);
+}
+
+void BuildingModelerAPI::addPointLoad(std::string loadCaseTag, int jointTag, double fx, double fy, double fz, double mx, double my, double mz)
+{
+    if (!loadCaseExists(loadCaseTag)) {
+        throw EntityNotFoundException("Load case: " + loadCaseTag + " does not exist.");
+    }
+
+    if (!jointExists(jointTag)) {
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
+    }
+
+    std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::PointLoad>(jointTag, fx, fy, fz, mx, my, mz);
+
+    physicalModel::Building::getInstance().m_pointLoads[load->getUniqueID()] = load;
+
+    physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addPointLoad(load);
+}
+
+void BuildingModelerAPI::addDistributedLineLoad(std::string loadCaseTag, int elementTag, double wz, double wy, double wx)
+{
+    if (!loadCaseExists(loadCaseTag)) {
+        throw EntityNotFoundException("Load case: " + loadCaseTag + " does not exist.");
+    }
+
+    if (!lineElementExists(elementTag)) {
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedLineLoad>(elementTag, wx, wy, wz);
+
+    physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
+
+    physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addDistributedLineLoad(load);
+}
+
+void BuildingModelerAPI::addDistributedAreaLoad(std::string loadCaseTag, int elementTag, double wz, double wy, double wx)
+{
+    if (!loadCaseExists(loadCaseTag)) {
+        throw EntityNotFoundException("Load case: " + loadCaseTag + " does not exist.");
+    }
+
+    if (!areaElementExists(elementTag)) {
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedAreaLoad>(elementTag, wx, wy, wz);
+
+    physicalModel::Building::getInstance().m_distributedAreaLoads[load->getUniqueID()] = load;
+
+    physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addDistributedAreaLoad(load);
+}
+
+void BuildingModelerAPI::addLoadCombination(std::string loadCombinationTag)
+{
+    if (loadCombinationExists(loadCombinationTag)) {
+        throw EntityFoundException("Load case: " + loadCombinationTag + " already exists.");
+    }
+
+    physicalModel::Building::getInstance().m_loadCombinations[loadCombinationTag] = std::make_shared<physicalModel::LoadCombination>(loadCombinationTag);
+}
+
+void BuildingModelerAPI::addLoadCaseToLoadCombination(std::string loadCombinationTag, std::string loadCaseTag, double factor)
+{
+    if (!loadCombinationExists(loadCombinationTag)) {
+        throw EntityFoundException("Load combination: " + loadCombinationTag + " does not exist.");
+    }
+
+    if (!loadCaseExists(loadCaseTag)) {
+        throw EntityNotFoundException("Load case: " + loadCaseTag + " does not exist.");
+    }
+
+    auto loadCase = physicalModel::Building::getInstance().getLoadCase(loadCaseTag);
+
+    physicalModel::Building::getInstance().m_loadCombinations[loadCombinationTag]->addLoadCase(loadCase, factor);
+}
+
 void BuildingModelerAPI::updateMassSourceFromMembers()
 {
     if (physicalModel::Building::getInstance().m_includeMassFromMembers) {
@@ -664,6 +783,142 @@ void BuildingModelerAPI::updateMassSourceFromMembers()
 void BuildingModelerAPI::updateAreaElementProperties()
 {
     physicalModel::Building::getInstance().updateSurroundingLineElements();
+}
+
+void BuildingModelerAPI::updateDeadAndLiveLoads()
+{
+    // Update dead loads
+    if (physicalModel::Building::getInstance().m_includeDeadLoadFromMembers) {
+
+        // dead load
+        auto loadCaseTag = "DEAD";
+        auto loadCaseType = physicalModel::LoadCaseType::DEAD;
+        if (physicalModel::Building::getInstance().m_loadCases.find(loadCaseTag) == physicalModel::Building::getInstance().m_loadCases.end()) {
+            physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_unique<physicalModel::LoadCase>(loadCaseTag, loadCaseType);
+        }
+        
+        // line elements
+        for (auto it = physicalModel::Building::getInstance().m_lineElements.begin(); it != physicalModel::Building::getInstance().m_lineElements.end(); it++) {
+
+            if (it->second->getLineElementType() == physicalModel::LineElementType::COLUMN) {
+
+                auto jointI = it->second->getIJointTag();
+                auto jointJ = it->second->getIJointTag();
+                auto weight = it->second->getWeight();
+                std::shared_ptr<physicalModel::Load> loadI = std::make_shared<physicalModel::PointLoad>(jointI, 0, 0, -weight / 2.0, 0, 0, 0);
+                std::shared_ptr<physicalModel::Load> loadJ = std::make_shared<physicalModel::PointLoad>(jointJ, 0, 0, -weight / 2.0, 0, 0, 0);
+
+                physicalModel::Building::getInstance().m_pointLoads[loadI->getUniqueID()] = loadI;
+                physicalModel::Building::getInstance().m_pointLoads[loadJ->getUniqueID()] = loadJ;
+
+                physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addPointLoad(loadI);
+                physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addPointLoad(loadJ);
+            }
+            else {
+                auto beamTag = it->second->getElementTag();
+                auto gamma = it->second->getWeight() / it->second->getLength();
+                std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedLineLoad>(beamTag, -gamma, 0, 0);
+
+                physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
+
+                physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addDistributedLineLoad(load);
+            }
+        }
+
+        // area elements
+        for (auto it = physicalModel::Building::getInstance().m_areaElements.begin(); it != physicalModel::Building::getInstance().m_areaElements.end(); it++) {
+
+            if (it->second->getAreaElementType() == physicalModel::AreaElementType::SLAB || physicalModel::Building::getInstance().m_gravityThroughLineElements) {
+
+                auto beamTags = it->second->getSurroundingLineElementTags();
+                auto gamma = it->second->getWeight() / it->second->getArea();
+                auto lineLength = it->second->getTributaryLineLength();
+
+                for (int i = 0; i < beamTags.size(); ++i) {
+
+                    if (beamTags[i] > -1) {
+
+                        std::shared_ptr<physicalModel::Load> load;
+
+                        if (i % 2 == 0) {
+                            load = std::make_shared<physicalModel::DistributedLineLoad>(beamTags[i], -gamma * lineLength.first, 0, 0);
+                        }
+                        else {
+                            load = std::make_shared<physicalModel::DistributedLineLoad>(beamTags[i], -gamma * lineLength.second, 0, 0);
+                        }
+
+                        physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
+
+                        physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addDistributedLineLoad(load);
+                    }
+                }
+            }
+            else {
+                auto elementTag = it->second->getElementTag();
+                auto gamma = it->second->getWeight() / it->second->getArea();
+                std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedAreaLoad>(elementTag, -gamma, 0, 0);
+
+                physicalModel::Building::getInstance().m_distributedAreaLoads[load->getUniqueID()] = load;
+
+                physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addDistributedAreaLoad(load);
+            }
+        }
+    }
+
+    // Update live loads
+    auto loadCaseTag = "LIVE";
+    auto loadCaseType = physicalModel::LoadCaseType::LIVE;
+    if (physicalModel::Building::getInstance().m_loadCases.find(loadCaseTag) == physicalModel::Building::getInstance().m_loadCases.end()) {
+        physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_unique<physicalModel::LoadCase>(loadCaseTag, loadCaseType);
+    }
+
+    for (auto it = physicalModel::Building::getInstance().m_floors.begin(); it != physicalModel::Building::getInstance().m_floors.end(); it++) {
+
+        auto liveLoad = it->second->getLiveLoadPerArea();
+        if (liveLoad != std::nullopt) {
+
+            auto slabTags = it->second->getSlabTags();
+
+            for (auto slabTag : slabTags) {
+
+                auto slab = physicalModel::Building::getInstance().getAreaElement(slabTag);
+
+                if (physicalModel::Building::getInstance().m_gravityThroughLineElements) {
+
+                    auto beamTags = slab->getSurroundingLineElementTags();
+                    auto lineLength = slab->getTributaryLineLength();
+
+                    for (int i = 0; i < beamTags.size(); ++i) {
+
+                        if (beamTags[i] > -1) {
+
+                            std::shared_ptr<physicalModel::Load> load;
+
+                            if (i % 2 == 0) {
+                                load = std::make_shared<physicalModel::DistributedLineLoad>(beamTags[i], -liveLoad.value() * lineLength.first, 0, 0);
+                            }
+                            else {
+                                load = std::make_shared<physicalModel::DistributedLineLoad>(beamTags[i], -liveLoad.value() * lineLength.second, 0, 0);
+                            }
+
+                            physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
+
+                            physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addDistributedLineLoad(load);
+                        }
+                    }
+                }
+                else {
+                    auto elementTag = slab->getElementTag();
+                    std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedAreaLoad>(elementTag, -liveLoad.value(), 0, 0);
+
+                    physicalModel::Building::getInstance().m_distributedAreaLoads[load->getUniqueID()] = load;
+
+                    physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addDistributedAreaLoad(load);
+                }
+            }
+        }
+    }
+
 }
 
 bool BuildingModelerAPI::jointExists(int jointTag)
@@ -714,6 +969,24 @@ bool BuildingModelerAPI::materialExists(int materialTag)
 bool BuildingModelerAPI::sectionExists(int sectionTag)
 {
     if (physicalModel::Building::getInstance().m_sections.find(sectionTag) != physicalModel::Building::getInstance().m_sections.end()) {
+        return true;
+    }
+
+    return false;
+}
+
+bool BuildingModelerAPI::loadCaseExists(std::string loadCaseTag)
+{
+    if (physicalModel::Building::getInstance().m_loadCases.find(loadCaseTag) != physicalModel::Building::getInstance().m_loadCases.end()) {
+        return true;
+    }
+
+    return false;
+}
+
+bool BuildingModelerAPI::loadCombinationExists(std::string loadCombinationTag)
+{
+    if (physicalModel::Building::getInstance().m_loadCombinations.find(loadCombinationTag) != physicalModel::Building::getInstance().m_loadCombinations.end()) {
         return true;
     }
 

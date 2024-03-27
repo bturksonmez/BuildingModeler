@@ -127,6 +127,17 @@ LineElementFormulation LineElement::getLineElementFormulation() const
 	return m_lineElementFormulation;
 }
 
+double LineElement::getWeight() const
+{
+	double weight = 0.0;
+
+	for (int i = 0; i < m_segmentLengths.size(); ++i) {
+		weight += (m_sections[i]->getMaterial()->getRho() * m_sections[i]->getA().value() * m_segmentLengths[i]);
+	}
+
+	return weight;
+}
+
 std::vector<int> LineElement::getAnalyticalNodeTags() const
 {
 	return m_analyticalNodeTags;

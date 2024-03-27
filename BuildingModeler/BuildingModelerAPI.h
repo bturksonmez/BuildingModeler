@@ -15,6 +15,8 @@ namespace buildingModeler
         static bool floorExists(int floorNo);
         static bool materialExists(int materialTag);
         static bool sectionExists(int sectionTag);
+        static bool loadCaseExists(std::string loadCaseTag);
+        static bool loadCombinationExists(std::string loadCombinationTag);
 
         static void invalidateAreaMeshAlongLineElement(int elementTag);
         static bool checkIfJointsCoplanar(const std::vector<utility::Vector3>& joints);
@@ -64,6 +66,7 @@ namespace buildingModeler
             physicalModel::AreaElementFormulation areaElementFormulation);
         static void meshAreaElement(int elementTag, std::optional<int> n1 = std::nullopt, std::optional<int> n2 = std::nullopt);
         static void disableMeshForAreaElement(int elementTag);
+        static void disableSlabElements(bool disableSlabElements);
         static const std::vector<std::vector<utility::Vector3>>& getNodeCoordinatesOfAreaElement(int elementTag);
         
         // Floor API
@@ -77,9 +80,21 @@ namespace buildingModeler
         // Building API
         static void includePDeltaEffects(bool includePDeltEffects);
 
+        // Loading API
+        static void includeDeadLoadFromMembers(bool includeDeadLoadFromMembers);
+        static void applyGravityLoadThroughLineElements(bool m_gravityThroughLineElements);
+        static void setLiveLoadForFloor(int floorNumber, double liveLoadPerArea);
+        static void addLoadCase(std::string loadCaseTag, physicalModel::LoadCaseType loadCaseType);
+        static void addPointLoad(std::string loadCaseTag, int jointTag, double fx, double fy, double fz, double mx, double my, double mz);
+        static void addDistributedLineLoad(std::string loadCaseTag, int elementTag, double wz, double wy, double wx);
+        static void addDistributedAreaLoad(std::string loadCaseTag, int elementTag, double wz, double wy, double wx);
+        static void addLoadCombination(std::string loadCombinationTag);
+        static void addLoadCaseToLoadCombination(std::string loadCombinationTag, std::string loadCaseTag, double factor);
+
         // Preprocessing
         static void updateMassSourceFromMembers();
         static void updateAreaElementProperties();
+        static void updateDeadAndLiveLoads();
 
         // Input File Generation
         static void createInputFile();

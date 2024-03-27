@@ -4,14 +4,13 @@
 
 namespace physicalModel
 {
-	class PointLoad : Load
+	class PointLoad : public Load
 	{
 	private:
 		int m_jointTag;
 
-		PointLoad(int jointTag, double fx = 0, double fy = 0, double fz = 0, double mx = 0, double my = 0, double mz = 0);
-
 	public:
+		PointLoad(int jointTag, double fx = 0, double fy = 0, double fz = 0, double mx = 0, double my = 0, double mz = 0);
 		PointLoad() = delete;
 		~PointLoad() {}
 

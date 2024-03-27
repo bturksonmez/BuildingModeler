@@ -2,8 +2,9 @@
 
 using namespace physicalModel;
 
-PointLoad::PointLoad(int jointTag, double fx, double fy, double fz, double mx, double my, double mz)
+PointLoad::PointLoad(int jointTag, double fx, double fy, double fz, double mx, double my, double mz) : Load()
 {
+	m_uniqueID = counter++;
 	m_jointTag = jointTag;
 	m_loadType = LoadType::POINT_LOAD;
 

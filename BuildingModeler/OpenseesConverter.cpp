@@ -52,7 +52,7 @@ void OpenseesConverter::toMaterial(const physicalModel::Material* material)
     {
     case physicalModel::MaterialType::ELASTIC:
         opensees::OpenseesModel::getInstance().m_materials[materialTag]
-            = std::make_unique<opensees::ElasticMaterial>(materialTag, material->getE(), material->getG(), material->getRho());
+            = std::make_shared<opensees::ElasticMaterial>(materialTag, material->getE(), material->getG(), material->getRho());
         break;
     default:
         break;
@@ -73,12 +73,12 @@ void OpenseesConverter::toSection(const physicalModel::Section* section)
     {
     case physicalModel::SectionType::ELASTIC1D:
         opensees::OpenseesModel::getInstance().m_sections[sectionTag]
-            = std::make_unique<opensees::ElasticSection>(sectionTag, materialAnalytical, section->getA().value(), section->getIyy().value(), section->getIzz().value(), section->getJ().value());
+            = std::make_shared<opensees::ElasticSection>(sectionTag, materialAnalytical, section->getA().value(), section->getIyy().value(), section->getIzz().value(), section->getJ().value());
         break;
     case physicalModel::SectionType::ELASTIC2D: {
         auto section2D = dynamic_cast<const physicalModel::ElasticSection2D*>(section);
         opensees::OpenseesModel::getInstance().m_sections[sectionTag]
-            = std::make_unique<opensees::ElasticMembranePlateSection>(sectionTag, materialAnalytical, section2D->getThickness());
+            = std::make_shared<opensees::ElasticMembranePlateSection>(sectionTag, materialAnalytical, section2D->getThickness());
         break;
     }
     default:
