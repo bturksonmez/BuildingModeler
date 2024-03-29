@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <cmath>
+
 #include "BuildingModelerAPI.h"
 #include "Utilities/VectorUtilities.h"
 

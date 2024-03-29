@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "PointLoad.h"
 #include "DistributedLineLoad.h"
 #include "DistributedAreaLoad.h"

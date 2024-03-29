@@ -10,7 +10,7 @@ namespace utility
         auto ba = pA.y - ma * pA.x;
         auto bb = qA.y - mb * qA.x;
 
-        if (ma == DBL_MAX) {
+        if (ma == std::numeric_limits<double>::max()) {
             
             auto y = mb * pA.x + bb;
             if (y <= pB.y && y >= pA.y) {
@@ -21,7 +21,7 @@ namespace utility
 
             return false;
         }
-        else if (mb == DBL_MAX) {
+        else if (mb == std::numeric_limits<double>::max()) {
 
             auto y = ma * qA.x + ba;
             if (y <= qB.y && y >= qA.y) {
@@ -78,7 +78,7 @@ namespace utility
     double VectorUtilities::calculateSlope(const Vector2& pA, const Vector2& pB)
     {
         if (pB.x - pA.x == 0) {
-            return DBL_MAX; // Avoid division by zero
+            return std::numeric_limits<double>::max(); // Avoid division by zero
         }
 
         return (pB.y - pA.y) / (pB.x - pA.x);

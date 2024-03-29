@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "AreaElement.h"
 #include "../Building.h"
 #include "../../Utilities/VectorUtilities.h"

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <limits>
+
 #include "Vector2.h"
 #include "Vector3.h"
 

@@ -82,7 +82,7 @@ namespace physicalModel
 		LineElementFormulation getLineElementFormulation() const;
 		double getWeight() const;
 
-		//analytical model getters
+		// analytical model getters
 		std::vector<int> getAnalyticalNodeTags() const;
 		const std::vector<utility::Vector3>& getAnalyticalNodeCoords() const;
 		const std::vector<int>& getAnalyticalElementTags() const;

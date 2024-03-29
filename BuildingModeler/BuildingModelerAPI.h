@@ -1,7 +1,7 @@
 #pragma once
 
 #include "PhysicalModel/Building.h"
-#include "OpenseesWrapper/OpenseesModel.h"
+#include "OpenSeesWrapper/OpenseesModel.h"
 #include "BuildingModelerExceptions.h"
 
 namespace buildingModeler

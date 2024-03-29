@@ -108,7 +108,7 @@ int Joint::getFloorNo() const
 	return m_floorNo;
 }
 
-const std::vector<int>& Joint::getConstraintVectorFromAnalyticalNode() const
+std::vector<int> Joint::getConstraintVectorFromAnalyticalNode() const
 {
 	auto constraint = opensees::OpenseesModel::getInstance().getSPConstraint(m_jointTag);
 
@@ -122,7 +122,7 @@ const std::vector<int>& Joint::getConstraintVectorFromAnalyticalNode() const
 	return {};
 }
 
-const utility::Vector3& Joint::getTranslationalMassFromAnalyticalNode() const
+utility::Vector3 Joint::getTranslationalMassFromAnalyticalNode() const
 {
 	auto mass = opensees::OpenseesModel::getInstance().getMass(m_jointTag);
 
@@ -133,7 +133,7 @@ const utility::Vector3& Joint::getTranslationalMassFromAnalyticalNode() const
 	return {};
 }
 
-const utility::Vector3& Joint::getRotationalMassFromAnalyticalNode() const
+utility::Vector3 Joint::getRotationalMassFromAnalyticalNode() const
 {
 	auto mass = opensees::OpenseesModel::getInstance().getMass(m_jointTag);
 

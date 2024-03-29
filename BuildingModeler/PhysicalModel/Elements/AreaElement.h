@@ -76,7 +76,7 @@ namespace physicalModel
 		double getWeight() const;
 		std::pair<double, double> getTributaryLineLength() const; // to be called only for rectangle areas
 
-		//analytical model getters
+		// analytical model getters
 		const std::vector<std::vector<int>>& getAnalyticalNodeTags() const;
 		const std::vector<std::vector<utility::Vector3>>& getAnalyticalNodeCoords() const;
 		const std::vector<int>& getAnalyticalElementTags() const;
