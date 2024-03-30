@@ -3,6 +3,7 @@
 #include "PhysicalModel/Building.h"
 #include "OpenSeesWrapper/OpenseesModel.h"
 #include "BuildingModelerExceptions.h"
+#include "PhysicalModel/Load/LoadCase.h"
 
 namespace buildingModeler
 {
@@ -58,6 +59,7 @@ namespace buildingModeler
         static void setSection(int elementTag, int segmentNo, int sectionTag);
         static void setSectionModifiers(int elementTag, int segmentNo, double modifierA, double modifierIyy, double modifierIzz, double modifierJ);
         static const std::vector<utility::Vector3>& getNodeCoordinatesOfLineElement(int elementTag);
+        static double getLength(int elementTag);
 
         // Area Element API
         static void addShearWall(int elementTag, std::vector<int> jointTags, int sectionTag,
@@ -68,6 +70,7 @@ namespace buildingModeler
         static void disableMeshForAreaElement(int elementTag);
         static void disableSlabElements(bool disableSlabElements);
         static const std::vector<std::vector<utility::Vector3>>& getNodeCoordinatesOfAreaElement(int elementTag);
+        static double getArea(int elementTag);
         
         // Floor API
         static void addFloor(int floorNumber, double height);
@@ -90,6 +93,9 @@ namespace buildingModeler
         static void addDistributedAreaLoad(std::string loadCaseTag, int elementTag, double wz, double wy, double wx);
         static void addLoadCombination(std::string loadCombinationTag);
         static void addLoadCaseToLoadCombination(std::string loadCombinationTag, std::string loadCaseTag, double factor);
+        static const std::vector<std::shared_ptr<physicalModel::Load>>& getPointLoads(std::string loadCaseTag);
+        static const std::vector<std::shared_ptr<physicalModel::Load>>& getDistributedLineLoads(std::string loadCaseTag);
+        static const std::vector<std::shared_ptr<physicalModel::Load>>& getDistributedAreaLoads(std::string loadCaseTag);
 
         // Preprocessing
         static void updateMassSourceFromMembers();

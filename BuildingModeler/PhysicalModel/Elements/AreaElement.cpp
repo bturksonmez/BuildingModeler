@@ -151,7 +151,7 @@ AreaElementFormulation AreaElement::getAreaElementFormulation() const
 
 double AreaElement::getWeight() const
 {
-	double weight = m_area * m_thickness * m_section->getMaterial()->getRho();
+	double weight = 9.81 * m_area * m_thickness * m_section->getMaterial()->getRho();
 
 	return weight;
 }

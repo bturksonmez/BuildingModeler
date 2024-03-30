@@ -132,7 +132,7 @@ double LineElement::getWeight() const
 	double weight = 0.0;
 
 	for (int i = 0; i < m_segmentLengths.size(); ++i) {
-		weight += (m_sections[i]->getMaterial()->getRho() * m_sections[i]->getA().value() * m_segmentLengths[i]);
+		weight += (9.81 * m_sections[i]->getMaterial()->getRho() * m_sections[i]->getA().value() * m_segmentLengths[i]);
 	}
 
 	return weight;

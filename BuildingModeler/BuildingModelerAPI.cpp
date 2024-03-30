@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cmath>
+#include <unordered_set>
 
 #include "BuildingModelerAPI.h"
 #include "Utilities/VectorUtilities.h"
@@ -317,6 +318,15 @@ const std::vector<utility::Vector3>& BuildingModelerAPI::getNodeCoordinatesOfLin
     return physicalModel::Building::getInstance().m_lineElements[elementTag]->getAnalyticalNodeCoords();
 }
 
+double BuildingModelerAPI::getLength(int elementTag)
+{
+    if (!lineElementExists(elementTag)) {
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->getLength();
+}
+
 void BuildingModelerAPI::addShearWall(int elementTag, std::vector<int> jointTags, int sectionTag,
     physicalModel::AreaElementFormulation areaElementFormulation)
 {
@@ -407,6 +417,13 @@ void BuildingModelerAPI::addSlab(int elementTag, std::vector<int> jointTags, int
     if (!checkIfQuadConvex(joints)) {
         throw InvalidOperationException("Joints of area element with tag " + std::to_string(elementTag) + " do not form convex geometry.");
     }
+
+    std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
+    physicalModel::Building::getInstance().m_areaElements[elementTag] = std::make_unique<physicalModel::SlabElement>(elementTag, jointTags, section, areaElementFormulation);
+    physicalModel::Building::getInstance().m_joints[jointTags[0]]->addConnectedSlab(elementTag);
+    physicalModel::Building::getInstance().m_joints[jointTags[1]]->addConnectedSlab(elementTag);
+    physicalModel::Building::getInstance().m_joints[jointTags[2]]->addConnectedSlab(elementTag);
+    physicalModel::Building::getInstance().m_joints[jointTags[3]]->addConnectedSlab(elementTag);
 }
 
 void BuildingModelerAPI::meshAreaElement(int elementTag, std::optional<int> n1, std::optional<int> n2)
@@ -537,6 +554,15 @@ const std::vector<std::vector<utility::Vector3>>& BuildingModelerAPI::getNodeCoo
     }
 
     return physicalModel::Building::getInstance().getAreaElement(elementTag)->getAnalyticalNodeCoords();
+}
+
+double BuildingModelerAPI::getArea(int elementTag)
+{
+    if (!areaElementExists(elementTag)) {
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    return physicalModel::Building::getInstance().m_areaElements[elementTag]->getArea();
 }
 
 void BuildingModelerAPI::addFloor(int floorNumber, double height)
@@ -776,6 +802,33 @@ void BuildingModelerAPI::addLoadCaseToLoadCombination(std::string loadCombinatio
     physicalModel::Building::getInstance().m_loadCombinations[loadCombinationTag]->addLoadCase(loadCase, factor);
 }
 
+const std::vector<std::shared_ptr<physicalModel::Load>>& BuildingModelerAPI::getPointLoads(std::string loadCaseTag)
+{
+    if (!loadCaseExists(loadCaseTag)) {
+        throw EntityNotFoundException("Load case: " + loadCaseTag + " does not exist.");
+    }
+
+    return  physicalModel::Building::getInstance().getLoadCase(loadCaseTag)->getPointLoads();
+}
+
+const std::vector<std::shared_ptr<physicalModel::Load>>& BuildingModelerAPI::getDistributedLineLoads(std::string loadCaseTag)
+{
+    if (!loadCaseExists(loadCaseTag)) {
+        throw EntityNotFoundException("Load case: " + loadCaseTag + " does not exist.");
+    }
+
+    return  physicalModel::Building::getInstance().getLoadCase(loadCaseTag)->getDistributedLineLoads();
+}
+
+const std::vector<std::shared_ptr<physicalModel::Load>>& BuildingModelerAPI::getDistributedAreaLoads(std::string loadCaseTag)
+{
+    if (!loadCaseExists(loadCaseTag)) {
+        throw EntityNotFoundException("Load case: " + loadCaseTag + " does not exist.");
+    }
+
+    return  physicalModel::Building::getInstance().getLoadCase(loadCaseTag)->getDistributedAreaLoads();
+}
+
 void BuildingModelerAPI::updateMassSourceFromMembers()
 {
     if (physicalModel::Building::getInstance().m_includeMassFromMembers) {
@@ -790,6 +843,10 @@ void BuildingModelerAPI::updateAreaElementProperties()
 
 void BuildingModelerAPI::updateDeadAndLiveLoads()
 {
+    if (!physicalModel::Building::getInstance().m_gravityThroughLineElements && physicalModel::Building::getInstance().m_disableSlabElements) {
+        throw InvalidOperationException("Self weight cannot be transferred through slab elements while they are disabled. Either enable slab elements or transfer the load through line elements");
+    }
+
     // Update dead loads
     if (physicalModel::Building::getInstance().m_includeDeadLoadFromMembers) {
 
@@ -880,7 +937,13 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
         auto liveLoad = it->second->getLiveLoadPerArea();
         if (liveLoad != std::nullopt) {
 
-            auto slabTags = it->second->getSlabTags();
+            std::unordered_set<int> slabTags;
+            for (auto jointTag : it->second->getJoints()) {
+
+                for (auto slabTag : physicalModel::Building::getInstance().getJoint(jointTag)->getConnectedSlabTags()) {
+                    slabTags.insert(slabTag);
+                }
+            }
 
             for (auto slabTag : slabTags) {
 
