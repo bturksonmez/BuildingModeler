@@ -810,6 +810,24 @@ void BuildingModelerAPI::addLoadCaseToLoadCombination(std::string loadCombinatio
     physicalModel::Building::getInstance().m_loadCombinations[loadCombinationTag]->addLoadCase(loadCase, factor);
 }
 
+void BuildingModelerAPI::setLoadCaseActive(std::string loadCaseTag, bool active)
+{
+    if (!loadCaseExists(loadCaseTag)) {
+        throw EntityNotFoundException("Load case: " + loadCaseTag + " does not exist.");
+    }
+
+    physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->setActive(active);
+}
+
+void BuildingModelerAPI::setLoadCombinationActive(std::string loadCombinationTag, bool active)
+{
+    if (!loadCombinationExists(loadCombinationTag)) {
+        throw EntityNotFoundException("Load combination: " + loadCombinationTag + " does not exist.");
+    }
+
+    physicalModel::Building::getInstance().m_loadCombinations[loadCombinationTag]->setActive(active);
+}
+
 const std::vector<std::shared_ptr<physicalModel::Load>>& BuildingModelerAPI::getPointLoads(std::string loadCaseTag)
 {
     if (!loadCaseExists(loadCaseTag)) {
@@ -837,22 +855,13 @@ const std::vector<std::shared_ptr<physicalModel::Load>>& BuildingModelerAPI::get
     return  physicalModel::Building::getInstance().getLoadCase(loadCaseTag)->getDistributedAreaLoads();
 }
 
-void BuildingModelerAPI::setLoadCaseActive(std::string loadCaseTag, bool active)
+const std::vector<std::shared_ptr<opensees::Load>>& BuildingModelerAPI::getLoadsFromAnalyticalModel(std::string loadPatternTag)
 {
-    if (!loadCaseExists(loadCaseTag)) {
-        throw EntityNotFoundException("Load case: " + loadCaseTag + " does not exist.");
+    if (!loadCaseExists(loadPatternTag) && !loadCombinationExists(loadPatternTag)) {
+        throw EntityNotFoundException("Load pattern: " + loadPatternTag + " does not exist.");
     }
 
-    physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->setActive(active);
-}
-
-void BuildingModelerAPI::setLoadCombinationActive(std::string loadCombinationTag, bool active)
-{
-    if (!loadCombinationExists(loadCombinationTag)) {
-        throw EntityNotFoundException("Load combination: " + loadCombinationTag + " does not exist.");
-    }
-
-    physicalModel::Building::getInstance().m_loadCombinations[loadCombinationTag]->setActive(active);
+    return  opensees::OpenseesModel::getInstance().getLoadPattern(loadPatternTag)->getLoadVector();
 }
 
 void BuildingModelerAPI::updateMassSourceFromMembers()

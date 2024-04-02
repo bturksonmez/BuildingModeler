@@ -31,5 +31,6 @@ namespace opensees
 		const std::vector<double>& getModifiers() const;
 		const std::shared_ptr<GeometricTransformation> getGeometricTransf() const;
 		BeamColumnElementType getBeamColumnElementType() const;
+		double getLength() const;
 	};
 }

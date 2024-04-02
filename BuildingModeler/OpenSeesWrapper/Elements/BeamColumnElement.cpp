@@ -1,4 +1,5 @@
 #include "BeamColumnElement.h"
+#include "../OpenseesModel.h"
 
 using namespace opensees;
 
@@ -32,4 +33,13 @@ const std::shared_ptr<GeometricTransformation> BeamColumnElement::getGeometricTr
 BeamColumnElementType BeamColumnElement::getBeamColumnElementType() const
 {
 	return m_beamColumnElementType;
+}
+
+double BeamColumnElement::getLength() const
+{
+	utility::Vector3 pointI = OpenseesModel::getInstance().getNode(m_nodeTags[0])->getCoords();
+	utility::Vector3 pointJ = OpenseesModel::getInstance().getNode(m_nodeTags[1])->getCoords();
+	utility::Vector3 dirVec = pointJ - pointI;
+
+	return dirVec.norm2();
 }

@@ -93,11 +93,12 @@ namespace buildingModeler
         static void addDistributedAreaLoad(std::string loadCaseTag, int elementTag, double wz, double wy, double wx);
         static void addLoadCombination(std::string loadCombinationTag);
         static void addLoadCaseToLoadCombination(std::string loadCombinationTag, std::string loadCaseTag, double factor);
+        static void setLoadCaseActive(std::string loadCaseTag, bool active);
+        static void setLoadCombinationActive(std::string loadCombinationTag, bool active);
         static const std::vector<std::shared_ptr<physicalModel::Load>>& getPointLoads(std::string loadCaseTag);
         static const std::vector<std::shared_ptr<physicalModel::Load>>& getDistributedLineLoads(std::string loadCaseTag);
         static const std::vector<std::shared_ptr<physicalModel::Load>>& getDistributedAreaLoads(std::string loadCaseTag);
-        static void setLoadCaseActive(std::string loadCaseTag, bool active);
-        static void setLoadCombinationActive(std::string loadCombinationTag, bool active);
+        static const std::vector<std::shared_ptr<opensees::Load>>& getLoadsFromAnalyticalModel(std::string loadPatternTag);
 
         // Preprocessing
         static void updateMassSourceFromMembers();
