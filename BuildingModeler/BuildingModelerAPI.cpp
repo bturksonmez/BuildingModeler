@@ -724,6 +724,10 @@ void BuildingModelerAPI::addLoadCase(std::string loadCaseTag, physicalModel::Loa
         throw EntityFoundException("Load case: " + loadCaseTag + " already exists.");
     }
 
+    if (loadCombinationExists(loadCaseTag)) {
+        throw EntityFoundException("Load case: " + loadCaseTag + " cannot have the same name with Load combination: " + loadCaseTag);
+    }
+
     physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_shared<physicalModel::LoadCase>(loadCaseTag, loadCaseType);
 }
 
@@ -781,7 +785,11 @@ void BuildingModelerAPI::addDistributedAreaLoad(std::string loadCaseTag, int ele
 void BuildingModelerAPI::addLoadCombination(std::string loadCombinationTag)
 {
     if (loadCombinationExists(loadCombinationTag)) {
-        throw EntityFoundException("Load case: " + loadCombinationTag + " already exists.");
+        throw EntityFoundException("Load combination: " + loadCombinationTag + " already exists.");
+    }
+
+    if (loadCaseExists(loadCombinationTag)) {
+        throw EntityFoundException("Load combination: " + loadCombinationTag + " cannot have the same name with Load case: " + loadCombinationTag);
     }
 
     physicalModel::Building::getInstance().m_loadCombinations[loadCombinationTag] = std::make_shared<physicalModel::LoadCombination>(loadCombinationTag);
@@ -790,7 +798,7 @@ void BuildingModelerAPI::addLoadCombination(std::string loadCombinationTag)
 void BuildingModelerAPI::addLoadCaseToLoadCombination(std::string loadCombinationTag, std::string loadCaseTag, double factor)
 {
     if (!loadCombinationExists(loadCombinationTag)) {
-        throw EntityFoundException("Load combination: " + loadCombinationTag + " does not exist.");
+        throw EntityNotFoundException("Load combination: " + loadCombinationTag + " does not exist.");
     }
 
     if (!loadCaseExists(loadCaseTag)) {
@@ -827,6 +835,24 @@ const std::vector<std::shared_ptr<physicalModel::Load>>& BuildingModelerAPI::get
     }
 
     return  physicalModel::Building::getInstance().getLoadCase(loadCaseTag)->getDistributedAreaLoads();
+}
+
+void BuildingModelerAPI::setLoadCaseActive(std::string loadCaseTag, bool active)
+{
+    if (!loadCaseExists(loadCaseTag)) {
+        throw EntityNotFoundException("Load case: " + loadCaseTag + " does not exist.");
+    }
+
+    physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->setActive(active);
+}
+
+void BuildingModelerAPI::setLoadCombinationActive(std::string loadCombinationTag, bool active)
+{
+    if (!loadCombinationExists(loadCombinationTag)) {
+        throw EntityNotFoundException("Load combination: " + loadCombinationTag + " does not exist.");
+    }
+
+    physicalModel::Building::getInstance().m_loadCombinations[loadCombinationTag]->setActive(active);
 }
 
 void BuildingModelerAPI::updateMassSourceFromMembers()

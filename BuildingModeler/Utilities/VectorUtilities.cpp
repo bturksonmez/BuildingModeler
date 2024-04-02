@@ -84,6 +84,31 @@ namespace utility
         return (pB.y - pA.y) / (pB.x - pA.x);
     }
 
+    double VectorUtilities::calculateQuadArea(const Vector3& pointI, const Vector3& pointJ, const Vector3& pointK, const Vector3& pointL)
+    {
+        if (pointI == pointJ || pointI == pointK || pointI == pointL) {
+            return -1; // To do exception
+        }
+        if (pointJ == pointK || pointJ == pointL) {
+            return -1; // To do exception
+        }
+        if (pointK == pointL) {
+            return -1; // To do exception
+        }
+
+        auto angleA = utility::VectorUtilities::getAngleBtw(pointJ - pointI, pointL - pointI);
+        auto angleC = utility::VectorUtilities::getAngleBtw(pointJ - pointK, pointL - pointK);
+
+        auto theta = angleA + angleC;
+        auto a = (pointJ - pointI).norm2();
+        auto b = (pointK - pointJ).norm2();
+        auto c = (pointL - pointK).norm2();
+        auto d = (pointI - pointL).norm2();
+        auto s = (a + b + c + d) / 2.0;
+
+        return std::sqrt((s - a) * (s - b) * (s - c) * (s - d) - a * b * c * d * std::pow(std::cos(theta / 2.0), 2));
+    }
+
     Vector2 VectorUtilities::projectVectorOn2DLocalBasis(const Vector3& vec, const Vector3& u, const Vector3& v)
     {
         utility::Vector2 projectedVec;

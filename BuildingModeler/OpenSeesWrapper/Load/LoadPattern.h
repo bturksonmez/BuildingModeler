@@ -1,7 +1,8 @@
 #pragma once
 
 #include "../OpenseesObject.h"
-#include "Load.h"
+#include "NodalLoad.h"
+#include "ElementLoad.h"
 
 namespace opensees
 {
@@ -15,16 +16,18 @@ namespace opensees
 	{
 	protected:
 		int m_patternTag;
+		std::string m_loadingName;
 		TimeSeriesType m_timeSeriesType;
 		std::vector<std::shared_ptr<Load>> m_loadVector;
-
-		LoadPattern(int patternTag, TimeSeriesType timeSeriesType) : m_patternTag(patternTag), m_timeSeriesType(timeSeriesType) {}
+		static int counter;
 
 	public:
+		LoadPattern(std::string loadingName, TimeSeriesType timeSeriesType) : m_loadingName(loadingName), m_timeSeriesType(timeSeriesType) { m_patternTag = counter++; }
 		LoadPattern() = delete;
 		~LoadPattern() {}
 
 		int getPatternTag() const;
+		std::string getLoadingName() const;
 		TimeSeriesType getTimeSeriesType() const;
 		const std::vector<std::shared_ptr<Load>>& getLoadVector() const;
 		void addLoad(std::shared_ptr<Load> load);

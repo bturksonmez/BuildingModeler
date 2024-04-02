@@ -11,6 +11,7 @@
 #include "Elements/ShellElement.h"
 #include "Constraints/SingleConstraint.h"
 #include "Constraints/DiaphragmConstraint.h"
+#include "Load/LoadPattern.h"
 #include "../PhysicalModel/Building.h"
 
 #include <sstream>
@@ -35,6 +36,7 @@ namespace opensees
 		std::map<int, std::shared_ptr<Material>> m_materials;
 		std::map<int, std::shared_ptr<GeometricTransformation>> m_geometricTransformation;
 		std::map<int, std::shared_ptr<Section>> m_sections;
+		std::map<std::string, std::shared_ptr<LoadPattern>> m_loadPatterns;
 		std::map<std::pair<int, int>, std::vector<int>> m_divisionsBetweenNodes;
 
 		OpenseesModel();
@@ -56,6 +58,7 @@ namespace opensees
 		Element* getQuadrilateralElement(int elementTag) const;
 		std::shared_ptr<Material> getMaterial(int materialTag) const;
 		std::shared_ptr<Section> getSection(int sectionTag) const;
+		std::shared_ptr<LoadPattern> getLoadPattern(std::string loadingName) const;
 		std::vector<int> getDivisionsBetweenNodes(int nodeA, int nodeB) const;
 
 		void addDivisionsBetweenNodes(int nodeA, int nodeB, std::vector<int> dividedNodes);

@@ -76,6 +76,12 @@ std::shared_ptr<Section> OpenseesModel::getSection(int sectionTag) const
     return (it != m_sections.end()) ? it->second : nullptr;
 }
 
+std::shared_ptr<LoadPattern> OpenseesModel::getLoadPattern(std::string loadingName) const
+{
+    auto it = m_loadPatterns.find(loadingName);
+    return (it != m_loadPatterns.end()) ? it->second : nullptr;
+}
+
 std::vector<int> OpenseesModel::getDivisionsBetweenNodes(int nodeA, int nodeB) const
 {
     if (m_divisionsBetweenNodes.count(std::make_pair(nodeA, nodeB))) {

@@ -96,6 +96,8 @@ namespace buildingModeler
         static const std::vector<std::shared_ptr<physicalModel::Load>>& getPointLoads(std::string loadCaseTag);
         static const std::vector<std::shared_ptr<physicalModel::Load>>& getDistributedLineLoads(std::string loadCaseTag);
         static const std::vector<std::shared_ptr<physicalModel::Load>>& getDistributedAreaLoads(std::string loadCaseTag);
+        static void setLoadCaseActive(std::string loadCaseTag, bool active);
+        static void setLoadCombinationActive(std::string loadCombinationTag, bool active);
 
         // Preprocessing
         static void updateMassSourceFromMembers();

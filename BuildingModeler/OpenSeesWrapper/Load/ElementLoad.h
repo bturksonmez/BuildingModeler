@@ -4,14 +4,13 @@
 
 namespace opensees
 {
-	class ElementLoad : Load
+	class ElementLoad : public Load
 	{
 	private:
 		int m_elementTag;
 
-		ElementLoad(int elementTag, std::vector<double> loadVector);
-
 	public:
+		ElementLoad(int elementTag, std::vector<double> loadVector);
 		ElementLoad() = delete;
 		~ElementLoad() {}
 

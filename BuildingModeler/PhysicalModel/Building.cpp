@@ -149,6 +149,7 @@ void Building::toAnalyticalModel()
     convertLineElements();
     convertAreaElements();
     applyRigidDiaphragms();
+    applyLoads();
 }
 
 void Building::addMemberMasses()
@@ -226,5 +227,22 @@ void Building::applyRigidDiaphragms()
 {
     for (auto it = m_floors.begin(); it != m_floors.end(); it++) {
         buildingModeler::OpenseesConverter::toRigidDiaphragm(it->second.get());
+    }
+}
+
+void Building::applyLoads()
+{
+    for (auto it = m_loadCases.begin(); it != m_loadCases.end(); it++) {
+
+        if (it->second->isActive()) {
+            buildingModeler::OpenseesConverter::toLoadPatternFromLoadCase(it->second.get());
+        }
+    }
+
+    for (auto it = m_loadCombinations.begin(); it != m_loadCombinations.end(); it++) {
+
+        if (it->second->isActive()) {
+            buildingModeler::OpenseesConverter::toLoadPatternFromLoadCombination(it->second.get());
+        }
     }
 }

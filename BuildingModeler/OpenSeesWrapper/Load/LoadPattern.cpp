@@ -2,9 +2,16 @@
 
 using namespace opensees;
 
+int LoadPattern::counter = 0;
+
 int LoadPattern::getPatternTag() const
 {
 	return m_patternTag;
+}
+
+std::string LoadPattern::getLoadingName() const
+{
+	return m_loadingName;
 }
 
 TimeSeriesType LoadPattern::getTimeSeriesType() const

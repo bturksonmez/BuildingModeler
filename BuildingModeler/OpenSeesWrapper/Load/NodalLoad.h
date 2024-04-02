@@ -4,14 +4,13 @@
 
 namespace opensees
 {
-	class NodalLoad : Load
+	class NodalLoad : public Load
 	{
 	private:
 		int m_nodeTag;
 
-		NodalLoad(int nodeTag, std::vector<double> loadVector);
-
 	public:
+		NodalLoad(int nodeTag, std::vector<double> loadVector);
 		NodalLoad() = delete;
 		~NodalLoad() {}
 

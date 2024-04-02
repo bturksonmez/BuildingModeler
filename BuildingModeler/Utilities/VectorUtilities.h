@@ -16,6 +16,7 @@ namespace utility
 		static Vector3 crossProduct(const Vector3& vecA, const Vector3& vecB);
 		static double getAngleBtw(const Vector3& vecA, const Vector3& vecB);
 		static double calculateSlope(const Vector2& pA, const Vector2& pB);
+		static double calculateQuadArea(const Vector3& pointI, const Vector3& pointJ, const Vector3& pointK, const Vector3& pointL);
 		static Vector2 projectVectorOn2DLocalBasis(const Vector3& vec, const Vector3& u, const Vector3& v);
 		static bool isBetween(const Vector2& pA, const Vector2& pB, const Vector2& point);
 	};

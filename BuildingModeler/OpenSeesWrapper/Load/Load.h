@@ -24,6 +24,8 @@ namespace opensees
 
 		LoadType getLoadType() const;
 		const std::vector<double>& getLoadVector() const;
+
+		Load& operator*=(const double c);
 	};
 }
 

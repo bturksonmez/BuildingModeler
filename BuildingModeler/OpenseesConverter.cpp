@@ -331,6 +331,112 @@ void OpenseesConverter::toRigidDiaphragm(physicalModel::Floor* floor)
     }
 }
 
+void OpenseesConverter::toLoadPatternFromLoadCase(physicalModel::LoadCase* loadCase)
+{
+    opensees::OpenseesModel::getInstance().m_loadPatterns[loadCase->getLoadCaseTag()] = std::make_shared<opensees::LoadPattern>(loadCase->getLoadCaseTag(), opensees::TimeSeriesType::LINEAR);
+
+    auto loadPattern = opensees::OpenseesModel::getInstance().getLoadPattern(loadCase->getLoadCaseTag());
+
+    auto pointLoads = loadCase->getPointLoads();
+    for (const auto& pointLoad : pointLoads) {
+   
+        std::shared_ptr<opensees::Load> load = std::make_shared<opensees::NodalLoad>(std::dynamic_pointer_cast<physicalModel::PointLoad>(pointLoad)->getJointTag(), pointLoad->getLoadVector());
+        loadPattern->addLoad(load);
+    }
+
+    auto lineLoads = loadCase->getDistributedLineLoads();
+    for (const auto& lineLoad : lineLoads) {
+
+        auto lineElement = physicalModel::Building::getInstance().getLineElement(std::dynamic_pointer_cast<physicalModel::DistributedLineLoad>(lineLoad)->getBeamElementTag());
+
+        for (const auto& analyticalElementTag : lineElement->getAnalyticalElementTags()) {
+
+            std::shared_ptr<opensees::Load> load = std::make_shared<opensees::ElementLoad>(analyticalElementTag, lineLoad->getLoadVector());
+            loadPattern->addLoad(load);
+        }
+    }
+
+    auto areaLoads = loadCase->getDistributedAreaLoads();
+    for (const auto& areaLoad : areaLoads) {
+    
+        auto areaElement = physicalModel::Building::getInstance().getAreaElement(std::dynamic_pointer_cast<physicalModel::DistributedAreaLoad>(areaLoad)->getAreaElementTag());
+        auto analyticalNodeTags = areaElement->getAnalyticalNodeTags();
+        auto analyticalNodeCoords = areaElement->getAnalyticalNodeCoords();
+        auto load = areaLoad->getLoadVector();
+    
+        for (int i = 0; i < analyticalNodeTags.size(); ++i) {
+    
+            auto subArea = utility::VectorUtilities::calculateQuadArea(analyticalNodeCoords[i][0], analyticalNodeCoords[i][1], analyticalNodeCoords[i][2], analyticalNodeCoords[i][3]);
+    
+            // To do: This part only considers slabs loading in z directions. It should be more general!
+            std::vector<double> loadVec{ 0, 0, 0, 0, 0, 0 };
+            loadVec[2] = subArea * load[0] / 4.0;
+    
+            for (const auto& nodeTag : analyticalNodeTags[i]) {
+    
+                std::shared_ptr<opensees::Load> load = std::make_shared<opensees::NodalLoad>(nodeTag, loadVec);
+                loadPattern->addLoad(load);
+            }
+        }
+    }
+}
+
+void OpenseesConverter::toLoadPatternFromLoadCombination(physicalModel::LoadCombination* loadCombination)
+{
+    opensees::OpenseesModel::getInstance().m_loadPatterns[loadCombination->getLoadCombinationTag()] = std::make_shared<opensees::LoadPattern>(loadCombination->getLoadCombinationTag(), opensees::TimeSeriesType::LINEAR);
+    auto loadPattern = opensees::OpenseesModel::getInstance().getLoadPattern(loadCombination->getLoadCombinationTag());
+
+    for (const auto& loadCase : loadCombination->getLoadCases()) {
+    
+        auto pointLoads = loadCase.first->getPointLoads();
+        for (const auto& pointLoad : pointLoads) {
+    
+            std::shared_ptr<opensees::Load> load = std::make_shared<opensees::NodalLoad>(std::dynamic_pointer_cast<physicalModel::PointLoad>(pointLoad)->getJointTag(), pointLoad->getLoadVector());
+            (*load) *= loadCase.second;
+            loadPattern->addLoad(load);
+        }
+    
+        auto lineLoads = loadCase.first->getDistributedLineLoads();
+        for (const auto& lineLoad : lineLoads) {
+    
+            auto lineElement = physicalModel::Building::getInstance().getLineElement(std::dynamic_pointer_cast<physicalModel::DistributedLineLoad>(lineLoad)->getBeamElementTag());
+    
+            for (const auto& analyticalElementTag : lineElement->getAnalyticalElementTags()) {
+    
+                std::shared_ptr<opensees::Load> load = std::make_shared<opensees::ElementLoad>(analyticalElementTag, lineLoad->getLoadVector());
+                (*load) *= loadCase.second;
+                loadPattern->addLoad(load);
+            }
+        }
+    
+        auto areaLoads = loadCase.first->getDistributedAreaLoads();
+        for (const auto& areaLoad : areaLoads) {
+    
+            auto areaElement = physicalModel::Building::getInstance().getAreaElement(std::dynamic_pointer_cast<physicalModel::DistributedAreaLoad>(areaLoad)->getAreaElementTag());
+            auto analyticalNodeTags = areaElement->getAnalyticalNodeTags();
+            auto analyticalNodeCoords = areaElement->getAnalyticalNodeCoords();
+            auto load = areaLoad->getLoadVector();
+    
+            for (int i = 0; i < analyticalNodeTags.size(); ++i) {
+    
+                auto subArea = utility::VectorUtilities::calculateQuadArea(analyticalNodeCoords[i][0], analyticalNodeCoords[i][1], analyticalNodeCoords[i][2], analyticalNodeCoords[i][3]);
+    
+                // To do: This part only considers slabs loading in z directions. It should be more general!
+                std::vector<double> loadVec{ 0, 0, 0, 0, 0, 0 };
+                loadVec[2] = loadCase.second * subArea * load[0] / 4.0;
+    
+                for (const auto& nodeTag : analyticalNodeTags[i]) {
+    
+                    std::shared_ptr<opensees::Load> load = std::make_shared<opensees::NodalLoad>(nodeTag, loadVec);
+                    loadPattern->addLoad(load);
+                }
+            }
+        }
+    }
+
+    
+}
+
 bool OpenseesConverter::nodeExists(int nodeTag)
 {
     if (opensees::OpenseesModel::getInstance().m_nodes.find(nodeTag) != opensees::OpenseesModel::getInstance().m_nodes.end()) {
@@ -370,6 +476,15 @@ bool OpenseesConverter::beamColumnElementExists(int elementTag)
 bool OpenseesConverter::quadrilateralElementExists(int elementTag)
 {
     if (opensees::OpenseesModel::getInstance().m_quadrilateralElements.find(elementTag) != opensees::OpenseesModel::getInstance().m_quadrilateralElements.end()) {
+        return true;
+    }
+
+    return false;
+}
+
+bool OpenseesConverter::loadPatternExists(std::string loadingName)
+{
+    if (opensees::OpenseesModel::getInstance().m_loadPatterns.find(loadingName) != opensees::OpenseesModel::getInstance().m_loadPatterns.end()) {
         return true;
     }
 

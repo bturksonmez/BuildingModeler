@@ -17,7 +17,6 @@ namespace physicalModel
 		int m_masterJoint = -1;
 		bool m_confineFloorMassOnDiaphragmNode = false;
 		std::vector<int> m_jointTags;
-		std::vector<int> m_slabTags;
 		std::optional<utility::Vector3> m_diaphragmMass;
 		std::optional<utility::Vector2> m_massCenter;
 		std::optional<utility::Vector2> m_stiffnessCenter;
@@ -31,7 +30,6 @@ namespace physicalModel
 		~Floor() {}
 
 		void addJoint(int jointTag);
-		void addSlab(int slabTag);
 		void makeRigid(int masterJoint);
 		void makeFlexible();
 		bool updateMassCenter();
@@ -45,7 +43,6 @@ namespace physicalModel
 		bool isRigid() const;
 		int getMassCenterJointTag() const;
 		const std::vector<int>& getJoints() const;
-		const std::vector<int>& getSlabTags() const;
 		std::optional<utility::Vector3> getDiaphragmMass() const;
 		std::optional<utility::Vector2> getMassCenter() const;
 		std::optional<utility::Vector2> getStiffnessCenter() const;

@@ -6,6 +6,11 @@ LoadCase::LoadCase(std::string loadCaseTag, LoadCaseType loadCaseType) : m_loadC
 {
 }
 
+void LoadCase::setActive(bool active)
+{
+	m_active = active;
+}
+
 void LoadCase::addPointLoad(std::shared_ptr<Load> load)
 {
 	m_pointLoads.push_back(load);
@@ -19,6 +24,11 @@ void LoadCase::addDistributedLineLoad(std::shared_ptr<Load> load)
 void LoadCase::addDistributedAreaLoad(std::shared_ptr<Load> load)
 {
 	m_distributedAreaLoads.push_back(load);
+}
+
+bool LoadCase::isActive() const
+{
+	return m_active;
 }
 
 std::string LoadCase::getLoadCaseTag() const

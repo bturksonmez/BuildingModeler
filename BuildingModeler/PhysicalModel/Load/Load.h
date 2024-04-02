@@ -27,7 +27,7 @@ namespace physicalModel
 
 		int getUniqueID() const;
 		LoadType getLoadType() const;
-		const std::vector<double>& getLoadVector() const;
+		std::vector<double> getLoadVector() const;
 	};
 }
 

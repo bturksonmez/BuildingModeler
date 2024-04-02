@@ -26,17 +26,7 @@ double AreaElement::calculateArea()
 	utility::Vector3 pointK = physicalModel::Building::getInstance().getJoint(m_jointTags[2])->getCoords();
 	utility::Vector3 pointL = physicalModel::Building::getInstance().getJoint(m_jointTags[3])->getCoords();
 
-	auto angleA = utility::VectorUtilities::getAngleBtw(pointJ - pointI, pointL - pointI);
-	auto angleC = utility::VectorUtilities::getAngleBtw(pointJ - pointK, pointL - pointK);
-	
-	auto theta = angleA + angleC;
-	auto a = (pointJ - pointI).norm2();
-	auto b = (pointK - pointJ).norm2();
-	auto c = (pointL - pointK).norm2();
-	auto d = (pointI - pointL).norm2();
-	auto s = (a + b + c + d) / 2.0;
-
-	return std::sqrt((s - a) * (s - b) * (s - c) * (s - d) - a * b * c * d * std::pow(std::cos(theta / 2.0), 2));
+	return utility::VectorUtilities::calculateQuadArea(pointI, pointJ, pointK, pointL);
 }
 
 void AreaElement::addSurroundingLineElement(int index, int surroundingLineElementTag)

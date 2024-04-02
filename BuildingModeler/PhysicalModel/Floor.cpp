@@ -14,11 +14,6 @@ void Floor::addJoint(int jointTag)
 	m_jointTags.push_back(jointTag);
 }
 
-void Floor::addSlab(int slabTag)
-{
-	m_slabTags.push_back(slabTag);
-}
-
 void Floor::makeRigid(int masterJoint)
 {
 	m_isRigid = true;
@@ -131,11 +126,6 @@ int Floor::getMassCenterJointTag() const
 const std::vector<int>& Floor::getJoints() const
 {
 	return m_jointTags;
-}
-
-const std::vector<int>& Floor::getSlabTags() const
-{
-	return m_slabTags;
 }
 
 std::optional<utility::Vector3> Floor::getDiaphragmMass() const

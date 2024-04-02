@@ -6,9 +6,19 @@ LoadCombination::LoadCombination(std::string loadCombinationTag) : m_loadCombina
 {
 }
 
+void LoadCombination::setActive(bool active)
+{
+	m_active = active;
+}
+
 void LoadCombination::addLoadCase(std::shared_ptr<LoadCase> load, double factor)
 {
 	m_loadCases.push_back(std::make_pair(load, factor));
+}
+
+bool LoadCombination::isActive() const
+{
+	return m_active;
 }
 
 std::string LoadCombination::getLoadCombinationTag() const

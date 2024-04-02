@@ -58,6 +58,7 @@ namespace physicalModel
         void convertLineElements();
         void convertAreaElements();
         void applyRigidDiaphragms();
+        void applyLoads();
 
     public:
         ~Building() {}
