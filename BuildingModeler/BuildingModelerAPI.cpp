@@ -697,6 +697,12 @@ void BuildingModelerAPI::includePDeltaEffects(bool includePDeltaEffects)
     physicalModel::Building::getInstance().m_includePDeltaEffects = includePDeltaEffects;
 }
 
+void BuildingModelerAPI::clear()
+{
+    opensees::OpenseesModel::getInstance().clear();
+    physicalModel::Building::getInstance().clear();
+}
+
 void BuildingModelerAPI::includeDeadLoadFromMembers(bool includeDeadLoadFromMembers)
 {
     physicalModel::Building::getInstance().m_includeDeadLoadFromMembers = includeDeadLoadFromMembers;

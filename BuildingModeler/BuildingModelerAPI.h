@@ -82,6 +82,7 @@ namespace buildingModeler
 
         // Building API
         static void includePDeltaEffects(bool includePDeltEffects);
+        static void clear();
 
         // Loading API
         static void includeDeadLoadFromMembers(bool includeDeadLoadFromMembers);

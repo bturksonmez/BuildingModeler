@@ -2,7 +2,16 @@
 #include "../BuildingModeler/BuildingModelerAPI.h"
 #include "../BuildingModeler/Utilities/Vector3.h"
 
-TEST(LoadTests, SelfWeightWithFramesOnlySuccess) {
+class LoadTests : public ::testing::Test {
+protected:
+    void TearDown() override {
+        typedef buildingModeler::BuildingModelerAPI api;
+
+        api::clear();
+    }
+};
+
+TEST_F(LoadTests, SelfWeightWithFramesOnlySuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -161,7 +170,7 @@ TEST(LoadTests, SelfWeightWithFramesOnlySuccess) {
     EXPECT_NEAR(expectedTotalWeight, totalWeight, epsilon);
 }
 
-TEST(LoadTests, SelfWeightAndLiveLoadSuccess) {
+TEST_F(LoadTests, SelfWeightAndLiveLoadSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -351,7 +360,7 @@ TEST(LoadTests, SelfWeightAndLiveLoadSuccess) {
     EXPECT_NEAR(expectedTotalWeight, totalWeight, epsilon);
 }
 
-TEST(LoadTests, SelfWeightAndLiveLoadThroughLineElementsSuccess) {
+TEST_F(LoadTests, SelfWeightAndLiveLoadThroughLineElementsSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -537,7 +546,7 @@ TEST(LoadTests, SelfWeightAndLiveLoadThroughLineElementsSuccess) {
     EXPECT_NEAR(expectedTotalWeight, totalWeight, epsilon);
 }
 
-TEST(LoadTests, SelfWeightLiveEqWindLoadCombinationSuccess) {
+TEST_F(LoadTests, SelfWeightLiveEqWindLoadCombinationSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -760,7 +769,7 @@ TEST(LoadTests, SelfWeightLiveEqWindLoadCombinationSuccess) {
     EXPECT_NEAR(expectedFz, actualFz, epsilon);
 }
 
-TEST(LoadTests, SelfWeightLiveEqWindLoadCombinationThroughLineElementsSuccess) {
+TEST_F(LoadTests, SelfWeightLiveEqWindLoadCombinationThroughLineElementsSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints

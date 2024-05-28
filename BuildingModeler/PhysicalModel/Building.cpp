@@ -23,12 +23,20 @@ void Building::clear()
 {
     m_includeMassFromMembers = true;
     m_includePDeltaEffects = false;
+    m_disableSlabElements = false;
+    m_includeDeadLoadFromMembers = true;
+    m_gravityThroughLineElements = true;
     m_joints.clear();
     m_lineElements.clear();
     m_areaElements.clear();
     m_floors.clear();
     m_materials.clear();
     m_sections.clear();
+    m_pointLoads.clear();
+    m_distributedLineLoads.clear();
+    m_distributedAreaLoads.clear();
+    m_loadCases.clear();
+    m_loadCombinations.clear();
 }
 
 Joint* Building::getJoint(int jointTag) const

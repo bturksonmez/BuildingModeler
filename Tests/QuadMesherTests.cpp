@@ -2,7 +2,16 @@
 #include "../BuildingModeler/BuildingModelerAPI.h"
 #include "../BuildingModeler/Utilities/Vector3.h"
 
-TEST(QuadMesherTests, ElementNotFoundFail) {
+class QuadMesherTests : public ::testing::Test {
+protected:
+    void TearDown() override {
+        typedef buildingModeler::BuildingModelerAPI api;
+
+        api::clear();
+    }
+};
+
+TEST_F(QuadMesherTests, ElementNotFoundFail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -31,7 +40,7 @@ TEST(QuadMesherTests, ElementNotFoundFail) {
     }
 }
 
-TEST(QuadMesherTests, NoSurroundingElementsWithNullN1Fail) {
+TEST_F(QuadMesherTests, NoSurroundingElementsWithNullN1Fail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -63,7 +72,7 @@ TEST(QuadMesherTests, NoSurroundingElementsWithNullN1Fail) {
     }
 }
 
-TEST(QuadMesherTests, UnbalancedSurroundingElementsWithNullN1Fail) {
+TEST_F(QuadMesherTests, UnbalancedSurroundingElementsWithNullN1Fail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -107,7 +116,7 @@ TEST(QuadMesherTests, UnbalancedSurroundingElementsWithNullN1Fail) {
     }
 }
 
-TEST(QuadMesherTests, NoSurroundingElementsWithMinusN1Fail) {
+TEST_F(QuadMesherTests, NoSurroundingElementsWithMinusN1Fail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -139,7 +148,7 @@ TEST(QuadMesherTests, NoSurroundingElementsWithMinusN1Fail) {
     }
 }
 
-TEST(QuadMesherTests, SurroundingElementsWithN1Fail) {
+TEST_F(QuadMesherTests, SurroundingElementsWithN1Fail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -185,7 +194,7 @@ TEST(QuadMesherTests, SurroundingElementsWithN1Fail) {
     }
 }
 
-TEST(QuadMesherTests, UnbalancedSurroundingElementSegmentsFail) {
+TEST_F(QuadMesherTests, UnbalancedSurroundingElementSegmentsFail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -231,7 +240,7 @@ TEST(QuadMesherTests, UnbalancedSurroundingElementSegmentsFail) {
     }
 }
 
-TEST(QuadMesherTests, MeshWithN1nN2Success) {
+TEST_F(QuadMesherTests, MeshWithN1nN2Success) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -282,7 +291,7 @@ TEST(QuadMesherTests, MeshWithN1nN2Success) {
     }
 }
 
-TEST(QuadMesherTests, NoMeshSuccess) {
+TEST_F(QuadMesherTests, NoMeshSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -328,7 +337,7 @@ TEST(QuadMesherTests, NoMeshSuccess) {
     }
 }
 
-TEST(QuadMesherTests, MeshWith4SurroundingElementsSuccess) {
+TEST_F(QuadMesherTests, MeshWith4SurroundingElementsSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -397,7 +406,7 @@ TEST(QuadMesherTests, MeshWith4SurroundingElementsSuccess) {
     }
 }
 
-TEST(QuadMesherTests, MeshWith2SurroundingElementsN1Success) {
+TEST_F(QuadMesherTests, MeshWith2SurroundingElementsN1Success) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -462,7 +471,7 @@ TEST(QuadMesherTests, MeshWith2SurroundingElementsN1Success) {
     }
 }
 
-TEST(QuadMesherTests, MeshWith2SurroundingElementsN2Success) {
+TEST_F(QuadMesherTests, MeshWith2SurroundingElementsN2Success) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -527,7 +536,7 @@ TEST(QuadMesherTests, MeshWith2SurroundingElementsN2Success) {
     }
 }
 
-TEST(QuadMesherTests, MeshWithN1nN2TwoElementsSuccess) {
+TEST_F(QuadMesherTests, MeshWithN1nN2TwoElementsSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -580,7 +589,7 @@ TEST(QuadMesherTests, MeshWithN1nN2TwoElementsSuccess) {
     }
 }
 
-TEST(QuadMesherTests, MeshWithN1nN2FiveElementsSuccess) {
+TEST_F(QuadMesherTests, MeshWithN1nN2FiveElementsSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -713,7 +722,7 @@ TEST(QuadMesherTests, MeshWithN1nN2FiveElementsSuccess) {
     }
 }
 
-TEST(QuadMesherTests, MeshWithN1nN2FiveElementsWithConstraintSuccess) {
+TEST_F(QuadMesherTests, MeshWithN1nN2FiveElementsWithConstraintSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -907,7 +916,7 @@ TEST(QuadMesherTests, MeshWithN1nN2FiveElementsWithConstraintSuccess) {
     }
 }
 
-TEST(QuadMesherTests, MeshWithSurroundingElementsFiveElementsSuccess) {
+TEST_F(QuadMesherTests, MeshWithSurroundingElementsFiveElementsSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints
@@ -1080,7 +1089,7 @@ TEST(QuadMesherTests, MeshWithSurroundingElementsFiveElementsSuccess) {
     }
 }
 
-TEST(QuadMesherTests, MeshWithN1nN2TwoElementsFail) {
+TEST_F(QuadMesherTests, MeshWithN1nN2TwoElementsFail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add quad joints

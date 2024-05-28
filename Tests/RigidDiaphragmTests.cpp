@@ -2,7 +2,16 @@
 #include "../BuildingModeler/BuildingModelerAPI.h"
 #include "../BuildingModeler/Utilities/Vector3.h"
 
-TEST(RigidDiaphragmTests, DiaphragmMassXYSuccess) {
+class RigidDiaphragmTests : public ::testing::Test {
+protected:
+    void TearDown() override {
+        typedef buildingModeler::BuildingModelerAPI api;
+
+        api::clear();
+    }
+};
+
+TEST_F(RigidDiaphragmTests, DiaphragmMassXYSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -108,7 +117,7 @@ TEST(RigidDiaphragmTests, DiaphragmMassXYSuccess) {
     EXPECT_NEAR(expectedDummyVec.z, rotMassAnalytical.z, epsilon);
 }
 
-TEST(RigidDiaphragmTests, DiaphragmMassXYSuccessWithMemberMasses) {
+TEST_F(RigidDiaphragmTests, DiaphragmMassXYSuccessWithMemberMasses) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -267,7 +276,7 @@ TEST(RigidDiaphragmTests, DiaphragmMassXYSuccessWithMemberMasses) {
     EXPECT_NEAR(expectedDummyVec.z, rotMassAnalytical.z, epsilon);
 }
 
-TEST(RigidDiaphragmTests, DiaphragmMassXSuccess) {
+TEST_F(RigidDiaphragmTests, DiaphragmMassXSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -371,7 +380,7 @@ TEST(RigidDiaphragmTests, DiaphragmMassXSuccess) {
     EXPECT_NEAR(expectedDummyVec.z, rotMassAnalytical.z, epsilon);
 }
 
-TEST(RigidDiaphragmTests, DiaphragmMassYSuccess) {
+TEST_F(RigidDiaphragmTests, DiaphragmMassYSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -475,7 +484,7 @@ TEST(RigidDiaphragmTests, DiaphragmMassYSuccess) {
     EXPECT_NEAR(expectedDummyVec.z, rotMassAnalytical.z, epsilon);
 }
 
-TEST(RigidDiaphragmTests, MasterJointAlreadyExistsFail) {
+TEST_F(RigidDiaphragmTests, MasterJointAlreadyExistsFail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -531,7 +540,7 @@ TEST(RigidDiaphragmTests, MasterJointAlreadyExistsFail) {
     }
 }
 
-TEST(RigidDiaphragmTests, FloorNotFoundFail) {
+TEST_F(RigidDiaphragmTests, FloorNotFoundFail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -585,7 +594,7 @@ TEST(RigidDiaphragmTests, FloorNotFoundFail) {
     }
 }
 
-TEST(RigidDiaphragmTests, FloorAlreadyRigidFail) {
+TEST_F(RigidDiaphragmTests, FloorAlreadyRigidFail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -641,7 +650,7 @@ TEST(RigidDiaphragmTests, FloorAlreadyRigidFail) {
     }
 }
 
-TEST(RigidDiaphragmTests, NoMassFail) {
+TEST_F(RigidDiaphragmTests, NoMassFail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -683,7 +692,7 @@ TEST(RigidDiaphragmTests, NoMassFail) {
     }
 }
 
-TEST(RigidDiaphragmTests, FloorNotFoundFlexibleFail) {
+TEST_F(RigidDiaphragmTests, FloorNotFoundFlexibleFail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -711,7 +720,7 @@ TEST(RigidDiaphragmTests, FloorNotFoundFlexibleFail) {
     }
 }
 
-TEST(RigidDiaphragmTests, FloorAlreadyFlexibleFail) {
+TEST_F(RigidDiaphragmTests, FloorAlreadyFlexibleFail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -753,7 +762,7 @@ TEST(RigidDiaphragmTests, FloorAlreadyFlexibleFail) {
     }
 }
 
-TEST(RigidDiaphragmTests, FloorNotFoundConfineFail) {
+TEST_F(RigidDiaphragmTests, FloorNotFoundConfineFail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints
@@ -809,7 +818,7 @@ TEST(RigidDiaphragmTests, FloorNotFoundConfineFail) {
     }
 }
 
-TEST(RigidDiaphragmTests, FlexibleFloorNotConfinedFail) {
+TEST_F(RigidDiaphragmTests, FlexibleFloorNotConfinedFail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add joints

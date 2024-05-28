@@ -23,8 +23,8 @@ void OpenseesModel::clear()
     m_beamColumnElements.clear();
     m_quadrilateralElements.clear();
     m_materials.clear();
-    m_geometricTransformation.clear();
     m_sections.clear();
+    m_loadPatterns.clear();
     m_divisionsBetweenNodes.clear();
 }
 

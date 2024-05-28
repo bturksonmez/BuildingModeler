@@ -2,7 +2,16 @@
 #include "../BuildingModeler/BuildingModelerAPI.h"
 #include "../BuildingModeler/Utilities/Vector3.h"
 
-TEST(FrameMesherTests, ElementNotFoundFail) {
+class FrameMesherTests : public ::testing::Test {
+protected:
+    void TearDown() override {
+        typedef buildingModeler::BuildingModelerAPI api;
+
+        api::clear();
+    }
+};
+
+TEST_F(FrameMesherTests, ElementNotFoundFail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add line element joints
@@ -29,7 +38,7 @@ TEST(FrameMesherTests, ElementNotFoundFail) {
     }
 }
 
-TEST(FrameMesherTests, SegmentRatiosIncorrectFail) {
+TEST_F(FrameMesherTests, SegmentRatiosIncorrectFail) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add line element joints
@@ -59,7 +68,7 @@ TEST(FrameMesherTests, SegmentRatiosIncorrectFail) {
     }
 }
 
-TEST(FrameMesherTests, MeshSuccess) {
+TEST_F(FrameMesherTests, MeshSuccess) {
     typedef buildingModeler::BuildingModelerAPI api;
 
     // add line element joints
