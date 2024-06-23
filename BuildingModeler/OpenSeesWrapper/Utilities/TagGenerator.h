@@ -10,8 +10,8 @@ namespace opensees
 			int m_nodeTag = 100001;
 			int m_columnTag = 100001;
 			int m_beamTag = 200001;
-			int m_slabTag = 300001;
-			int m_shearWallTag = 400001;
+			int m_slabTag = 400001;
+			int m_shearWallTag = 500001;
 
 			TagGenerator() {}
 

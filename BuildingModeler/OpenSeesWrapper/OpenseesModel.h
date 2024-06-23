@@ -12,6 +12,7 @@
 #include "Constraints/SingleConstraint.h"
 #include "Constraints/DiaphragmConstraint.h"
 #include "Load/LoadPattern.h"
+#include "Outputs/Output.h"
 #include "../PhysicalModel/Building.h"
 
 #include <sstream>
@@ -38,6 +39,8 @@ namespace opensees
 		std::map<int, std::shared_ptr<Section>> m_sections;
 		std::map<std::string, std::shared_ptr<LoadPattern>> m_loadPatterns;
 		std::map<std::pair<int, int>, std::vector<int>> m_divisionsBetweenNodes;
+		std::map<int, opensees::ElementType> m_outputElements;
+		std::unordered_map<std::string, std::unique_ptr<Output>> m_outputs;
 
 		OpenseesModel();
 
@@ -60,8 +63,10 @@ namespace opensees
 		std::shared_ptr<Section> getSection(int sectionTag) const;
 		std::shared_ptr<LoadPattern> getLoadPattern(std::string loadingName) const;
 		std::vector<int> getDivisionsBetweenNodes(int nodeA, int nodeB) const;
+		Output* getOutput(std::string loadTag) const;
 
 		void addDivisionsBetweenNodes(int nodeA, int nodeB, std::vector<int> dividedNodes);
+		void addOutputElement(int elementTag, opensees::ElementType elementType);
 		void toTclFile();
 
 		friend class buildingModeler::OpenseesConverter;

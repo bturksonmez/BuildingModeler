@@ -148,6 +148,7 @@ void OpenseesConverter::toBeamColumnElement(physicalModel::LineElement* element)
         }
 
         element->addAnalyticalElementTag(elementTag);
+        opensees::OpenseesModel::getInstance().addOutputElement(elementTag, opensees::ElementType::BEAMCOLUMN);
 
         if (element->getLineElementType() == physicalModel::LineElementType::COLUMN) {
             elementTag = opensees::utilities::TagGenerator::getInstance().getNextColumnTag();
@@ -646,6 +647,7 @@ void OpenseesConverter::createMeshForQuadElement(physicalModel::AreaElement* ele
 
             element->addAnalyticalNodeTags(nodeTags);
             element->addAnalyticalElementTag(elementTag);
+            opensees::OpenseesModel::getInstance().addOutputElement(elementTag, opensees::ElementType::QUADRILATERAL);
 
             if (element->getAreaElementType() == physicalModel::AreaElementType::SLAB) {
                 elementTag = opensees::utilities::TagGenerator::getInstance().getNextSlabTag();

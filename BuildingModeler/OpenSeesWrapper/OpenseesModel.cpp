@@ -91,9 +91,20 @@ std::vector<int> OpenseesModel::getDivisionsBetweenNodes(int nodeA, int nodeB) c
     return {};
 }
 
+Output* OpenseesModel::getOutput(std::string loadTag) const
+{
+    auto it = m_outputs.find(loadTag);
+    return (it != m_outputs.end()) ? it->second.get() : nullptr;
+}
+
 void OpenseesModel::addDivisionsBetweenNodes(int nodeA, int nodeB, std::vector<int> dividedNodes)
 {
     m_divisionsBetweenNodes.insert_or_assign(std::make_pair(nodeA, nodeB), dividedNodes);
+}
+
+void OpenseesModel::addOutputElement(int elementTag, opensees::ElementType elementType)
+{
+    m_outputElements.insert(std::make_pair(elementTag, elementType));
 }
 
 void OpenseesModel::toTclFile()
