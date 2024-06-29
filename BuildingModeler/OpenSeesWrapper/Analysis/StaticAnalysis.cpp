@@ -2,9 +2,8 @@
 
 using namespace opensees;
 
-StaticAnalysis::StaticAnalysis(std::string sourceModelName, std::shared_ptr<LoadPattern> loadPattern) : Analysis(sourceModelName)
+StaticAnalysis::StaticAnalysis(std::string sourceModelName, std::string analysisName, std::shared_ptr<LoadPattern> loadPattern) : Analysis(sourceModelName, analysisName)
 {
-	m_analysisID = counter++;
 	m_analysisType = opensees::AnalysisType::STATIC;
 	m_loadPattern = loadPattern;
 }

@@ -382,12 +382,16 @@ void OpenseesConverter::toAnalysisObjectFromLoadCase(physicalModel::LoadCase* lo
             }
         }
 
-        std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::StaticAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), loadPattern);
+        std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::StaticAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), staticLoadCase->getLoadCaseTag(), loadPattern);
         opensees::OpenseesModel::getInstance().m_analyses.insert(analysis);
+
+        opensees::OpenseesModel::getInstance().m_outputs[staticLoadCase->getLoadCaseTag()] = std::make_unique<opensees::StaticOutput>(staticLoadCase->getLoadCaseTag());
     }
     else if (auto modalLoadCase = dynamic_cast<physicalModel::ModalLoadCase*>(loadCase)) {
-        std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::ModalAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), modalLoadCase->getNumberOfModes());
+        std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::ModalAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), staticLoadCase->getLoadCaseTag(), modalLoadCase->getNumberOfModes());
         opensees::OpenseesModel::getInstance().m_analyses.insert(analysis);
+
+        opensees::OpenseesModel::getInstance().m_outputs[modalLoadCase->getLoadCaseTag()] = std::make_unique<opensees::ModalOutput>(modalLoadCase->getLoadCaseTag());
     }
     
 }
@@ -444,7 +448,12 @@ void OpenseesConverter::toAnalysisObjectFromStaticLoadCombination(physicalModel:
                     }
                 }
             }
-        } 
+        }
+
+        std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::StaticAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), loadCombination->getLoadCombinationTag(), loadPattern);
+        opensees::OpenseesModel::getInstance().m_analyses.insert(analysis);
+
+        opensees::OpenseesModel::getInstance().m_outputs[loadCombination->getLoadCombinationTag()] = std::make_unique<opensees::StaticOutput>(loadCombination->getLoadCombinationTag());
     }
 }
 

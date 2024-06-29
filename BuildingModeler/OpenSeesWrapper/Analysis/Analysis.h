@@ -15,10 +15,11 @@ namespace opensees
 	protected:
 		size_t m_analysisID;
 		std::string m_sourceModelName;
+		std::string m_analysisName;
 		AnalysisType m_analysisType;
 		static size_t counter;
 
-		Analysis(std::string sourceModelName);
+		Analysis(std::string sourceModelName, std::string analysisName);
 
 	public:
 		Analysis() = delete;
@@ -26,6 +27,7 @@ namespace opensees
 
 		size_t getAnalysisID() const;
 		std::string getSourceModelName() const;
+		std::string getAnalysisName() const;
 		AnalysisType getAnalysisType() const;
 		
 		struct AnalysisHash

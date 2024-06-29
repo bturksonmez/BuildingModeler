@@ -14,7 +14,8 @@
 #include "Load/LoadPattern.h"
 #include "Analysis/StaticAnalysis.h"
 #include "Analysis/ModalAnalysis.h"
-#include "Outputs/Output.h"
+#include "Outputs/StaticOutput.h"
+#include "Outputs/ModalOutput.h"
 #include "../PhysicalModel/Building.h"
 
 #include <sstream>

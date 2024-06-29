@@ -11,7 +11,7 @@ namespace opensees
 		std::shared_ptr<LoadPattern> m_loadPattern;
 
 	public:
-		StaticAnalysis(std::string sourceModelName, std::shared_ptr<LoadPattern> loadPattern);
+		StaticAnalysis(std::string sourceModelName, std::string analysisName, std::shared_ptr<LoadPattern> loadPattern);
 		~StaticAnalysis() {}
 
 		std::shared_ptr<LoadPattern> getLoadPattern() const;

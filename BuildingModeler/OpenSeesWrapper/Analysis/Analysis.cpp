@@ -4,9 +4,9 @@ using namespace opensees;
 
 size_t Analysis::counter = 0;
 
-Analysis::Analysis(std::string sourceModelName) : m_sourceModelName(sourceModelName)
+Analysis::Analysis(std::string sourceModelName, std::string analysisName) : m_sourceModelName(sourceModelName), m_analysisName(analysisName)
 {
-
+	m_analysisID = counter++;
 }
 
 size_t Analysis::getAnalysisID() const
@@ -17,6 +17,11 @@ size_t Analysis::getAnalysisID() const
 std::string Analysis::getSourceModelName() const
 {
 	return m_sourceModelName;
+}
+
+std::string Analysis::getAnalysisName() const
+{
+	return m_analysisName;
 }
 
 AnalysisType Analysis::getAnalysisType() const

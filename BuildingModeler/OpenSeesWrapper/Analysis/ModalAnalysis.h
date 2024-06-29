@@ -11,7 +11,7 @@ namespace opensees
 		size_t m_numberOfModes;
 
 	public:
-		ModalAnalysis(std::string sourceModelName, size_t numberOfModes);
+		ModalAnalysis(std::string sourceModelName, std::string analysisName, size_t numberOfModes);
 		~ModalAnalysis() {}
 
 		size_t getNumberOfModes() const;
