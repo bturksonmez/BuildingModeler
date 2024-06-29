@@ -713,19 +713,19 @@ TEST_F(LoadTests, SelfWeightLiveEqWindLoadCombinationSuccess) {
     api::updateDeadAndLiveLoads();
 
     // additional loading
-    api::addLoadCase("WIND", physicalModel::LoadCaseType::WIND);
+    api::addStaticLoadCase("WIND", physicalModel::StaticLoadCaseType::WIND);
     api::addPointLoad("WIND", 100, 100, 100, 0, 0, 0, 0);
-    api::addLoadCase("EQ", physicalModel::LoadCaseType::EARTHQUAKE);
+    api::addStaticLoadCase("EQ", physicalModel::StaticLoadCaseType::EARTHQUAKE);
     api::addPointLoad("EQ", 100, 200, 200, 0, 0, 0, 0);
     api::addPointLoad("EQ", 200, 150, 200, 0, 0, 0, 0);
 
     // create load combination
-    api::addLoadCombination("COMB");
-    api::setLoadCombinationActive("COMB", true);
-    api::addLoadCaseToLoadCombination("COMB", "DEAD", 1.4);
-    api::addLoadCaseToLoadCombination("COMB", "LIVE", 1.6);
-    api::addLoadCaseToLoadCombination("COMB", "WIND", 1.0);
-    api::addLoadCaseToLoadCombination("COMB", "EQ", 1.2);
+    api::addStaticLoadCombination("COMB");
+    api::setStaticLoadCombinationActive("COMB", true);
+    api::addLoadCaseToStaticLoadCombination("COMB", "DEAD", 1.4);
+    api::addLoadCaseToStaticLoadCombination("COMB", "LIVE", 1.6);
+    api::addLoadCaseToStaticLoadCombination("COMB", "WIND", 1.0);
+    api::addLoadCaseToStaticLoadCombination("COMB", "EQ", 1.2);
 
     // create analytical model
     physicalModel::Building::getInstance().toAnalyticalModel();
@@ -936,19 +936,19 @@ TEST_F(LoadTests, SelfWeightLiveEqWindLoadCombinationThroughLineElementsSuccess)
     api::updateDeadAndLiveLoads();
 
     // additional loading
-    api::addLoadCase("WIND", physicalModel::LoadCaseType::WIND);
+    api::addStaticLoadCase("WIND", physicalModel::StaticLoadCaseType::WIND);
     api::addPointLoad("WIND", 100, 100, 100, 0, 0, 0, 0);
-    api::addLoadCase("EQ", physicalModel::LoadCaseType::EARTHQUAKE);
+    api::addStaticLoadCase("EQ", physicalModel::StaticLoadCaseType::EARTHQUAKE);
     api::addPointLoad("EQ", 100, 200, 200, 0, 0, 0, 0);
     api::addPointLoad("EQ", 200, 150, 200, 0, 0, 0, 0);
 
     // create load combination
-    api::addLoadCombination("COMB");
-    api::setLoadCombinationActive("COMB", true);
-    api::addLoadCaseToLoadCombination("COMB", "DEAD", 1.4);
-    api::addLoadCaseToLoadCombination("COMB", "LIVE", 1.6);
-    api::addLoadCaseToLoadCombination("COMB", "WIND", 1.0);
-    api::addLoadCaseToLoadCombination("COMB", "EQ", 1.2);
+    api::addStaticLoadCombination("COMB");
+    api::setStaticLoadCombinationActive("COMB", true);
+    api::addLoadCaseToStaticLoadCombination("COMB", "DEAD", 1.4);
+    api::addLoadCaseToStaticLoadCombination("COMB", "LIVE", 1.6);
+    api::addLoadCaseToStaticLoadCombination("COMB", "WIND", 1.0);
+    api::addLoadCaseToStaticLoadCombination("COMB", "EQ", 1.2);
 
     // create analytical model
     physicalModel::Building::getInstance().toAnalyticalModel();

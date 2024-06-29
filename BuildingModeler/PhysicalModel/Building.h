@@ -9,7 +9,9 @@
 #include "Elements/ShearWallElement.h"
 #include "Elements/SlabElement.h"
 #include "Floor.h"
-#include "Load/LoadCombination.h"
+#include "Load/StaticLoadCase.h"
+#include "Load/ModalLoadCase.h"
+#include "Load/StaticLoadCombination.h"
 
 
 #include <map>
@@ -46,7 +48,7 @@ namespace physicalModel
         std::map<int, std::shared_ptr<Load>> m_distributedLineLoads;
         std::map<int, std::shared_ptr<Load>> m_distributedAreaLoads;
         std::map<std::string, std::shared_ptr<LoadCase>> m_loadCases;
-        std::map<std::string, std::shared_ptr<LoadCombination>> m_loadCombinations;
+        std::map<std::string, std::shared_ptr<StaticLoadCombination>> m_staticLoadCombinations;
 
 
         Building() {}
@@ -81,7 +83,7 @@ namespace physicalModel
         std::shared_ptr<Load> getDistributedLineLoad(int loadID) const;
         std::shared_ptr<Load> getDistributedAreaLoad(int loadID) const;
         std::shared_ptr<LoadCase> getLoadCase(std::string loadCaseTag) const;
-        std::shared_ptr<LoadCombination> getLoadCombination(std::string loadCombinationTag) const;
+        std::shared_ptr<StaticLoadCombination> getStaticLoadCombination(std::string loadCombinationTag) const;
 
         void updateSurroundingLineElements(); // for area elements
         void toAnalyticalModel();

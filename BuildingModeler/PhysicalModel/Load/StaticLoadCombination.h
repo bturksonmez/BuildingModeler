@@ -4,7 +4,7 @@
 
 namespace physicalModel
 {
-	class LoadCombination
+	class StaticLoadCombination
 	{
 	private:
 		bool m_active = false;
@@ -12,9 +12,9 @@ namespace physicalModel
 		std::vector<std::pair<std::shared_ptr<LoadCase>, double>> m_loadCases;
 
 	public:
-		LoadCombination(std::string loadCombinationTag);
-		LoadCombination() = delete;
-		~LoadCombination() {}
+		StaticLoadCombination(std::string loadCombinationTag);
+		StaticLoadCombination() = delete;
+		~StaticLoadCombination() {}
 
 		void setActive(bool active);
 		void addLoadCase(std::shared_ptr<LoadCase> load, double factor);

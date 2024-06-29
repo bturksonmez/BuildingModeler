@@ -724,17 +724,30 @@ void BuildingModelerAPI::setLiveLoadForFloor(int floorNumber, double liveLoadPer
     floor->setLiveLoadPerArea(liveLoadPerArea);
 }
 
-void BuildingModelerAPI::addLoadCase(std::string loadCaseTag, physicalModel::LoadCaseType loadCaseType)
+void BuildingModelerAPI::addStaticLoadCase(std::string loadCaseTag, physicalModel::StaticLoadCaseType loadCaseType)
 {
     if (loadCaseExists(loadCaseTag)) {
         throw EntityFoundException("Load case: " + loadCaseTag + " already exists.");
     }
 
-    if (loadCombinationExists(loadCaseTag)) {
-        throw EntityFoundException("Load case: " + loadCaseTag + " cannot have the same name with Load combination: " + loadCaseTag);
+    if (staticLoadCombinationExists(loadCaseTag)) {
+        throw EntityFoundException("Static load combination: " + loadCaseTag + " cannot have the same name with Load case: " + loadCaseTag);
     }
 
-    physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_shared<physicalModel::LoadCase>(loadCaseTag, loadCaseType);
+    physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_shared<physicalModel::StaticLoadCase>(loadCaseTag, loadCaseType);
+}
+
+void BuildingModelerAPI::addModalLoadCase(std::string loadCaseTag, size_t numberOfModes)
+{
+    if (loadCaseExists(loadCaseTag)) {
+        throw EntityFoundException("Load case: " + loadCaseTag + " already exists.");
+    }
+
+    if (staticLoadCombinationExists(loadCaseTag)) {
+        throw EntityFoundException("Static load combination: " + loadCaseTag + " cannot have the same name with Load case: " + loadCaseTag);
+    }
+
+    physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_shared<physicalModel::ModalLoadCase>(loadCaseTag, numberOfModes);
 }
 
 void BuildingModelerAPI::addPointLoad(std::string loadCaseTag, int jointTag, double fx, double fy, double fz, double mx, double my, double mz)
@@ -747,11 +760,17 @@ void BuildingModelerAPI::addPointLoad(std::string loadCaseTag, int jointTag, dou
         throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
     }
 
-    std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::PointLoad>(jointTag, fx, fy, fz, mx, my, mz);
+    auto loadCase = physicalModel::Building::getInstance().m_loadCases[loadCaseTag];
+    if (auto staticLoadCase = std::dynamic_pointer_cast<physicalModel::StaticLoadCase>(loadCase)) {
+        std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::PointLoad>(jointTag, fx, fy, fz, mx, my, mz);
 
-    physicalModel::Building::getInstance().m_pointLoads[load->getUniqueID()] = load;
+        physicalModel::Building::getInstance().m_pointLoads[load->getUniqueID()] = load;
 
-    physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addPointLoad(load);
+        staticLoadCase->addPointLoad(load);
+    }
+    else {
+        throw InvalidInputException("Load case with tag " + loadCaseTag + " is not a static load case.Point loads can be added only to static load cases!");
+    }
 }
 
 void BuildingModelerAPI::addDistributedLineLoad(std::string loadCaseTag, int elementTag, double wz, double wy, double wx)
@@ -764,11 +783,17 @@ void BuildingModelerAPI::addDistributedLineLoad(std::string loadCaseTag, int ele
         throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
     }
 
-    std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedLineLoad>(elementTag, wx, wy, wz);
+    auto loadCase = physicalModel::Building::getInstance().m_loadCases[loadCaseTag];
+    if (auto staticLoadCase = std::dynamic_pointer_cast<physicalModel::StaticLoadCase>(loadCase)) {
+        std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedLineLoad>(elementTag, wx, wy, wz);
 
-    physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
+        physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
 
-    physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addDistributedLineLoad(load);
+        staticLoadCase->addDistributedLineLoad(load);
+    }
+    else {
+        throw InvalidInputException("Load case with tag " + loadCaseTag + " is not a static load case.Distributed line loads can be added only to static load cases!");
+    }
 }
 
 void BuildingModelerAPI::addDistributedAreaLoad(std::string loadCaseTag, int elementTag, double wz, double wy, double wx)
@@ -781,30 +806,36 @@ void BuildingModelerAPI::addDistributedAreaLoad(std::string loadCaseTag, int ele
         throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
     }
 
-    std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedAreaLoad>(elementTag, wx, wy, wz);
+    auto loadCase = physicalModel::Building::getInstance().m_loadCases[loadCaseTag];
+    if (auto staticLoadCase = std::dynamic_pointer_cast<physicalModel::StaticLoadCase>(loadCase)) {
+        std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedAreaLoad>(elementTag, wx, wy, wz);
 
-    physicalModel::Building::getInstance().m_distributedAreaLoads[load->getUniqueID()] = load;
+        physicalModel::Building::getInstance().m_distributedAreaLoads[load->getUniqueID()] = load;
 
-    physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addDistributedAreaLoad(load);
+        staticLoadCase->addDistributedAreaLoad(load);
+    }
+    else {
+        throw InvalidInputException("Load case with tag " + loadCaseTag + " is not a static load case.Distributed area loads can be added only to static load cases!");
+    }
 }
 
-void BuildingModelerAPI::addLoadCombination(std::string loadCombinationTag)
+void BuildingModelerAPI::addStaticLoadCombination(std::string staticLoadCombinationTag)
 {
-    if (loadCombinationExists(loadCombinationTag)) {
-        throw EntityFoundException("Load combination: " + loadCombinationTag + " already exists.");
+    if (staticLoadCombinationExists(staticLoadCombinationTag)) {
+        throw EntityFoundException("Static load combination: " + staticLoadCombinationTag + " already exists.");
     }
 
-    if (loadCaseExists(loadCombinationTag)) {
-        throw EntityFoundException("Load combination: " + loadCombinationTag + " cannot have the same name with Load case: " + loadCombinationTag);
+    if (loadCaseExists(staticLoadCombinationTag)) {
+        throw EntityFoundException("Static load combination: " + staticLoadCombinationTag + " cannot have the same name with Load case: " + staticLoadCombinationTag);
     }
 
-    physicalModel::Building::getInstance().m_loadCombinations[loadCombinationTag] = std::make_shared<physicalModel::LoadCombination>(loadCombinationTag);
+    physicalModel::Building::getInstance().m_staticLoadCombinations[staticLoadCombinationTag] = std::make_shared<physicalModel::StaticLoadCombination>(staticLoadCombinationTag);
 }
 
-void BuildingModelerAPI::addLoadCaseToLoadCombination(std::string loadCombinationTag, std::string loadCaseTag, double factor)
+void BuildingModelerAPI::addLoadCaseToStaticLoadCombination(std::string staticLoadCombinationTag, std::string loadCaseTag, double factor)
 {
-    if (!loadCombinationExists(loadCombinationTag)) {
-        throw EntityNotFoundException("Load combination: " + loadCombinationTag + " does not exist.");
+    if (!staticLoadCombinationExists(staticLoadCombinationTag)) {
+        throw EntityNotFoundException("Static load combination: " + staticLoadCombinationTag + " does not exist.");
     }
 
     if (!loadCaseExists(loadCaseTag)) {
@@ -813,7 +844,12 @@ void BuildingModelerAPI::addLoadCaseToLoadCombination(std::string loadCombinatio
 
     auto loadCase = physicalModel::Building::getInstance().getLoadCase(loadCaseTag);
 
-    physicalModel::Building::getInstance().m_loadCombinations[loadCombinationTag]->addLoadCase(loadCase, factor);
+    if (loadCase->getLoadCaseType() == physicalModel::LoadCaseType::STATIC) {
+        physicalModel::Building::getInstance().m_staticLoadCombinations[staticLoadCombinationTag]->addLoadCase(loadCase, factor);
+    }
+    else {
+        throw InvalidInputException("Load case with tag " + loadCaseTag + " is not a static load case.Only static load cases can be added to static load combinations!");
+    }
 }
 
 void BuildingModelerAPI::setLoadCaseActive(std::string loadCaseTag, bool active)
@@ -825,13 +861,13 @@ void BuildingModelerAPI::setLoadCaseActive(std::string loadCaseTag, bool active)
     physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->setActive(active);
 }
 
-void BuildingModelerAPI::setLoadCombinationActive(std::string loadCombinationTag, bool active)
+void BuildingModelerAPI::setStaticLoadCombinationActive(std::string staticLoadCombinationTag, bool active)
 {
-    if (!loadCombinationExists(loadCombinationTag)) {
-        throw EntityNotFoundException("Load combination: " + loadCombinationTag + " does not exist.");
+    if (!staticLoadCombinationExists(staticLoadCombinationTag)) {
+        throw EntityNotFoundException("Static load combination: " + staticLoadCombinationTag + " does not exist.");
     }
 
-    physicalModel::Building::getInstance().m_loadCombinations[loadCombinationTag]->setActive(active);
+    physicalModel::Building::getInstance().m_staticLoadCombinations[staticLoadCombinationTag]->setActive(active);
 }
 
 const std::vector<std::shared_ptr<physicalModel::Load>>& BuildingModelerAPI::getPointLoads(std::string loadCaseTag)
@@ -840,7 +876,13 @@ const std::vector<std::shared_ptr<physicalModel::Load>>& BuildingModelerAPI::get
         throw EntityNotFoundException("Load case: " + loadCaseTag + " does not exist.");
     }
 
-    return  physicalModel::Building::getInstance().getLoadCase(loadCaseTag)->getPointLoads();
+    auto loadCase = physicalModel::Building::getInstance().m_loadCases[loadCaseTag];
+    if (auto staticLoadCase = std::dynamic_pointer_cast<physicalModel::StaticLoadCase>(loadCase)) {
+        return staticLoadCase->getPointLoads();
+    }
+    else {
+        throw InvalidInputException("Load case with tag " + loadCaseTag + " is not a static load case.Only static load cases can have point loads!");
+    }
 }
 
 const std::vector<std::shared_ptr<physicalModel::Load>>& BuildingModelerAPI::getDistributedLineLoads(std::string loadCaseTag)
@@ -849,7 +891,13 @@ const std::vector<std::shared_ptr<physicalModel::Load>>& BuildingModelerAPI::get
         throw EntityNotFoundException("Load case: " + loadCaseTag + " does not exist.");
     }
 
-    return  physicalModel::Building::getInstance().getLoadCase(loadCaseTag)->getDistributedLineLoads();
+    auto loadCase = physicalModel::Building::getInstance().m_loadCases[loadCaseTag];
+    if (auto staticLoadCase = std::dynamic_pointer_cast<physicalModel::StaticLoadCase>(loadCase)) {
+        return staticLoadCase->getDistributedLineLoads();
+    }
+    else {
+        throw InvalidInputException("Load case with tag " + loadCaseTag + " is not a static load case.Only static load cases can have distributed line loads!");
+    }
 }
 
 const std::vector<std::shared_ptr<physicalModel::Load>>& BuildingModelerAPI::getDistributedAreaLoads(std::string loadCaseTag)
@@ -858,12 +906,18 @@ const std::vector<std::shared_ptr<physicalModel::Load>>& BuildingModelerAPI::get
         throw EntityNotFoundException("Load case: " + loadCaseTag + " does not exist.");
     }
 
-    return  physicalModel::Building::getInstance().getLoadCase(loadCaseTag)->getDistributedAreaLoads();
+    auto loadCase = physicalModel::Building::getInstance().m_loadCases[loadCaseTag];
+    if (auto staticLoadCase = std::dynamic_pointer_cast<physicalModel::StaticLoadCase>(loadCase)) {
+        return staticLoadCase->getDistributedAreaLoads();
+    }
+    else {
+        throw InvalidInputException("Load case with tag " + loadCaseTag + " is not a static load case.Only static load cases can have distributed area loads!");
+    }
 }
 
 const std::vector<std::shared_ptr<opensees::Load>>& BuildingModelerAPI::getLoadsFromAnalyticalModel(std::string loadPatternTag)
 {
-    if (!loadCaseExists(loadPatternTag) && !loadCombinationExists(loadPatternTag)) {
+    if (!loadCaseExists(loadPatternTag) && !staticLoadCombinationExists(loadPatternTag)) {
         throw EntityNotFoundException("Load pattern: " + loadPatternTag + " does not exist.");
     }
 
@@ -893,10 +947,12 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
 
         // dead load
         auto loadCaseTag = "DEAD";
-        auto loadCaseType = physicalModel::LoadCaseType::DEAD;
+        auto staticLoadCaseType = physicalModel::StaticLoadCaseType::DEAD;
         if (physicalModel::Building::getInstance().m_loadCases.find(loadCaseTag) == physicalModel::Building::getInstance().m_loadCases.end()) {
-            physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_unique<physicalModel::LoadCase>(loadCaseTag, loadCaseType);
+            physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_shared<physicalModel::StaticLoadCase>(loadCaseTag, staticLoadCaseType);
         }
+
+        auto staticLoadCase = std::dynamic_pointer_cast<physicalModel::StaticLoadCase>(physicalModel::Building::getInstance().m_loadCases[loadCaseTag]);
         
         // line elements
         for (auto it = physicalModel::Building::getInstance().m_lineElements.begin(); it != physicalModel::Building::getInstance().m_lineElements.end(); it++) {
@@ -912,8 +968,8 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
                 physicalModel::Building::getInstance().m_pointLoads[loadI->getUniqueID()] = loadI;
                 physicalModel::Building::getInstance().m_pointLoads[loadJ->getUniqueID()] = loadJ;
 
-                physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addPointLoad(loadI);
-                physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addPointLoad(loadJ);
+                staticLoadCase->addPointLoad(loadI);
+                staticLoadCase->addPointLoad(loadJ);
             }
             else {
                 auto beamTag = it->second->getElementTag();
@@ -922,7 +978,7 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
 
                 physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
 
-                physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addDistributedLineLoad(load);
+                staticLoadCase->addDistributedLineLoad(load);
             }
         }
 
@@ -950,7 +1006,7 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
 
                         physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
 
-                        physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addDistributedLineLoad(load);
+                        staticLoadCase->addDistributedLineLoad(load);
                     }
                 }
             }
@@ -961,17 +1017,19 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
 
                 physicalModel::Building::getInstance().m_distributedAreaLoads[load->getUniqueID()] = load;
 
-                physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addDistributedAreaLoad(load);
+                staticLoadCase->addDistributedAreaLoad(load);
             }
         }
     }
 
     // Update live loads
     auto loadCaseTag = "LIVE";
-    auto loadCaseType = physicalModel::LoadCaseType::LIVE;
+    auto staticLoadCaseType = physicalModel::StaticLoadCaseType::LIVE;
     if (physicalModel::Building::getInstance().m_loadCases.find(loadCaseTag) == physicalModel::Building::getInstance().m_loadCases.end()) {
-        physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_unique<physicalModel::LoadCase>(loadCaseTag, loadCaseType);
+        physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_shared<physicalModel::StaticLoadCase>(loadCaseTag, staticLoadCaseType);
     }
+
+    auto staticLoadCase = std::dynamic_pointer_cast<physicalModel::StaticLoadCase>(physicalModel::Building::getInstance().m_loadCases[loadCaseTag]);
 
     for (auto it = physicalModel::Building::getInstance().m_floors.begin(); it != physicalModel::Building::getInstance().m_floors.end(); it++) {
 
@@ -1010,7 +1068,7 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
 
                             physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
 
-                            physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addDistributedLineLoad(load);
+                            staticLoadCase->addDistributedLineLoad(load);
                         }
                     }
                 }
@@ -1020,7 +1078,7 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
 
                     physicalModel::Building::getInstance().m_distributedAreaLoads[load->getUniqueID()] = load;
 
-                    physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->addDistributedAreaLoad(load);
+                    staticLoadCase->addDistributedAreaLoad(load);
                 }
             }
         }
@@ -1091,9 +1149,9 @@ bool BuildingModelerAPI::loadCaseExists(std::string loadCaseTag)
     return false;
 }
 
-bool BuildingModelerAPI::loadCombinationExists(std::string loadCombinationTag)
+bool BuildingModelerAPI::staticLoadCombinationExists(std::string loadCombinationTag)
 {
-    if (physicalModel::Building::getInstance().m_loadCombinations.find(loadCombinationTag) != physicalModel::Building::getInstance().m_loadCombinations.end()) {
+    if (physicalModel::Building::getInstance().m_staticLoadCombinations.find(loadCombinationTag) != physicalModel::Building::getInstance().m_staticLoadCombinations.end()) {
         return true;
     }
 

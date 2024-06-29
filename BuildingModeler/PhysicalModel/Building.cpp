@@ -36,7 +36,7 @@ void Building::clear()
     m_distributedLineLoads.clear();
     m_distributedAreaLoads.clear();
     m_loadCases.clear();
-    m_loadCombinations.clear();
+    m_staticLoadCombinations.clear();
 }
 
 Joint* Building::getJoint(int jointTag) const
@@ -99,10 +99,10 @@ std::shared_ptr<LoadCase> Building::getLoadCase(std::string loadCaseTag) const
     return (it != m_loadCases.end()) ? it->second : nullptr;
 }
 
-std::shared_ptr<LoadCombination> Building::getLoadCombination(std::string loadCombinationTag) const
+std::shared_ptr<StaticLoadCombination> Building::getStaticLoadCombination(std::string staticLoadCombinationTag) const
 {
-    auto it = m_loadCombinations.find(loadCombinationTag);
-    return (it != m_loadCombinations.end()) ? it->second : nullptr;
+    auto it = m_staticLoadCombinations.find(staticLoadCombinationTag);
+    return (it != m_staticLoadCombinations.end()) ? it->second : nullptr;
 }
 
 void Building::updateSurroundingLineElements()
@@ -243,14 +243,14 @@ void Building::applyLoads()
     for (auto it = m_loadCases.begin(); it != m_loadCases.end(); it++) {
 
         if (it->second->isActive()) {
-            buildingModeler::OpenseesConverter::toLoadPatternFromLoadCase(it->second.get());
+            buildingModeler::OpenseesConverter::toAnalysisObjectFromLoadCase(it->second.get());
         }
     }
 
-    for (auto it = m_loadCombinations.begin(); it != m_loadCombinations.end(); it++) {
+    for (auto it = m_staticLoadCombinations.begin(); it != m_staticLoadCombinations.end(); it++) {
 
         if (it->second->isActive()) {
-            buildingModeler::OpenseesConverter::toLoadPatternFromLoadCombination(it->second.get());
+            buildingModeler::OpenseesConverter::toAnalysisObjectFromStaticLoadCombination(it->second.get());
         }
     }
 }

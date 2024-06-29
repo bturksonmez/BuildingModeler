@@ -17,7 +17,7 @@ namespace buildingModeler
         static bool materialExists(int materialTag);
         static bool sectionExists(int sectionTag);
         static bool loadCaseExists(std::string loadCaseTag);
-        static bool loadCombinationExists(std::string loadCombinationTag);
+        static bool staticLoadCombinationExists(std::string staticLoadCombinationTag);
 
         static void invalidateAreaMeshAlongLineElement(int elementTag);
         static bool checkIfJointsCoplanar(const std::vector<utility::Vector3>& joints);
@@ -88,14 +88,15 @@ namespace buildingModeler
         static void includeDeadLoadFromMembers(bool includeDeadLoadFromMembers);
         static void applyGravityLoadThroughLineElements(bool m_gravityThroughLineElements);
         static void setLiveLoadForFloor(int floorNumber, double liveLoadPerArea);
-        static void addLoadCase(std::string loadCaseTag, physicalModel::LoadCaseType loadCaseType);
+        static void addStaticLoadCase(std::string loadCaseTag, physicalModel::StaticLoadCaseType loadCaseType);
+        static void addModalLoadCase(std::string loadCaseTag, size_t numberOfModes);
         static void addPointLoad(std::string loadCaseTag, int jointTag, double fx, double fy, double fz, double mx, double my, double mz);
         static void addDistributedLineLoad(std::string loadCaseTag, int elementTag, double wz, double wy, double wx);
         static void addDistributedAreaLoad(std::string loadCaseTag, int elementTag, double wz, double wy, double wx);
-        static void addLoadCombination(std::string loadCombinationTag);
-        static void addLoadCaseToLoadCombination(std::string loadCombinationTag, std::string loadCaseTag, double factor);
+        static void addStaticLoadCombination(std::string staticLoadCombinationTag);
+        static void addLoadCaseToStaticLoadCombination(std::string staticLoadCombinationTag, std::string loadCaseTag, double factor);
         static void setLoadCaseActive(std::string loadCaseTag, bool active);
-        static void setLoadCombinationActive(std::string loadCombinationTag, bool active);
+        static void setStaticLoadCombinationActive(std::string staticLoadCombinationTag, bool active);
         static const std::vector<std::shared_ptr<physicalModel::Load>>& getPointLoads(std::string loadCaseTag);
         static const std::vector<std::shared_ptr<physicalModel::Load>>& getDistributedLineLoads(std::string loadCaseTag);
         static const std::vector<std::shared_ptr<physicalModel::Load>>& getDistributedAreaLoads(std::string loadCaseTag);

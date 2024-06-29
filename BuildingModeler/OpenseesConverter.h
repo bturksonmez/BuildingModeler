@@ -29,7 +29,7 @@ namespace buildingModeler
         static void toBeamColumnElement(physicalModel::LineElement* element);
         static void toQuadrilateralElement(physicalModel::AreaElement* element);
         static void toRigidDiaphragm(physicalModel::Floor* floor);
-        static void toLoadPatternFromLoadCase(physicalModel::LoadCase* loadCase);
-        static void toLoadPatternFromLoadCombination(physicalModel::LoadCombination* loadCombination);
+        static void toAnalysisObjectFromLoadCase(physicalModel::LoadCase* loadCase);
+        static void toAnalysisObjectFromStaticLoadCombination(physicalModel::StaticLoadCombination* loadCombination);
     };
 }

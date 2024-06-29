@@ -28,6 +28,11 @@ void OpenseesModel::clear()
     m_divisionsBetweenNodes.clear();
 }
 
+std::string OpenseesModel::getModelName() const
+{
+    return m_modelName;
+}
+
 Node* OpenseesModel::getNode(int nodeTag) const
 {
     auto it = m_nodes.find(nodeTag);
@@ -95,6 +100,11 @@ Output* OpenseesModel::getOutput(std::string loadTag) const
 {
     auto it = m_outputs.find(loadTag);
     return (it != m_outputs.end()) ? it->second.get() : nullptr;
+}
+
+void OpenseesModel::setModelName(std::string modelName)
+{
+    m_modelName = modelName;
 }
 
 void OpenseesModel::addDivisionsBetweenNodes(int nodeA, int nodeB, std::vector<int> dividedNodes)
@@ -165,4 +175,11 @@ void OpenseesModel::toTclFile()
     else {
         std::cerr << "Unable to open file for writing." << std::endl;
     }
+
+    createLoadingTclFiles();
+}
+
+void OpenseesModel::createLoadingTclFiles()
+{
+
 }
