@@ -32,5 +32,7 @@ namespace opensees
 		std::string getLoadTag() const;
 		OutputType getOutputType() const;
 		const std::unordered_map<int, std::vector<std::vector<double>>>& getNodeDisplacement() const;
+
+		virtual void readOutput() = 0;
 	};
 }

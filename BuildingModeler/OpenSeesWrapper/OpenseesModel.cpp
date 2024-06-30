@@ -16,6 +16,7 @@ OpenseesModel& OpenseesModel::getInstance()
 
 void OpenseesModel::clear()
 {
+    m_modelName = "model";
     m_nodes.clear();
     m_masses.clear();
     m_contraintsSP.clear();
@@ -25,7 +26,9 @@ void OpenseesModel::clear()
     m_materials.clear();
     m_sections.clear();
     m_loadPatterns.clear();
+    m_analyses.clear();
     m_divisionsBetweenNodes.clear();
+    m_outputElements.clear();
 }
 
 std::string OpenseesModel::getModelName() const
@@ -96,10 +99,20 @@ std::vector<int> OpenseesModel::getDivisionsBetweenNodes(int nodeA, int nodeB) c
     return {};
 }
 
-Output* OpenseesModel::getOutput(std::string loadTag) const
+std::vector<int> OpenseesModel::getOutputNodes() const
 {
-    auto it = m_outputs.find(loadTag);
-    return (it != m_outputs.end()) ? it->second.get() : nullptr;
+    std::vector<int> outputNodes;
+
+    for (auto it = m_nodes.begin(); it != m_nodes.end(); it++) {
+        outputNodes.push_back(it->first);
+    }
+
+    return outputNodes;
+}
+
+const std::map<int, opensees::ElementType>& OpenseesModel::getOutputElements() const
+{
+    return m_outputElements;
 }
 
 void OpenseesModel::setModelName(std::string modelName)

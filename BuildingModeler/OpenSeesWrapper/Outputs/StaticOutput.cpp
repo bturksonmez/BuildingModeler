@@ -11,3 +11,8 @@ const std::unordered_map<int, std::vector<std::vector<double>>>& StaticOutput::g
 {
 	return m_eleForceOutput;
 }
+
+void StaticOutput::readOutput()
+{
+
+}

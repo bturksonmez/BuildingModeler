@@ -32,7 +32,7 @@ namespace opensees
 	class OpenseesModel
 	{
 	private:
-		std::string m_modelName = "model.tcl";
+		std::string m_modelName = "model";
 		std::map<int, std::unique_ptr<Node>> m_nodes;
 		std::map<int, std::unique_ptr<Mass>> m_masses;
 		std::map<int, std::unique_ptr<Constraint>> m_contraintsSP;
@@ -46,7 +46,6 @@ namespace opensees
 		std::unordered_set<std::shared_ptr<Analysis>, Analysis::AnalysisHash, Analysis::AnalysisEqual> m_analyses;
 		std::map<std::pair<int, int>, std::vector<int>> m_divisionsBetweenNodes;
 		std::map<int, opensees::ElementType> m_outputElements;
-		std::unordered_map<std::string, std::unique_ptr<Output>> m_outputs;
 
 		OpenseesModel();
 
@@ -72,7 +71,8 @@ namespace opensees
 		std::shared_ptr<Section> getSection(int sectionTag) const;
 		std::shared_ptr<LoadPattern> getLoadPattern(std::string loadingName) const;
 		std::vector<int> getDivisionsBetweenNodes(int nodeA, int nodeB) const;
-		Output* getOutput(std::string loadTag) const;
+		std::vector<int> getOutputNodes() const;
+		const std::map<int, opensees::ElementType>& getOutputElements() const;
 
 		void setModelName(std::string modelName);
 		void addDivisionsBetweenNodes(int nodeA, int nodeB, std::vector<int> dividedNodes);

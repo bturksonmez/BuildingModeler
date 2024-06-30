@@ -381,17 +381,29 @@ void OpenseesConverter::toAnalysisObjectFromLoadCase(physicalModel::LoadCase* lo
                 }
             }
         }
+        std::shared_ptr<opensees::Output> output = std::make_shared<opensees::StaticOutput>(staticLoadCase->getLoadCaseTag());
 
-        std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::StaticAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), staticLoadCase->getLoadCaseTag(), loadPattern);
+        std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::StaticAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), staticLoadCase->getLoadCaseTag(), output, loadPattern);
         opensees::OpenseesModel::getInstance().m_analyses.insert(analysis);
-
-        opensees::OpenseesModel::getInstance().m_outputs[staticLoadCase->getLoadCaseTag()] = std::make_unique<opensees::StaticOutput>(staticLoadCase->getLoadCaseTag());
     }
     else if (auto modalLoadCase = dynamic_cast<physicalModel::ModalLoadCase*>(loadCase)) {
-        std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::ModalAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), staticLoadCase->getLoadCaseTag(), modalLoadCase->getNumberOfModes());
-        opensees::OpenseesModel::getInstance().m_analyses.insert(analysis);
+        // To do: throw exception if floor is not rigid!
+        std::vector<int> masterNodeTags;
+        int floorNo = 1;
+        while (true) {
+            auto floor = physicalModel::Building::getInstance().getFloor(floorNo);
 
-        opensees::OpenseesModel::getInstance().m_outputs[modalLoadCase->getLoadCaseTag()] = std::make_unique<opensees::ModalOutput>(modalLoadCase->getLoadCaseTag());
+            if (floor == nullptr) {
+                break;
+            }
+
+            masterNodeTags.push_back(floor->getMassCenterJointTag());
+            floorNo++;
+        }
+        std::shared_ptr<opensees::Output> output = std::make_shared<opensees::ModalOutput>(modalLoadCase->getLoadCaseTag(), masterNodeTags);
+
+        std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::ModalAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), modalLoadCase->getLoadCaseTag(), output, modalLoadCase->getNumberOfModes(), masterNodeTags);
+        opensees::OpenseesModel::getInstance().m_analyses.insert(analysis);    
     }
     
 }
@@ -449,11 +461,10 @@ void OpenseesConverter::toAnalysisObjectFromStaticLoadCombination(physicalModel:
                 }
             }
         }
+        std::shared_ptr<opensees::Output> output = std::make_shared<opensees::StaticOutput>(loadCombination->getLoadCombinationTag());
 
-        std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::StaticAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), loadCombination->getLoadCombinationTag(), loadPattern);
+        std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::StaticAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), loadCombination->getLoadCombinationTag(), output, loadPattern);
         opensees::OpenseesModel::getInstance().m_analyses.insert(analysis);
-
-        opensees::OpenseesModel::getInstance().m_outputs[loadCombination->getLoadCombinationTag()] = std::make_unique<opensees::StaticOutput>(loadCombination->getLoadCombinationTag());
     }
 }
 

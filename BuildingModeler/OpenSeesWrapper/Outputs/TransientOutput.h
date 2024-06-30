@@ -15,5 +15,7 @@ namespace opensees
 		~TransientOutput() {}
 
 		const std::unordered_map<int, std::vector<std::vector<double>>>& getElementForce() const;
+
+		void readOutput() override;
 	};
 }

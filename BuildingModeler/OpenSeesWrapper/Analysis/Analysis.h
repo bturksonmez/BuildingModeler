@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../OpenseesObject.h"
+#include "../Outputs/Output.h"
 
 namespace opensees
 {
@@ -17,9 +18,10 @@ namespace opensees
 		std::string m_sourceModelName;
 		std::string m_analysisName;
 		AnalysisType m_analysisType;
+		std::shared_ptr<Output> m_output;
 		static size_t counter;
 
-		Analysis(std::string sourceModelName, std::string analysisName);
+		Analysis(std::string sourceModelName, std::string analysisName, std::shared_ptr<Output> output);
 
 	public:
 		Analysis() = delete;
@@ -29,6 +31,7 @@ namespace opensees
 		std::string getSourceModelName() const;
 		std::string getAnalysisName() const;
 		AnalysisType getAnalysisType() const;
+		std::shared_ptr<Output> getOutput() const;
 		
 		struct AnalysisHash
 		{

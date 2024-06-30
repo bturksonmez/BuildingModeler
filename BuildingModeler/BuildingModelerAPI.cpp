@@ -581,6 +581,8 @@ void BuildingModelerAPI::addFloor(int floorNumber, double height)
     else {
         physicalModel::Building::getInstance().m_floors[floorNumber] = std::make_unique<physicalModel::Floor>(floorNumber, height);
     }
+
+    // To do: do something about floor number and height inconssitency. Higher floor numbers should not be below lower floor numbers.
 }
 
 void BuildingModelerAPI::makeRigid(int floorNumber, int masterJointTag)
