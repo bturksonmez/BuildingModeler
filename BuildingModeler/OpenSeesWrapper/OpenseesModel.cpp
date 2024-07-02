@@ -134,6 +134,8 @@ void OpenseesModel::toTclFile()
 {
     std::stringstream modelTcl;
 
+    modelTcl << "model BasicBuilder -ndm 3 -ndf 6\n";
+
     for (auto it = m_nodes.begin(); it != m_nodes.end(); it++) {
         modelTcl << it->second->getOpenseesCommand();
     }
@@ -194,5 +196,17 @@ void OpenseesModel::toTclFile()
 
 void OpenseesModel::createLoadingTclFiles()
 {
+    for (const auto analysis : m_analyses) {
 
+        auto analysisTcl = analysis->getOpenseesCommand();
+
+        std::ofstream outFile("C:\\Codes\\Opensees\\" + analysis->getAnalysisName() + ".tcl");
+        if (outFile.is_open()) {
+            outFile << analysisTcl;
+            outFile.close();
+        }
+        else {
+            std::cerr << "Unable to open file for writing." << std::endl;
+        }
+    }
 }

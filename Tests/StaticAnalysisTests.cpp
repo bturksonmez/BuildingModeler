@@ -11,44 +11,136 @@ protected:
     }
 };
 
-TEST_F(StaticAnalysisTests, OneStoryFrameStructureWithNx1Ny1) {
+TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
     typedef buildingModeler::BuildingModelerAPI api;
 
-    // add quad joints
-    api::addJoint(1, { 1, 0, 0 });
-    api::addJoint(2, { 2, 0, 0 });
-    api::addJoint(3, { 3, 1, 0 });
-    api::addJoint(4, { 1, 1, 0 });
+    // add joints
+    api::addJoint(0, { 0, 0, 0 });
+    api::addJoint(1, { 2, 0, 0 });
+    api::addJoint(2, { 2, 2, 0 });
+    api::addJoint(3, { 0, 2, 0 });
+    api::addJoint(4, { 0, 0, 2 });
+    api::addJoint(5, { 2, 0, 2 });
+    api::addJoint(6, { 2, 2, 2 });
+    api::addJoint(7, { 0, 2, 2 });
+    api::addJoint(8, { 0, 0, 4 });
+    api::addJoint(9, { 2, 0, 4 });
+    api::addJoint(10, { 2, 2, 4 });
+    api::addJoint(11, { 0, 2, 4 });
+
+    // add constraints
+    api::setConstraintVector(0, { 1, 1, 1, 1, 1, 1 });
+    api::setConstraintVector(1, { 1, 1, 1, 1, 1, 1 });
+    api::setConstraintVector(2, { 1, 1, 1, 1, 1, 1 });
+    api::setConstraintVector(3, { 1, 1, 1, 1, 1, 1 });
+
+    // add floors
+    api::addFloor(0, 0.0);
+    api::addFloor(1, 2.0);
+    api::addFloor(2, 4.0);
+
+    // assign nodes to floor
+    api::setFloorNo(0, 0);
+    api::setFloorNo(1, 0);
+    api::setFloorNo(2, 0);
+    api::setFloorNo(3, 0);
+    api::setFloorNo(4, 1);
+    api::setFloorNo(5, 1);
+    api::setFloorNo(6, 1);
+    api::setFloorNo(7, 1);
+    api::setFloorNo(8, 2);
+    api::setFloorNo(9, 2);
+    api::setFloorNo(10, 2);
+    api::setFloorNo(11, 2);
 
     // add material
-    api::addElasticMaterial(1, 20, 20, 2);
-
-    // add section 2D
-    api::addElasticSection2D(1, 1, 2.0);
-
-    // add area element
-    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addElasticMaterial(1, 30000000, 12500000, 2.4);
 
     // add section 1D
-    api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(1, 1, 0.2025, 0.0034171875, 0.0034171875, 0.006834375);
 
-    // add line element
-    api::addBeam(1, { 1, 2 }, 2, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addBeam(2, { 2, 3 }, 2, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addBeam(3, { 3, 4 }, 2, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addBeam(4, { 4, 1 }, 2, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    // add section 2D
+    api::addElasticSection2D(2, 1, 0.12);
 
-    // set segment ratios
-    api::setSegmentRatios(1, { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 });
-    api::setSegmentRatios(3, { 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 });
-    api::setSegmentRatios(2, { 0.5, 0.5 });
-    api::setSegmentRatios(4, { 0.5, 0.5 });
+    // add beam elements
+    api::addBeam(11, { 4, 5 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addBeam(12, { 5, 6 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addBeam(13, { 6, 7 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addBeam(14, { 7, 4 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addBeam(21, { 8, 9 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addBeam(22, { 9, 10 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addBeam(23, { 10, 11 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addBeam(24, { 11, 8 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+
+    // add beam segments
+    api::setSegmentRatios(11, { 0.5, 0.5 });
+    api::setSegmentRatios(12, { 0.5, 0.5 });
+    api::setSegmentRatios(13, { 0.5, 0.5 });
+    api::setSegmentRatios(14, { 0.5, 0.5 });
+    api::setSegmentRatios(21, { 0.5, 0.5 });
+    api::setSegmentRatios(22, { 0.5, 0.5 });
+    api::setSegmentRatios(23, { 0.5, 0.5 });
+    api::setSegmentRatios(24, { 0.5, 0.5 });
+
+    // add beam section modifiers
+    api::setSectionModifiers(11, 0, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(11, 1, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(12, 0, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(12, 1, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(13, 0, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(13, 1, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(14, 0, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(14, 1, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(21, 0, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(21, 1, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(22, 0, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(22, 1, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(23, 0, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(23, 1, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(24, 0, 1.0, 0.3, 0.3, 1.0);
+    api::setSectionModifiers(24, 1, 1.0, 0.3, 0.3, 1.0);
+
+    // add column elements
+    api::addColumn(101, { 0, 4 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(102, { 1, 5 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(103, { 2, 6 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(104, { 3, 7 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(201, { 4, 8 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(202, { 5, 9 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(203, { 6, 10 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(204, { 7, 11 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+
+    // add column section modifiers
+    api::setSectionModifiers(101, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(102, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(103, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(104, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(201, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(202, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(203, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(204, 0, 1.0, 0.7, 0.7, 1.0);
+
+    // add slab elements
+    api::addSlab(1001, { 4, 5, 6, 7 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2001, { 8, 9, 10, 11 }, 2, physicalModel::AreaElementFormulation::LINEAR);
 
     // update connectivity between line and area elements
     api::updateAreaElementProperties();
 
     //mesh the element
-    api::meshAreaElement(1);
+    api::meshAreaElement(1001);
+    api::meshAreaElement(2001);
+
+    // make rigid
+    api::updateMassSourceFromMembers();
+    api::makeRigid(1, 1000);
+    api::makeRigid(2, 2000);
+    api::confineFloorMassOnDiaphragmNode(1, true);
+    api::confineFloorMassOnDiaphragmNode(2, true);
+
+    // add modal analysis
+    api::addModalLoadCase("modal", 3);
+    api::setLoadCaseActive("modal", true);
 
     // create analytical model and tcl file
     api::createInputFile();
