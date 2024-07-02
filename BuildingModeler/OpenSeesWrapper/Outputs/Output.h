@@ -4,6 +4,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "../Utilities/DataReader.h"
+
 namespace opensees
 {
 	enum class OutputType
@@ -33,6 +35,6 @@ namespace opensees
 		OutputType getOutputType() const;
 		const std::unordered_map<int, std::vector<std::vector<double>>>& getNodeDisplacement() const;
 
-		virtual void readOutput() = 0;
+		virtual void retrieveOutput() = 0;
 	};
 }

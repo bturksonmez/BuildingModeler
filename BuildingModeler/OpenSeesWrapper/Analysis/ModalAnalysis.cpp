@@ -64,7 +64,7 @@ std::string ModalAnalysis::getOpenseesCommand() const
 	command += "\n";
 
 	command += "#Storing Lambda Values\n";
-	command += "set lambda \"Lambda.txt\"\n";
+	command += "set lambda \"lambda.out\"\n";
 	command += "set lambdaFile [open $lambda \"w\"]\n";
 	command += "foreach l $lambdaVal {\n";
 	command += "\tputs $lambdaFile \"$l\"\n";

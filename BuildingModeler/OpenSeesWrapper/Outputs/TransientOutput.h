@@ -16,6 +16,6 @@ namespace opensees
 
 		const std::unordered_map<int, std::vector<std::vector<double>>>& getElementForce() const;
 
-		void readOutput() override;
+		void retrieveOutput() override;
 	};
 }

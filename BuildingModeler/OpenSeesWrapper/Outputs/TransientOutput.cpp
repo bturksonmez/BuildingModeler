@@ -12,7 +12,7 @@ const std::unordered_map<int, std::vector<std::vector<double>>>& TransientOutput
 	return m_eleForceOutput;
 }
 
-void TransientOutput::readOutput()
+void TransientOutput::retrieveOutput()
 {
 	// To do: to be implemented
 }
