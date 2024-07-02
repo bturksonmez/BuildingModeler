@@ -77,3 +77,8 @@ std::string ModalAnalysis::getOpenseesCommand() const
 
 	return command;
 }
+
+void ModalAnalysis::perform()
+{
+	m_output->retrieveOutput();
+}

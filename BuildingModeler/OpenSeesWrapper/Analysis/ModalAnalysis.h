@@ -18,5 +18,6 @@ namespace opensees
 		size_t getNumberOfModes() const;
 		const std::vector<int>& getMasterNodeTags() const;
 		std::string getOpenseesCommand() const override;
+		void perform() override;
 	};
 }

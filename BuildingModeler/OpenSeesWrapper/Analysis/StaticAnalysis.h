@@ -16,5 +16,6 @@ namespace opensees
 
 		std::shared_ptr<LoadPattern> getLoadPattern() const;
 		std::string getOpenseesCommand() const override;
+		void perform() override;
 	};
 }

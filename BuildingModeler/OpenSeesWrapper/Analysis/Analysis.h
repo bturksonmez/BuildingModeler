@@ -48,5 +48,7 @@ namespace opensees
 				return lhs->getAnalysisID() == rhs->getAnalysisID();
 			}
 		};
+
+		virtual void perform() = 0;
 	};
 }
