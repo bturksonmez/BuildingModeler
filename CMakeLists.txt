@@ -20,7 +20,7 @@ add_executable(Tests
 	"Tests/QuadMesherTests.cpp"
 	"Tests/FrameMesherTests.cpp"
 	"Tests/RigidDiaphragmTests.cpp"
-	"Tests/LoadTests.cpp")
+	"Tests/LoadTests.cpp" "Tests/StaticAnalysisTests.cpp")
 
 target_link_libraries(Tests 
 	gtest 

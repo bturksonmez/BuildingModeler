@@ -180,7 +180,7 @@ void OpenseesModel::toTclFile()
         }
     }
 
-    std::ofstream outFile(m_modelName + ".tcl");
+    std::ofstream outFile("C:\\Codes\\Opensees\\" + m_modelName + ".tcl");
     if (outFile.is_open()) {
         outFile << modelTcl.str();
         outFile.close();
