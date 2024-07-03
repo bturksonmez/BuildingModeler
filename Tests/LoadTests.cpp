@@ -148,9 +148,9 @@ TEST_F(LoadTests, SelfWeightWithFramesOnlySuccess) {
     const double epsilon = 1e-6;
 
     // retrieve loads from load cases
-    auto pointLoads = api::getPointLoads("DEAD");
-    auto lineLoads = api::getDistributedLineLoads("DEAD");
-    auto areaLoads = api::getDistributedAreaLoads("DEAD");
+    auto pointLoads = api::getPointLoads("dead");
+    auto lineLoads = api::getDistributedLineLoads("dead");
+    auto areaLoads = api::getDistributedAreaLoads("dead");
     ASSERT_EQ(0, areaLoads.size());
 
     // calculate total weight from members
@@ -324,14 +324,14 @@ TEST_F(LoadTests, SelfWeightAndLiveLoadSuccess) {
     const double epsilon = 1e-6;
 
     // retrieve loads from load cases
-    auto pointLoads = api::getPointLoads("DEAD");
-    auto lineLoads = api::getDistributedLineLoads("DEAD");
-    auto areaLoads = api::getDistributedAreaLoads("DEAD");
-    auto pointLoadsL = api::getPointLoads("LIVE");
+    auto pointLoads = api::getPointLoads("dead");
+    auto lineLoads = api::getDistributedLineLoads("dead");
+    auto areaLoads = api::getDistributedAreaLoads("dead");
+    auto pointLoadsL = api::getPointLoads("live");
     ASSERT_EQ(0, pointLoadsL.size());
-    auto lineLoadsL = api::getDistributedLineLoads("LIVE");
+    auto lineLoadsL = api::getDistributedLineLoads("live");
     ASSERT_EQ(0, lineLoadsL.size());
-    auto areaLoadsL = api::getDistributedAreaLoads("LIVE");
+    auto areaLoadsL = api::getDistributedAreaLoads("live");
 
     // calculate total weight from members
     auto totalWeight = 0.0;
@@ -514,14 +514,14 @@ TEST_F(LoadTests, SelfWeightAndLiveLoadThroughLineElementsSuccess) {
     const double epsilon = 1e-6;
 
     // retrieve loads from load cases
-    auto pointLoads = api::getPointLoads("DEAD");
-    auto lineLoads = api::getDistributedLineLoads("DEAD");
-    auto areaLoads = api::getDistributedAreaLoads("DEAD");
+    auto pointLoads = api::getPointLoads("dead");
+    auto lineLoads = api::getDistributedLineLoads("dead");
+    auto areaLoads = api::getDistributedAreaLoads("dead");
     ASSERT_EQ(0, areaLoads.size());
-    auto pointLoadsL = api::getPointLoads("LIVE");
+    auto pointLoadsL = api::getPointLoads("live");
     ASSERT_EQ(0, pointLoadsL.size());
-    auto lineLoadsL = api::getDistributedLineLoads("LIVE");
-    auto areaLoadsL = api::getDistributedAreaLoads("LIVE");
+    auto lineLoadsL = api::getDistributedLineLoads("live");
+    auto areaLoadsL = api::getDistributedAreaLoads("live");
     ASSERT_EQ(0, areaLoadsL.size());
 
     // calculate total weight from members
@@ -722,8 +722,8 @@ TEST_F(LoadTests, SelfWeightLiveEqWindLoadCombinationSuccess) {
     // create load combination
     api::addStaticLoadCombination("COMB");
     api::setStaticLoadCombinationActive("COMB", true);
-    api::addLoadCaseToStaticLoadCombination("COMB", "DEAD", 1.4);
-    api::addLoadCaseToStaticLoadCombination("COMB", "LIVE", 1.6);
+    api::addLoadCaseToStaticLoadCombination("COMB", "dead", 1.4);
+    api::addLoadCaseToStaticLoadCombination("COMB", "live", 1.6);
     api::addLoadCaseToStaticLoadCombination("COMB", "WIND", 1.0);
     api::addLoadCaseToStaticLoadCombination("COMB", "EQ", 1.2);
 
@@ -945,8 +945,8 @@ TEST_F(LoadTests, SelfWeightLiveEqWindLoadCombinationThroughLineElementsSuccess)
     // create load combination
     api::addStaticLoadCombination("COMB");
     api::setStaticLoadCombinationActive("COMB", true);
-    api::addLoadCaseToStaticLoadCombination("COMB", "DEAD", 1.4);
-    api::addLoadCaseToStaticLoadCombination("COMB", "LIVE", 1.6);
+    api::addLoadCaseToStaticLoadCombination("COMB", "dead", 1.4);
+    api::addLoadCaseToStaticLoadCombination("COMB", "live", 1.6);
     api::addLoadCaseToStaticLoadCombination("COMB", "WIND", 1.0);
     api::addLoadCaseToStaticLoadCombination("COMB", "EQ", 1.2);
 

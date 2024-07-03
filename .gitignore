@@ -35,3 +35,6 @@ external/
 *.exe
 *.out
 *.app
+
+# Json files
+*.json
