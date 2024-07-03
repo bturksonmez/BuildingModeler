@@ -49,6 +49,6 @@ namespace opensees
 			}
 		};
 
-		virtual void perform() = 0;
+		void perform();
 	};
 }

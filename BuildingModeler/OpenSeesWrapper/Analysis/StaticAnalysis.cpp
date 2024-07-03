@@ -56,8 +56,3 @@ std::string StaticAnalysis::getOpenseesCommand() const
 
 	return command;
 }
-
-void StaticAnalysis::perform()
-{
-	m_output->retrieveOutput();
-}

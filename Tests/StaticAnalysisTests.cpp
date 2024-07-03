@@ -156,7 +156,7 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
     api::addLoadCaseToStaticLoadCombination("combo1", "dead", 1.0);
     api::addLoadCaseToStaticLoadCombination("combo1", "live", 0.3);
     api::addLoadCaseToStaticLoadCombination("combo1", "eq", 1.0);
-    api::setStaticLoadCombinationActive("combo1", true);
+    //api::setStaticLoadCombinationActive("combo1", true);
 
     // create analytical model and tcl file
     api::createInputFile();

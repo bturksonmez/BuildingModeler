@@ -182,7 +182,7 @@ void OpenseesModel::toTclFile()
         }
     }
 
-    std::ofstream outFile("C:\\Codes\\Opensees\\" + m_modelName + ".tcl");
+    std::ofstream outFile(m_modelName + ".tcl");
     if (outFile.is_open()) {
         outFile << modelTcl.str();
         outFile.close();
@@ -200,7 +200,7 @@ void OpenseesModel::createLoadingTclFiles()
 
         auto analysisTcl = analysis->getOpenseesCommand();
 
-        std::ofstream outFile("C:\\Codes\\Opensees\\" + analysis->getAnalysisName() + ".tcl");
+        std::ofstream outFile(analysis->getAnalysisName() + ".tcl");
         if (outFile.is_open()) {
             outFile << analysisTcl;
             outFile.close();
@@ -208,5 +208,7 @@ void OpenseesModel::createLoadingTclFiles()
         else {
             std::cerr << "Unable to open file for writing." << std::endl;
         }
+
+        analysis->perform();
     }
 }
