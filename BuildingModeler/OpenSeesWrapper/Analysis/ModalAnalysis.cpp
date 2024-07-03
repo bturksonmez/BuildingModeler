@@ -31,7 +31,7 @@ std::string ModalAnalysis::getOpenseesCommand() const
 
 	command += "#Eigenvector recorder for dof 1\n";
 	command += "for { set k 1 } { $k <= " + std::to_string(m_numberOfModes) + " } { incr k } {\n";
-	command += "\trecorder Node -file[format \"mode1%i.out\" $k] -node ";
+	command += "\trecorder Node -file [format \"mode1%i.out\" $k] -node ";
 	for (const auto& nodeTag : m_masterNodeTags) {
 		command += (std::to_string(nodeTag) + " ");
 	}
@@ -41,7 +41,7 @@ std::string ModalAnalysis::getOpenseesCommand() const
 
 	command += "#Eigenvector recorder for dof 2\n";
 	command += "for { set k 1 } { $k <= " + std::to_string(m_numberOfModes) + " } { incr k } {\n";
-	command += "\trecorder Node -file[format \"mode2%i.out\" $k] -node ";
+	command += "\trecorder Node -file [format \"mode2%i.out\" $k] -node ";
 	for (const auto& nodeTag : m_masterNodeTags) {
 		command += (std::to_string(nodeTag) + " ");
 	}
@@ -51,7 +51,7 @@ std::string ModalAnalysis::getOpenseesCommand() const
 
 	command += "#Eigenvector recorder for dof 6\n";
 	command += "for { set k 1 } { $k <= " + std::to_string(m_numberOfModes) + " } { incr k } {\n";
-	command += "\trecorder Node -file[format \"mode6%i.out\" $k] -node ";
+	command += "\trecorder Node -file [format \"mode6%i.out\" $k] -node ";
 	for (const auto& nodeTag : m_masterNodeTags) {
 		command += (std::to_string(nodeTag) + " ");
 	}

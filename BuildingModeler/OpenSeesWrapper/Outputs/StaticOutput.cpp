@@ -22,7 +22,7 @@ void StaticOutput::retrieveOutput()
 
 void StaticOutput::retrieveNodeDisplacements()
 {
-	std::string outputFile = "nodeDisp.out";
+	std::string outputFile = "C:\\Codes\\Opensees\\nodeDisp.out";
 	auto displacements = utilities::DataReader::readContinuosLine<double>(outputFile);
 
 	auto nodeTags = OpenseesModel::getInstance().getOutputNodes();
@@ -39,7 +39,7 @@ void StaticOutput::retrieveNodeDisplacements()
 
 void StaticOutput::retrieveElementForces()
 {
-	std::string outputFile = "eleForce.out";
+	std::string outputFile = "C:\\Codes\\Opensees\\eleForce.out";
 	auto forces = utilities::DataReader::readContinuosLine<double>(outputFile);
 
 	auto eleTags = OpenseesModel::getInstance().getOutputElements();

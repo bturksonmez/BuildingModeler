@@ -948,7 +948,7 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
     if (physicalModel::Building::getInstance().m_includeDeadLoadFromMembers) {
 
         // dead load
-        auto loadCaseTag = "DEAD";
+        auto loadCaseTag = "dead";
         auto staticLoadCaseType = physicalModel::StaticLoadCaseType::DEAD;
         if (physicalModel::Building::getInstance().m_loadCases.find(loadCaseTag) == physicalModel::Building::getInstance().m_loadCases.end()) {
             physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_shared<physicalModel::StaticLoadCase>(loadCaseTag, staticLoadCaseType);
@@ -962,7 +962,7 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
             if (it->second->getLineElementType() == physicalModel::LineElementType::COLUMN) {
 
                 auto jointI = it->second->getIJointTag();
-                auto jointJ = it->second->getIJointTag();
+                auto jointJ = it->second->getJJointTag();
                 auto weight = it->second->getWeight();
                 std::shared_ptr<physicalModel::Load> loadI = std::make_shared<physicalModel::PointLoad>(jointI, 0, 0, -weight / 2.0, 0, 0, 0);
                 std::shared_ptr<physicalModel::Load> loadJ = std::make_shared<physicalModel::PointLoad>(jointJ, 0, 0, -weight / 2.0, 0, 0, 0);
@@ -1025,7 +1025,7 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
     }
 
     // Update live loads
-    auto loadCaseTag = "LIVE";
+    auto loadCaseTag = "live";
     auto staticLoadCaseType = physicalModel::StaticLoadCaseType::LIVE;
     if (physicalModel::Building::getInstance().m_loadCases.find(loadCaseTag) == physicalModel::Building::getInstance().m_loadCases.end()) {
         physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_shared<physicalModel::StaticLoadCase>(loadCaseTag, staticLoadCaseType);

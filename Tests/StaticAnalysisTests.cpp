@@ -142,6 +142,22 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
     api::addModalLoadCase("modal", 3);
     api::setLoadCaseActive("modal", true);
 
+    // add gravity and live loads
+    api::includeDeadLoadFromMembers(true);
+    api::updateDeadAndLiveLoads();
+
+    // add eqarthquake loads
+    api::addStaticLoadCase("eq", physicalModel::StaticLoadCaseType::EARTHQUAKE);
+    api::addPointLoad("eq", 1000, 10, 0, 0, 0, 0, 0);
+    api::addPointLoad("eq", 2000, 20, 0, 0, 0, 0, 0);
+
+    // add load combination
+    api::addStaticLoadCombination("combo1");
+    api::addLoadCaseToStaticLoadCombination("combo1", "dead", 1.0);
+    api::addLoadCaseToStaticLoadCombination("combo1", "live", 0.3);
+    api::addLoadCaseToStaticLoadCombination("combo1", "eq", 1.0);
+    api::setStaticLoadCombinationActive("combo1", true);
+
     // create analytical model and tcl file
     api::createInputFile();
 }
