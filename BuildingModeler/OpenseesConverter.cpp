@@ -130,8 +130,17 @@ void OpenseesConverter::toBeamColumnElement(physicalModel::LineElement* element)
         transf = opensees::OpenseesModel::getInstance().m_geometricTransformation[1];
     }
 
-    elementTag = element->getElementTag();
     for (int i = 0; i < element->getSegmentLengths().size(); ++i) {
+
+        if (element->getLineElementType() == physicalModel::LineElementType::COLUMN && i != 0) {
+            elementTag = opensees::utilities::TagGenerator::getInstance().getNextColumnTag();
+        }
+        else if (element->getLineElementType() == physicalModel::LineElementType::BEAM && i != 0) {
+            elementTag = opensees::utilities::TagGenerator::getInstance().getNextBeamTag();
+        }
+        if (beamColumnElementExists(elementTag)) {
+            // To do: exception
+        }
 
         auto section = opensees::OpenseesModel::getInstance().m_sections[element->getSection(i)->getSectionTag()];
         auto sectionModifiers = element->getSectionModifiers(i);
@@ -149,16 +158,6 @@ void OpenseesConverter::toBeamColumnElement(physicalModel::LineElement* element)
 
         element->addAnalyticalElementTag(elementTag);
         opensees::OpenseesModel::getInstance().addOutputElement(elementTag, opensees::ElementType::BEAMCOLUMN);
-
-        if (element->getLineElementType() == physicalModel::LineElementType::COLUMN) {
-            elementTag = opensees::utilities::TagGenerator::getInstance().getNextColumnTag();
-        }
-        else {
-            elementTag = opensees::utilities::TagGenerator::getInstance().getNextBeamTag();
-        }
-        if (beamColumnElementExists(elementTag)) {
-            // To do: exception
-        }
     }
 }
 
@@ -657,6 +656,16 @@ void OpenseesConverter::createMeshForQuadElement(physicalModel::AreaElement* ele
             nodeTags.push_back(nodes[i + 1][j + 1]);
             nodeTags.push_back(nodes[i + 1][j]);
 
+            if (element->getAreaElementType() == physicalModel::AreaElementType::SLAB && (i != 0 || j != 0)) {
+                elementTag = opensees::utilities::TagGenerator::getInstance().getNextSlabTag();
+            }
+            else if (element->getAreaElementType() == physicalModel::AreaElementType::SHEARWALL && (i != 0 || j != 0)) {
+                elementTag = opensees::utilities::TagGenerator::getInstance().getNextShearWallTag();
+            }
+            if (quadrilateralElementExists(elementTag)) {
+                // To do: exception
+            }
+
             switch (element->getAreaElementFormulation())
             {
             case physicalModel::AreaElementFormulation::LINEAR:
@@ -679,15 +688,7 @@ void OpenseesConverter::createMeshForQuadElement(physicalModel::AreaElement* ele
             element->addAnalyticalElementTag(elementTag);
             opensees::OpenseesModel::getInstance().addOutputElement(elementTag, opensees::ElementType::QUADRILATERAL);
 
-            if (element->getAreaElementType() == physicalModel::AreaElementType::SLAB) {
-                elementTag = opensees::utilities::TagGenerator::getInstance().getNextSlabTag();
-            }
-            else {
-                elementTag = opensees::utilities::TagGenerator::getInstance().getNextShearWallTag();
-            }
-            if (quadrilateralElementExists(elementTag)) {
-                // To do: exception
-            }
+            
         }
     }
 }
