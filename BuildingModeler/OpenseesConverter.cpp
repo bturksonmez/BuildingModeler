@@ -460,11 +460,12 @@ void OpenseesConverter::toAnalysisObjectFromStaticLoadCombination(physicalModel:
                 }
             }
         }
-        std::shared_ptr<opensees::Output> output = std::make_shared<opensees::StaticOutput>(loadCombination->getLoadCombinationTag());
-
-        std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::StaticAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), loadCombination->getLoadCombinationTag(), output, loadPattern);
-        opensees::OpenseesModel::getInstance().m_analyses.insert(analysis);
     }
+
+    std::shared_ptr<opensees::Output> output = std::make_shared<opensees::StaticOutput>(loadCombination->getLoadCombinationTag());
+
+    std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::StaticAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), loadCombination->getLoadCombinationTag(), output, loadPattern);
+    opensees::OpenseesModel::getInstance().m_analyses.insert(analysis);
 }
 
 bool OpenseesConverter::nodeExists(int nodeTag)
