@@ -9,7 +9,7 @@ bool Process::runOpensees(const std::string& inputFile)
 	PROCESS_INFORMATION processInfo = { 0 };
 
 	LPWSTR input = convertString(inputFile);
-	bool success = CreateProcessW(L"OpenSees.exe", input, NULL, NULL, FALSE, NULL, NULL, NULL, &startInfo, &processInfo);
+	bool success = CreateProcessW(L"C:\\Codes\\Opensees\\OpenSees.exe", input, NULL, NULL, FALSE, NULL, NULL, NULL, &startInfo, &processInfo);
 	WaitForSingleObject(processInfo.hProcess, INFINITE);
 	CloseHandle(processInfo.hThread);
 	CloseHandle(processInfo.hProcess);

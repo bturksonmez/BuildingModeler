@@ -38,5 +38,5 @@ std::shared_ptr<Output> Analysis::getOutput() const
 void Analysis::perform()
 {
 	utilities::Process::runOpensees("source " + m_analysisName + ".tcl");
-	//m_output->retrieveOutput();
+	m_output->retrieveOutput();
 }
