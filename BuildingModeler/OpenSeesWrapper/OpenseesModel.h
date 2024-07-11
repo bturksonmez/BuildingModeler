@@ -78,6 +78,7 @@ namespace opensees
 		void addDivisionsBetweenNodes(int nodeA, int nodeB, std::vector<int> dividedNodes);
 		void addOutputElement(int elementTag, opensees::ElementType elementType);
 		void toTclFile();
+		void analyze();
 
 		friend class buildingModeler::OpenseesConverter;
 	};

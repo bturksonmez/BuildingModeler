@@ -197,7 +197,6 @@ void OpenseesModel::toTclFile()
 void OpenseesModel::createLoadingTclFiles()
 {
     for (const auto analysis : m_analyses) {
-
         auto analysisTcl = analysis->getOpenseesCommand();
 
         std::ofstream outFile(analysis->getAnalysisName() + ".tcl");
@@ -209,6 +208,13 @@ void OpenseesModel::createLoadingTclFiles()
             std::cerr << "Unable to open file for writing." << std::endl;
         }
 
+        analysis->perform();
+    }
+}
+
+void OpenseesModel::analyze()
+{
+    for (const auto analysis : m_analyses) {
         analysis->perform();
     }
 }

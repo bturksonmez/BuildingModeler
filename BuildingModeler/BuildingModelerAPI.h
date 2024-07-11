@@ -108,6 +108,8 @@ namespace buildingModeler
         static void updateDeadAndLiveLoads();
 
         // Input File Generation
-        static void createInputFile();
+        static void createAnalyticalModel();
+        static void createModelAndLoadingFiles();
+        static void analyze();
     };
 }

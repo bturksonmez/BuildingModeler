@@ -159,5 +159,7 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
     api::setStaticLoadCombinationActive("combo1", true);
 
     // create analytical model and tcl file
-    api::createInputFile();
+    api::createAnalyticalModel();
+    api::createModelAndLoadingFiles();
+    api::analyze();
 }

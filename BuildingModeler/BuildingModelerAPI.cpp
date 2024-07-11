@@ -1255,9 +1255,18 @@ bool BuildingModelerAPI::checkIfQuadConvex(const std::vector<utility::Vector3>& 
     return false;
 }
 
-void BuildingModelerAPI::createInputFile()
+void BuildingModelerAPI::createAnalyticalModel()
 {
     // Clear analytical model - modifications are only allowed in physical model
     physicalModel::Building::getInstance().toAnalyticalModel();
+}
+
+void BuildingModelerAPI::createModelAndLoadingFiles()
+{
     opensees::OpenseesModel::getInstance().toTclFile();
+}
+
+void BuildingModelerAPI::analyze()
+{
+    opensees::OpenseesModel::getInstance().analyze();
 }

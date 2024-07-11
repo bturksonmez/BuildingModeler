@@ -51,7 +51,9 @@ int main()
     api::includeMassFromMembers(false);
 
     // create analytical model
-    api::createInputFile();
+    api::createAnalyticalModel();
+    api::createModelAndLoadingFiles();
+    api::analyze();
 
 	return 0;
 }
