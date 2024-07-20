@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 
+#include "ILineElementOutputFetcher.h"
 #include "../Sections/Section.h"
 #include "../../Utilities/Vector3.h"
 
@@ -35,7 +36,7 @@ namespace physicalModel
 		NONLINEAR_BEAM_WITH_HINGES
 	};
 
-	class LineElement
+	class LineElement : public ILineElementOutputFetcher
 	{
 	protected:
 		int m_elementTag;
@@ -86,5 +87,17 @@ namespace physicalModel
 		std::vector<int> getAnalyticalNodeTags() const;
 		const std::vector<utility::Vector3>& getAnalyticalNodeCoords() const;
 		const std::vector<int>& getAnalyticalElementTags() const;
+
+		// output fetcher
+		double calculateAxialForce(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
+		double calculateShearForceY(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
+		double calculateShearForceZ(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
+		double calculateMomentYY(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
+		double calculateMomentZZ(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
+		double calculateTorsion(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
+		double calculateDR(std::string analysisTag, size_t timeStep, bool fromIJoint = true) override;
+		double calculateChordRotationYY(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
+		double calculateChordRotationZZ(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
+		double calculateDisplacement(std::string analysisTag, size_t timeStep, size_t segmentNode, size_t dof) override;
 	};
 }

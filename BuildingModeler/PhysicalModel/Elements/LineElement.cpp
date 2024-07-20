@@ -152,3 +152,53 @@ const std::vector<int>& LineElement::getAnalyticalElementTags() const
 {
 	return m_analyticalElementTags;
 }
+
+double LineElement::calculateAxialForce(std::string analysisTag, size_t timeStep, bool atIJoint)
+{
+	return 1;
+}
+
+double LineElement::calculateShearForceY(std::string analysisTag, size_t timeStep, bool atIJoint)
+{
+	return 1;
+}
+
+double LineElement::calculateShearForceZ(std::string analysisTag, size_t timeStep, bool atIJoint)
+{
+	return 1;
+}
+
+double LineElement::calculateMomentYY(std::string analysisTag, size_t timeStep, bool atIJoint)
+{
+	return 1;
+}
+
+double LineElement::calculateMomentZZ(std::string analysisTag, size_t timeStep, bool atIJoint)
+{
+	return 1;
+}
+
+double LineElement::calculateTorsion(std::string analysisTag, size_t timeStep, bool atIJoint)
+{
+	return 1;
+}
+
+double LineElement::calculateDR(std::string analysisTag, size_t timeStep, bool fromIJoint)
+{
+	return 1;
+}
+
+double LineElement::calculateChordRotationYY(std::string analysisTag, size_t timeStep, bool atIJoint)
+{
+	return 1;
+}
+
+double LineElement::calculateChordRotationZZ(std::string analysisTag, size_t timeStep, bool atIJoint)
+{
+	return 1;
+}
+
+double LineElement::calculateDisplacement(std::string analysisTag, size_t timeStep, size_t segmentNode, size_t dof)
+{
+	return 1;
+}
