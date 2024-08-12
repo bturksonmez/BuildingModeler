@@ -43,7 +43,7 @@ namespace opensees
 		std::map<int, std::shared_ptr<GeometricTransformation>> m_geometricTransformation;
 		std::map<int, std::shared_ptr<Section>> m_sections;
 		std::map<std::string, std::shared_ptr<LoadPattern>> m_loadPatterns;
-		std::unordered_set<std::shared_ptr<Analysis>, Analysis::AnalysisHash, Analysis::AnalysisEqual> m_analyses;
+		std::unordered_map<std::string, std::shared_ptr<Analysis>> m_analyses;
 		std::map<std::pair<int, int>, std::vector<int>> m_divisionsBetweenNodes;
 		std::map<int, opensees::ElementType> m_outputElements;
 
@@ -70,6 +70,7 @@ namespace opensees
 		std::shared_ptr<Material> getMaterial(int materialTag) const;
 		std::shared_ptr<Section> getSection(int sectionTag) const;
 		std::shared_ptr<LoadPattern> getLoadPattern(std::string loadingName) const;
+		std::shared_ptr<Analysis> getAnalysis(std::string analysesName) const;
 		std::vector<int> getDivisionsBetweenNodes(int nodeA, int nodeB) const;
 		std::vector<int> getOutputNodes() const;
 		const std::map<int, opensees::ElementType>& getOutputElements() const;

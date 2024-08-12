@@ -15,7 +15,7 @@ const std::unordered_map<int, std::vector<std::vector<double>>>& StaticOutput::g
 
 void StaticOutput::retrieveOutput()
 {
-	// To do: these method will be updated based on multiple stage analysis not just jor analyze 1 command in OpenSees
+	// To do: these methods will be updated based on multiple stage analysis not just fsor analyze 1 command in OpenSees
 	retrieveNodeDisplacements();
 	retrieveElementForces();
 }

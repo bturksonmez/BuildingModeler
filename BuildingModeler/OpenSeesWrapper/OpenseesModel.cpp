@@ -90,6 +90,12 @@ std::shared_ptr<LoadPattern> OpenseesModel::getLoadPattern(std::string loadingNa
     return (it != m_loadPatterns.end()) ? it->second : nullptr;
 }
 
+std::shared_ptr<Analysis> OpenseesModel::getAnalysis(std::string analysesName) const
+{
+    auto it = m_analyses.find(analysesName);
+    return (it != m_analyses.end()) ? it->second : nullptr;
+}
+
 std::vector<int> OpenseesModel::getDivisionsBetweenNodes(int nodeA, int nodeB) const
 {
     if (m_divisionsBetweenNodes.count(std::make_pair(nodeA, nodeB))) {
@@ -197,9 +203,9 @@ void OpenseesModel::toTclFile()
 void OpenseesModel::createLoadingTclFiles()
 {
     for (const auto analysis : m_analyses) {
-        auto analysisTcl = analysis->getOpenseesCommand();
+        auto analysisTcl = analysis.second->getOpenseesCommand();
 
-        std::ofstream outFile(analysis->getAnalysisName() + ".tcl");
+        std::ofstream outFile(analysis.first + ".tcl");
         if (outFile.is_open()) {
             outFile << analysisTcl;
             outFile.close();
@@ -208,13 +214,13 @@ void OpenseesModel::createLoadingTclFiles()
             std::cerr << "Unable to open file for writing." << std::endl;
         }
 
-        analysis->perform();
+        analysis.second->perform();
     }
 }
 
 void OpenseesModel::analyze()
 {
     for (const auto analysis : m_analyses) {
-        analysis->perform();
+        analysis.second->perform();
     }
 }

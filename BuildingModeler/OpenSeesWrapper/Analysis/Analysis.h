@@ -33,22 +33,6 @@ namespace opensees
 		AnalysisType getAnalysisType() const;
 		std::shared_ptr<Output> getOutput() const;
 		
-		struct AnalysisHash
-		{
-			size_t operator()(const std::shared_ptr<Analysis>& ptr) const
-			{
-				return std::hash<size_t>()(ptr->getAnalysisID());
-			}
-		};
-
-		struct AnalysisEqual
-		{
-			bool operator()(const std::shared_ptr<Analysis>& lhs, const std::shared_ptr<Analysis>& rhs) const
-			{
-				return lhs->getAnalysisID() == rhs->getAnalysisID();
-			}
-		};
-
 		void perform();
 	};
 }

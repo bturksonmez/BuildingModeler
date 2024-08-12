@@ -383,7 +383,7 @@ void OpenseesConverter::toAnalysisObjectFromLoadCase(physicalModel::LoadCase* lo
         std::shared_ptr<opensees::Output> output = std::make_shared<opensees::StaticOutput>(staticLoadCase->getLoadCaseTag());
 
         std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::StaticAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), staticLoadCase->getLoadCaseTag(), output, loadPattern);
-        opensees::OpenseesModel::getInstance().m_analyses.insert(analysis);
+        opensees::OpenseesModel::getInstance().m_analyses[staticLoadCase->getLoadCaseTag()] = analysis;
     }
     else if (auto modalLoadCase = dynamic_cast<physicalModel::ModalLoadCase*>(loadCase)) {
         // To do: throw exception if floor is not rigid!
@@ -402,7 +402,7 @@ void OpenseesConverter::toAnalysisObjectFromLoadCase(physicalModel::LoadCase* lo
         std::shared_ptr<opensees::Output> output = std::make_shared<opensees::ModalOutput>(modalLoadCase->getLoadCaseTag(), masterNodeTags);
 
         std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::ModalAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), modalLoadCase->getLoadCaseTag(), output, modalLoadCase->getNumberOfModes(), masterNodeTags);
-        opensees::OpenseesModel::getInstance().m_analyses.insert(analysis);    
+        opensees::OpenseesModel::getInstance().m_analyses[modalLoadCase->getLoadCaseTag()] = analysis;
     }
     
 }
@@ -465,7 +465,7 @@ void OpenseesConverter::toAnalysisObjectFromStaticLoadCombination(physicalModel:
     std::shared_ptr<opensees::Output> output = std::make_shared<opensees::StaticOutput>(loadCombination->getLoadCombinationTag());
 
     std::shared_ptr<opensees::Analysis> analysis = std::make_shared<opensees::StaticAnalysis>(opensees::OpenseesModel::getInstance().getModelName(), loadCombination->getLoadCombinationTag(), output, loadPattern);
-    opensees::OpenseesModel::getInstance().m_analyses.insert(analysis);
+    opensees::OpenseesModel::getInstance().m_analyses[loadCombination->getLoadCombinationTag()] = analysis;
 }
 
 bool OpenseesConverter::nodeExists(int nodeTag)
