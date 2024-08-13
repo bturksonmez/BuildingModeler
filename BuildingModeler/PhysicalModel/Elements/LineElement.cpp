@@ -155,7 +155,12 @@ const std::vector<int>& LineElement::getAnalyticalElementTags() const
 
 double LineElement::calculateAxialForce(std::string analysisTag, size_t timeStep, bool atIJoint)
 {
-	return 1;
+	auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+	auto output = analysis->getOutput();
+	auto staticOutput = std::dynamic_pointer_cast<opensees::StaticOutput>(output);
+
+	auto forces = staticOutput->getElementForce();
+	return forces[atIJoint ? m_jointTags[0] : m_jointTags[1]][0][0];
 }
 
 double LineElement::calculateShearForceY(std::string analysisTag, size_t timeStep, bool atIJoint)
