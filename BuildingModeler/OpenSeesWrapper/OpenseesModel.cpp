@@ -213,8 +213,6 @@ void OpenseesModel::createLoadingTclFiles()
         else {
             std::cerr << "Unable to open file for writing." << std::endl;
         }
-
-        analysis.second->perform();
     }
 }
 

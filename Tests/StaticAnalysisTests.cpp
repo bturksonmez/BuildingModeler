@@ -148,18 +148,24 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
 
     // add eqarthquake loads
     api::addStaticLoadCase("eq", physicalModel::StaticLoadCaseType::EARTHQUAKE);
-    api::addPointLoad("eq", 1000, 10, 0, 0, 0, 0, 0);
-    api::addPointLoad("eq", 2000, 20, 0, 0, 0, 0, 0);
+    api::addPointLoad("eq", 1000, 0, 0, -20, 0, 0, 0);
+    api::addPointLoad("eq", 2000, 0, 0, -20, 0, 0, 0);
 
     // add load combination
     api::addStaticLoadCombination("combo1");
-    api::addLoadCaseToStaticLoadCombination("combo1", "dead", 1.0);
+    api::addLoadCaseToStaticLoadCombination("combo1", "dead", 1000.0);
     api::addLoadCaseToStaticLoadCombination("combo1", "live", 0.3);
-    api::addLoadCaseToStaticLoadCombination("combo1", "eq", 1.0);
+    //api::addLoadCaseToStaticLoadCombination("combo1", "eq", 1.0);
     api::setStaticLoadCombinationActive("combo1", true);
 
     // create analytical model and tcl file
     api::createAnalyticalModel();
     api::createModelAndLoadingFiles();
     api::analyze();
+
+    // get axial loads for columns
+    double axialLoad101 = api::getLineElementAxialForce(101, "combo1", 0, true);
+    double axialLoad102 = api::getLineElementAxialForce(102, "combo1", 0, true);
+    double axialLoad103 = api::getLineElementAxialForce(103, "combo1", 0, true);
+    double axialLoad104 = api::getLineElementAxialForce(104, "combo1", 0, true);
 }

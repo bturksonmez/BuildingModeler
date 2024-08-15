@@ -89,15 +89,14 @@ namespace physicalModel
 		const std::vector<int>& getAnalyticalElementTags() const;
 
 		// output fetcher
-		double calculateAxialForce(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
-		double calculateShearForceY(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
-		double calculateShearForceZ(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
-		double calculateMomentYY(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
-		double calculateMomentZZ(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
-		double calculateTorsion(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
-		double calculateDR(std::string analysisTag, size_t timeStep, bool fromIJoint = true) override;
-		double calculateChordRotationYY(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
-		double calculateChordRotationZZ(std::string analysisTag, size_t timeStep, bool atIJoint = true) override;
-		double calculateDisplacement(std::string analysisTag, size_t timeStep, size_t segmentNode, size_t dof) override;
+		double calculateForceX(std::string analysisTag, bool atIJoint, size_t timeStep) override;
+		double calculateForceY(std::string analysisTag, bool atIJoint, size_t timeStep) override;
+		double calculateForceZ(std::string analysisTag, bool atIJoint, size_t timeStep) override;
+		double calculateMomentXX(std::string analysisTag, bool atIJoint, size_t timeStep) override;
+		double calculateMomentYY(std::string analysisTag, bool atIJoint, size_t timeStep) override;
+		double calculateMomentZZ(std::string analysisTag, bool atIJoint, size_t timeStep) override;
+		double calculateDR(std::string analysisTag, bool fromIJoint, size_t timeStep) override;
+		double calculateChordRotation(std::string analysisTag, bool fromIJoint, size_t timeStep) override;
+		double calculateDisplacement(std::string analysisTag, size_t segmentNode, size_t dof, size_t timeStep) override;
 	};
 }

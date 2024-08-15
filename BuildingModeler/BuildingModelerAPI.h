@@ -107,6 +107,9 @@ namespace buildingModeler
         static void updateAreaElementProperties();
         static void updateDeadAndLiveLoads();
 
+        // Postprocessing
+        static double getLineElementAxialForce(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint);
+
         // Input File Generation
         static void createAnalyticalModel();
         static void createModelAndLoadingFiles();
