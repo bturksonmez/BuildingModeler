@@ -108,6 +108,8 @@ namespace buildingModeler
         static void updateDeadAndLiveLoads();
 
         // Postprocessing
+        static double getLineElementForceX(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint);
+        static double getLineElementForceY(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint);
         static double getLineElementForceZ(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint);
 
         // Input File Generation

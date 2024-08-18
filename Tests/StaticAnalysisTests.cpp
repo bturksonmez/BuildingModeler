@@ -144,7 +144,7 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
 
     // add gravity and live loads
     api::includeDeadLoadFromMembers(true);
-    api::applyGravityLoadThroughLineElements(false);
+    //api::applyGravityLoadThroughLineElements(false);
     api::setLiveLoadForFloor(1, 2);
     api::setLiveLoadForFloor(2, 2);
     api::updateDeadAndLiveLoads();
@@ -158,7 +158,7 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
     api::addStaticLoadCombination("combo1");
     api::addLoadCaseToStaticLoadCombination("combo1", "dead", 1.0);
     api::addLoadCaseToStaticLoadCombination("combo1", "live", 0.3);
-    //api::addLoadCaseToStaticLoadCombination("combo1", "eq", 1.0);
+    api::addLoadCaseToStaticLoadCombination("combo1", "eq", 1.0);
     api::setStaticLoadCombinationActive("combo1", true);
 
     // create analytical model and tcl file
@@ -166,9 +166,23 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
     api::createModelAndLoadingFiles();
     api::analyze();
 
-    // get axial loads for columns
-    double axialLoad101 = api::getLineElementForceZ(101, "combo1", 0, true);
-    double axialLoad102 = api::getLineElementForceZ(102, "combo1", 0, true);
-    double axialLoad103 = api::getLineElementForceZ(103, "combo1", 0, true);
-    double axialLoad104 = api::getLineElementForceZ(104, "combo1", 0, true);
+    // get axial forces for bottom columns
+    double axialForce101 = api::getLineElementForceZ(101, "combo1", 0, true);
+    double axialForce102 = api::getLineElementForceZ(102, "combo1", 0, true);
+    double axialForce103 = api::getLineElementForceZ(103, "combo1", 0, true);
+    double axialForce104 = api::getLineElementForceZ(104, "combo1", 0, true);
+    double totalAxialForce = axialForce101 + axialForce102 + axialForce103 + axialForce104;
+
+    // get shear forces for bottom columns in X direction
+    double shearForce101 = api::getLineElementForceX(101, "combo1", 0, true);
+    double shearForce102 = api::getLineElementForceX(102, "combo1", 0, true);
+    double shearForce103 = api::getLineElementForceX(103, "combo1", 0, true);
+    double shearForce104 = api::getLineElementForceX(104, "combo1", 0, true);
+    double totalShearForce = shearForce101 + shearForce102 + shearForce103 + shearForce104;
+
+    // floating-point comparison tolerance
+    const double epsilon = 1e-4;
+
+    EXPECT_NEAR(160.89672, totalAxialForce, epsilon);
+    EXPECT_NEAR(-30.0, totalShearForce, epsilon);
 }
