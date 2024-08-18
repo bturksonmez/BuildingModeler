@@ -1255,13 +1255,13 @@ bool BuildingModelerAPI::checkIfQuadConvex(const std::vector<utility::Vector3>& 
     return false;
 }
 
-double BuildingModelerAPI::getLineElementAxialForce(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint)
+double BuildingModelerAPI::getLineElementForceZ(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint)
 {
     if (!lineElementExists(elementTag)) {
         throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
     }
 
-    return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateForceX(analysisTag, atIJoint, timeStep);
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateForceZ(analysisTag, atIJoint, timeStep);
 }
 
 void BuildingModelerAPI::createAnalyticalModel()
