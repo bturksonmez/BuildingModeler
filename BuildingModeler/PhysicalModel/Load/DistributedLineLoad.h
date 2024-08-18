@@ -10,7 +10,7 @@ namespace physicalModel
 		int m_beamElementTag;
 
 	public:
-		DistributedLineLoad(int beamElementTag, double wz = 0, double wy = 0, double wx = 0);
+		DistributedLineLoad(int beamElementTag, double wy = 0, double wz = 0, double wx = 0);
 		DistributedLineLoad() = delete;
 		~DistributedLineLoad() {}
 

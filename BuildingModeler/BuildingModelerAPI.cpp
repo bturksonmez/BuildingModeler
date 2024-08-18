@@ -976,7 +976,7 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
             else {
                 auto beamTag = it->second->getElementTag();
                 auto gamma = it->second->getWeight() / it->second->getLength();
-                std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedLineLoad>(beamTag, -gamma, 0, 0);
+                std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedLineLoad>(beamTag, 0, -gamma, 0);
 
                 physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
 
@@ -987,7 +987,7 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
         // area elements
         for (auto it = physicalModel::Building::getInstance().m_areaElements.begin(); it != physicalModel::Building::getInstance().m_areaElements.end(); it++) {
 
-            if (it->second->getAreaElementType() == physicalModel::AreaElementType::SLAB || physicalModel::Building::getInstance().m_gravityThroughLineElements) {
+            if (it->second->getAreaElementType() == physicalModel::AreaElementType::SLAB && physicalModel::Building::getInstance().m_gravityThroughLineElements) {
 
                 auto beamTags = it->second->getSurroundingLineElementTags();
                 auto gamma = it->second->getWeight() / it->second->getArea();
@@ -1000,10 +1000,10 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
                         std::shared_ptr<physicalModel::Load> load;
 
                         if (i % 2 == 0) {
-                            load = std::make_shared<physicalModel::DistributedLineLoad>(beamTags[i], -gamma * lineLength.first, 0, 0);
+                            load = std::make_shared<physicalModel::DistributedLineLoad>(beamTags[i], 0, -gamma * lineLength.first, 0);
                         }
                         else {
-                            load = std::make_shared<physicalModel::DistributedLineLoad>(beamTags[i], -gamma * lineLength.second, 0, 0);
+                            load = std::make_shared<physicalModel::DistributedLineLoad>(beamTags[i], 0, -gamma * lineLength.second, 0);
                         }
 
                         physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
@@ -1015,7 +1015,7 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
             else {
                 auto elementTag = it->second->getElementTag();
                 auto gamma = it->second->getWeight() / it->second->getArea();
-                std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedAreaLoad>(elementTag, -gamma, 0, 0);
+                std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedAreaLoad>(elementTag, 0, -gamma, 0);
 
                 physicalModel::Building::getInstance().m_distributedAreaLoads[load->getUniqueID()] = load;
 
@@ -1062,10 +1062,10 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
                             std::shared_ptr<physicalModel::Load> load;
 
                             if (i % 2 == 0) {
-                                load = std::make_shared<physicalModel::DistributedLineLoad>(beamTags[i], -liveLoad.value() * lineLength.first, 0, 0);
+                                load = std::make_shared<physicalModel::DistributedLineLoad>(beamTags[i], 0, -liveLoad.value() * lineLength.first, 0);
                             }
                             else {
-                                load = std::make_shared<physicalModel::DistributedLineLoad>(beamTags[i], -liveLoad.value() * lineLength.second, 0, 0);
+                                load = std::make_shared<physicalModel::DistributedLineLoad>(beamTags[i], 0, -liveLoad.value() * lineLength.second, 0);
                             }
 
                             physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
@@ -1076,7 +1076,7 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
                 }
                 else {
                     auto elementTag = slab->getElementTag();
-                    std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedAreaLoad>(elementTag, -liveLoad.value(), 0, 0);
+                    std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedAreaLoad>(elementTag, 0, -liveLoad.value(), 0);
 
                     physicalModel::Building::getInstance().m_distributedAreaLoads[load->getUniqueID()] = load;
 

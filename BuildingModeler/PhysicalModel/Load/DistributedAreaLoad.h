@@ -10,7 +10,7 @@ namespace physicalModel
 		int m_areaElementTag;
 
 	public:
-		DistributedAreaLoad(int areaElementTag, double wz = 0, double wy = 0, double wx = 0);
+		DistributedAreaLoad(int areaElementTag, double wy = 0, double wz = 0, double wx = 0);
 		DistributedAreaLoad() = delete;
 		~DistributedAreaLoad() {}
 
