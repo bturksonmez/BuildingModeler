@@ -108,9 +108,21 @@ namespace buildingModeler
         static void updateDeadAndLiveLoads();
 
         // Postprocessing
-        static double getLineElementForceX(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint);
-        static double getLineElementForceY(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint);
-        static double getLineElementForceZ(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint);
+        static std::vector<double> getDisplacements(int jointTag, std::string analysisTag, size_t timeStep = 0);
+        static double getTranslationalDispX(int jointTag, std::string analysisTag, size_t timeStep = 0);
+        static double getTranslationalDispY(int jointTag, std::string analysisTag, size_t timeStep = 0);
+        static double getTranslationalDispZ(int jointTag, std::string analysisTag, size_t timeStep = 0);
+        static double getRotationalDispX(int jointTag, std::string analysisTag, size_t timeStep = 0);
+        static double getRotationalDispY(int jointTag, std::string analysisTag, size_t timeStep = 0);
+        static double getRotationalDispZ(int jointTag, std::string analysisTag, size_t timeStep = 0);
+        static double getLineElementForceX(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
+        static double getLineElementForceY(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
+        static double getLineElementForceZ(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
+        static double getLineElementMomentX(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
+        static double getLineElementMomentY(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
+        static double getLineElementMomentZ(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
+        static double getLineElementDR(int elementTag, std::string analysisTag, size_t dof, size_t timeStep = 0, bool fromIJoint = true);
+        static double getLineElementCR(int elementTag, std::string analysisTag, size_t dofRot, size_t dofRelDisp, size_t timeStep = 0, bool fromIJoint = true);
 
         // Input File Generation
         static void createAnalyticalModel();

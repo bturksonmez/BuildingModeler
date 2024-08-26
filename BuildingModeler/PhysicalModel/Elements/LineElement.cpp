@@ -160,7 +160,7 @@ double LineElement::calculateForceX(std::string analysisTag, bool atIJoint, size
 	auto staticOutput = std::dynamic_pointer_cast<opensees::StaticOutput>(output);
 
 	auto forces = staticOutput->getElementForce();
-	return forces[m_elementTag][0][atIJoint ? 0 : 6];
+	return forces[m_elementTag][timeStep][atIJoint ? 0 : 6];
 }
 
 double LineElement::calculateForceY(std::string analysisTag, bool atIJoint, size_t timeStep)
@@ -170,7 +170,7 @@ double LineElement::calculateForceY(std::string analysisTag, bool atIJoint, size
 	auto staticOutput = std::dynamic_pointer_cast<opensees::StaticOutput>(output);
 
 	auto forces = staticOutput->getElementForce();
-	return forces[m_elementTag][0][atIJoint ? 1 : 7];
+	return forces[m_elementTag][timeStep][atIJoint ? 1 : 7];
 }
 
 double LineElement::calculateForceZ(std::string analysisTag, bool atIJoint, size_t timeStep)
@@ -180,7 +180,7 @@ double LineElement::calculateForceZ(std::string analysisTag, bool atIJoint, size
 	auto staticOutput = std::dynamic_pointer_cast<opensees::StaticOutput>(output);
 
 	auto forces = staticOutput->getElementForce();
-	return forces[m_elementTag][0][atIJoint ? 2 : 8];
+	return forces[m_elementTag][timeStep][atIJoint ? 2 : 8];
 }
 
 double LineElement::calculateMomentXX(std::string analysisTag, bool atIJoint, size_t timeStep)
@@ -190,7 +190,7 @@ double LineElement::calculateMomentXX(std::string analysisTag, bool atIJoint, si
 	auto staticOutput = std::dynamic_pointer_cast<opensees::StaticOutput>(output);
 
 	auto forces = staticOutput->getElementForce();
-	return forces[m_elementTag][0][atIJoint ? 3 : 9];
+	return forces[m_elementTag][timeStep][atIJoint ? 3 : 9];
 }
 
 double LineElement::calculateMomentYY(std::string analysisTag, bool atIJoint, size_t timeStep)
@@ -200,7 +200,7 @@ double LineElement::calculateMomentYY(std::string analysisTag, bool atIJoint, si
 	auto staticOutput = std::dynamic_pointer_cast<opensees::StaticOutput>(output);
 
 	auto forces = staticOutput->getElementForce();
-	return forces[m_elementTag][0][atIJoint ? 4 : 10];
+	return forces[m_elementTag][timeStep][atIJoint ? 4 : 10];
 }
 
 double LineElement::calculateMomentZZ(std::string analysisTag, bool atIJoint, size_t timeStep)
@@ -210,27 +210,25 @@ double LineElement::calculateMomentZZ(std::string analysisTag, bool atIJoint, si
 	auto staticOutput = std::dynamic_pointer_cast<opensees::StaticOutput>(output);
 
 	auto forces = staticOutput->getElementForce();
-	return forces[m_elementTag][0][atIJoint ? 5 : 11];
+	return forces[m_elementTag][timeStep][atIJoint ? 5 : 11];
 }
 
-double LineElement::calculateDR(std::string analysisTag, bool fromIJoint, size_t timeStep)
+double LineElement::calculateDR(std::string analysisTag, size_t dof, bool fromIJoint, size_t timeStep)
 {
+	// To do: elaborate the method. Input drift direction and drift axis location. (For example for columns drift axis is z axis)
 	auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
 	auto output = analysis->getOutput();
 
 	auto displacements = output->getNodeDisplacement();
-	auto dispI = displacements[m_jointTags[0]][0][0];
-	auto dispJ = displacements[m_jointTags[1]][0][0];
+	auto dispI = displacements[m_jointTags[0]][timeStep][dof];
+	auto dispJ = displacements[m_jointTags[1]][timeStep][dof];
 
-	utility::Vector3 pointI = physicalModel::Building::getInstance().getJoint(m_jointTags[0])->getCoords();
-	utility::Vector3 pointJ = physicalModel::Building::getInstance().getJoint(m_jointTags[1])->getCoords();
-
-	auto DR = (dispI - dispJ) / std::abs(pointI.z - pointJ.z);
+	auto DR = (dispI - dispJ) / getLength();
 
 	return fromIJoint ? DR : -1 * DR;
 }
 
-double LineElement::calculateChordRotation(std::string analysisTag, bool fromIJoint, size_t timeStep)
+double LineElement::calculateChordRotation(std::string analysisTag, size_t dofRot, size_t dofRelDisp, bool fromIJoint, size_t timeStep)
 {
 	return 1;
 }

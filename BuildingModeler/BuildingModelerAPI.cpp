@@ -1255,6 +1255,69 @@ bool BuildingModelerAPI::checkIfQuadConvex(const std::vector<utility::Vector3>& 
     return false;
 }
 
+std::vector<double> BuildingModelerAPI::getDisplacements(int jointTag, std::string analysisTag, size_t timeStep)
+{
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    auto output = analysis->getOutput();
+
+    auto disp = output->getNodeDisplacement();
+    return disp[jointTag][timeStep];
+}
+
+double BuildingModelerAPI::getTranslationalDispX(int jointTag, std::string analysisTag, size_t timeStep)
+{
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    auto output = analysis->getOutput();
+
+    auto disp = output->getNodeDisplacement();
+    return disp[jointTag][timeStep][0];
+}
+
+double BuildingModelerAPI::getTranslationalDispY(int jointTag, std::string analysisTag, size_t timeStep)
+{
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    auto output = analysis->getOutput();
+
+    auto disp = output->getNodeDisplacement();
+    return disp[jointTag][timeStep][1];
+}
+
+double BuildingModelerAPI::getTranslationalDispZ(int jointTag, std::string analysisTag, size_t timeStep)
+{
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    auto output = analysis->getOutput();
+
+    auto disp = output->getNodeDisplacement();
+    return disp[jointTag][timeStep][2];
+}
+
+double BuildingModelerAPI::getRotationalDispX(int jointTag, std::string analysisTag, size_t timeStep)
+{
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    auto output = analysis->getOutput();
+
+    auto disp = output->getNodeDisplacement();
+    return disp[jointTag][timeStep][3];
+}
+
+double BuildingModelerAPI::getRotationalDispY(int jointTag, std::string analysisTag, size_t timeStep)
+{
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    auto output = analysis->getOutput();
+
+    auto disp = output->getNodeDisplacement();
+    return disp[jointTag][timeStep][4];
+}
+
+double BuildingModelerAPI::getRotationalDispZ(int jointTag, std::string analysisTag, size_t timeStep)
+{
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    auto output = analysis->getOutput();
+
+    auto disp = output->getNodeDisplacement();
+    return disp[jointTag][timeStep][5];
+}
+
 double BuildingModelerAPI::getLineElementForceX(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint)
 {
     if (!lineElementExists(elementTag)) {
@@ -1280,6 +1343,69 @@ double BuildingModelerAPI::getLineElementForceZ(int elementTag, std::string anal
     }
 
     return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateForceZ(analysisTag, atIJoint, timeStep);
+}
+
+double BuildingModelerAPI::getLineElementMomentX(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint)
+{
+    if (!lineElementExists(elementTag)) {
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateMomentXX(analysisTag, atIJoint, timeStep);
+}
+
+double BuildingModelerAPI::getLineElementMomentY(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint)
+{
+    if (!lineElementExists(elementTag)) {
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateMomentYY(analysisTag, atIJoint, timeStep);
+}
+
+double BuildingModelerAPI::getLineElementMomentZ(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint)
+{
+    if (!lineElementExists(elementTag)) {
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateMomentZZ(analysisTag, atIJoint, timeStep);
+}
+
+double BuildingModelerAPI::getLineElementDR(int elementTag, std::string analysisTag, size_t dof, size_t timeStep, bool fromIJoint)
+{
+    if (!lineElementExists(elementTag)) {
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    if (dof < 1 || dof > 3) {
+        throw InvalidInputException("Drift ratio can be measured in translational directions, check your input dof!");
+    }
+
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateDR(analysisTag, dof - 1, fromIJoint, timeStep);
+}
+
+double  BuildingModelerAPI::getLineElementCR(int elementTag, std::string analysisTag, size_t dofRot, size_t dofRelDisp, size_t timeStep, bool fromIJoint)
+{
+    if (!lineElementExists(elementTag)) {
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    if (dofRelDisp < 1 || dofRelDisp > 3) {
+        throw InvalidInputException("Relative displacement can be measured in translational directions, check your relative displacment dof!");
+    }
+
+    if (dofRot < 4 || dofRot > 6) {
+        throw InvalidInputException("Chord rotation can be measured in rotational directions, check your input rotation dof!");
+    }
+
+    if ((dofRot == 4 && dofRelDisp == 1) ||
+        (dofRot == 5 && dofRelDisp == 2) ||
+        (dofRot == 6 && dofRelDisp == 3)) {
+        throw InvalidInputException("Invalid matching between dof of rotation and relative displacement!");
+    }
+
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateChordRotation(analysisTag, dofRot - 1, dofRelDisp - 1, fromIJoint, timeStep);
 }
 
 void BuildingModelerAPI::createAnalyticalModel()
