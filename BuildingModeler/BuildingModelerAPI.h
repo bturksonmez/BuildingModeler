@@ -124,6 +124,13 @@ namespace buildingModeler
         static double getLineElementDR(int elementTag, std::string analysisTag, size_t dof, size_t timeStep = 0, bool fromIJoint = true);
         static double getLineElementCR(int elementTag, std::string analysisTag, size_t dofRot, size_t dofRelDisp, size_t timeStep = 0, bool fromIJoint = true);
 
+        // To do
+        // getFloorDR
+        // LineElement::calculateChordRotation
+        // LineElement::calculateDisplacement
+        // Postprocessing for shear walls
+        // Add new test with shear walls
+
         // Input File Generation
         static void createAnalyticalModel();
         static void createModelAndLoadingFiles();
