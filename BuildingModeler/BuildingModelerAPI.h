@@ -124,11 +124,10 @@ namespace buildingModeler
         static double getLineElementMomentY(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
         static double getLineElementMomentZ(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
         static double getLineElementDR(int elementTag, std::string analysisTag, size_t dof, size_t timeStep = 0, bool fromIJoint = true);
-        static double getLineElementCR(int elementTag, std::string analysisTag, size_t dofRot, size_t dofRelDisp, size_t timeStep = 0, bool fromIJoint = true);
+        static double getLineElementCR(int elementTag, std::string analysisTag, size_t dofRot, size_t timeStep = 0, bool fromIJoint = true);
+        static double getLineElementDisplacement(int elementTag, size_t segmentNode, std::string analysisTag, size_t dof, size_t timeStep = 0);
 
         // To do
-        // LineElement::calculateChordRotation
-        // LineElement::calculateDisplacement
         // Postprocessing for shear walls
         // Add new test with shear walls
         // Return last time step value by default

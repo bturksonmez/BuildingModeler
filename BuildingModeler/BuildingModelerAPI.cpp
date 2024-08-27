@@ -1471,27 +1471,37 @@ double BuildingModelerAPI::getLineElementDR(int elementTag, std::string analysis
     return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateDR(analysisTag, dof - 1, fromIJoint, timeStep);
 }
 
-double  BuildingModelerAPI::getLineElementCR(int elementTag, std::string analysisTag, size_t dofRot, size_t dofRelDisp, size_t timeStep, bool fromIJoint)
+double BuildingModelerAPI::getLineElementCR(int elementTag, std::string analysisTag, size_t dofRot, size_t timeStep, bool fromIJoint)
 {
     if (!lineElementExists(elementTag)) {
         throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
     }
 
-    if (dofRelDisp < 1 || dofRelDisp > 3) {
-        throw InvalidInputException("Relative displacement can be measured in translational directions, check your relative displacment dof!");
+    // To do: chord rotation measuring planes are defined by gloal directions. However, local coordinate system would
+    // be more correct for skewed members. Since all our members' directions align with global coordinate system
+    // this part will remain as it is for now.
+    if (dofRot < 4 || dofRot > 5) {
+        throw InvalidInputException("Chord rotation can be measured in rotational directions X and Y, check your input rotation dof!");
     }
 
-    if (dofRot < 4 || dofRot > 6) {
-        throw InvalidInputException("Chord rotation can be measured in rotational directions, check your input rotation dof!");
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateChordRotation(analysisTag, dofRot - 1, fromIJoint, timeStep);
+}
+
+double BuildingModelerAPI::getLineElementDisplacement(int elementTag, size_t segmentNode, std::string analysisTag, size_t dof, size_t timeStep)
+{
+    if (!lineElementExists(elementTag)) {
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
     }
 
-    if ((dofRot == 4 && dofRelDisp == 1) ||
-        (dofRot == 5 && dofRelDisp == 2) ||
-        (dofRot == 6 && dofRelDisp == 3)) {
-        throw InvalidInputException("Invalid matching between dof of rotation and relative displacement!");
+    if (segmentNode > physicalModel::Building::getInstance().m_lineElements[elementTag]->getAnalyticalNodeTags().size() - 1) {
+        throw InvalidInputException("Segment number exceeds the number of segments of line element for displacement recording!");
     }
 
-    return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateChordRotation(analysisTag, dofRot - 1, dofRelDisp - 1, fromIJoint, timeStep);
+    if (dof < 1 || dof > 6) {
+        throw InvalidInputException("Check your input dof!");
+    }
+
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateDisplacement(analysisTag, segmentNode, dof - 1, timeStep);
 }
 
 void BuildingModelerAPI::createAnalyticalModel()

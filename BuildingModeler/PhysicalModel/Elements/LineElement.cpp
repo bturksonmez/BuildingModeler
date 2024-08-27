@@ -228,12 +228,12 @@ double LineElement::calculateDR(std::string analysisTag, size_t dof, bool fromIJ
 	return fromIJoint ? DR : -1 * DR;
 }
 
-double LineElement::calculateChordRotation(std::string analysisTag, size_t dofRot, size_t dofRelDisp, bool fromIJoint, size_t timeStep)
-{
-	return 1;
-}
-
 double LineElement::calculateDisplacement(std::string analysisTag, size_t segmentNode, size_t dof, size_t timeStep)
 {
-	return 1;
+	auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+	auto output = analysis->getOutput();
+
+	auto displacements = output->getNodeDisplacement();
+
+	return displacements[m_analyticalNodeTags[segmentNode]][timeStep][dof];
 }
