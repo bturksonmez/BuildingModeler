@@ -174,9 +174,9 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
     double floor2DRX = api::getFloorDR(2, "combo1", 1);
     double buildingDRX = api::getBuildingDR("combo1", 1);
     
-    //EXPECT_NEAR(0.0023349, floor1DRX, epsilon);
-    //EXPECT_NEAR(0.0052545, floor2DRX, epsilon);
-    //EXPECT_NEAR(0.0026273, buildingDRX, epsilon);
+    EXPECT_NEAR(0.0023349, floor1DRX, epsilon);
+    EXPECT_NEAR(0.0052545, floor2DRX, epsilon);
+    EXPECT_NEAR(0.0026273, buildingDRX, epsilon);
 
     // get axial forces for bottom columns
     double axialForce101 = api::getLineElementForceZ(101, "combo1", 0, true);
