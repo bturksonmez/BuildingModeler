@@ -109,6 +109,8 @@ namespace buildingModeler
 
         // Postprocessing
         static std::vector<double> getDisplacements(int jointTag, std::string analysisTag, size_t timeStep = 0);
+        static double getFloorDR(int floorNumber, std::string analysisTag, size_t dof, size_t timeStep = 0);
+        static double getBuildingDR(std::string analysisTag, size_t dof, size_t timeStep = 0);
         static double getTranslationalDispX(int jointTag, std::string analysisTag, size_t timeStep = 0);
         static double getTranslationalDispY(int jointTag, std::string analysisTag, size_t timeStep = 0);
         static double getTranslationalDispZ(int jointTag, std::string analysisTag, size_t timeStep = 0);
@@ -125,11 +127,11 @@ namespace buildingModeler
         static double getLineElementCR(int elementTag, std::string analysisTag, size_t dofRot, size_t dofRelDisp, size_t timeStep = 0, bool fromIJoint = true);
 
         // To do
-        // getFloorDR
         // LineElement::calculateChordRotation
         // LineElement::calculateDisplacement
         // Postprocessing for shear walls
         // Add new test with shear walls
+        // Return last time step value by default
 
         // Input File Generation
         static void createAnalyticalModel();

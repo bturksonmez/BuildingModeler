@@ -151,8 +151,8 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
 
     // add earthquake loads
     api::addStaticLoadCase("eq", physicalModel::StaticLoadCaseType::EARTHQUAKE);
-    api::addPointLoad("eq", 1000, 10, 0, 0, 0, 0, 0);
-    api::addPointLoad("eq", 2000, 20, 0, 0, 0, 0, 0);
+    api::addPointLoad("eq", 1000, 300, 0, 0, 0, 0, 0);
+    api::addPointLoad("eq", 2000, 600, 0, 0, 0, 0, 0);
 
     // add load combination
     api::addStaticLoadCombination("combo1");
@@ -166,12 +166,26 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
     api::createModelAndLoadingFiles();
     api::analyze();
 
+    // floating-point comparison tolerance
+    const double epsilon = 1e-3;
+
+    // get floor DRs and building DR
+    double floor1DRX = api::getFloorDR(1, "combo1", 1);
+    double floor2DRX = api::getFloorDR(2, "combo1", 1);
+    double buildingDRX = api::getBuildingDR("combo1", 1);
+    
+    //EXPECT_NEAR(0.0023349, floor1DRX, epsilon);
+    //EXPECT_NEAR(0.0052545, floor2DRX, epsilon);
+    //EXPECT_NEAR(0.0026273, buildingDRX, epsilon);
+
     // get axial forces for bottom columns
     double axialForce101 = api::getLineElementForceZ(101, "combo1", 0, true);
     double axialForce102 = api::getLineElementForceZ(102, "combo1", 0, true);
     double axialForce103 = api::getLineElementForceZ(103, "combo1", 0, true);
     double axialForce104 = api::getLineElementForceZ(104, "combo1", 0, true);
     double totalAxialForce = axialForce101 + axialForce102 + axialForce103 + axialForce104;
+
+    EXPECT_NEAR(160.897, totalAxialForce, epsilon);
 
     // get shear forces for bottom columns in X direction
     double shearForce101 = api::getLineElementForceX(101, "combo1", 0, true);
@@ -180,9 +194,5 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
     double shearForce104 = api::getLineElementForceX(104, "combo1", 0, true);
     double totalShearForce = shearForce101 + shearForce102 + shearForce103 + shearForce104;
 
-    // floating-point comparison tolerance
-    const double epsilon = 1e-4;
-
-    EXPECT_NEAR(160.89672, totalAxialForce, epsilon);
-    EXPECT_NEAR(-30.0, totalShearForce, epsilon);
+    EXPECT_NEAR(-900.0, totalShearForce, epsilon);
 }

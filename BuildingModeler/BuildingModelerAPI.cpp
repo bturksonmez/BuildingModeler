@@ -1257,6 +1257,10 @@ bool BuildingModelerAPI::checkIfQuadConvex(const std::vector<utility::Vector3>& 
 
 std::vector<double> BuildingModelerAPI::getDisplacements(int jointTag, std::string analysisTag, size_t timeStep)
 {
+    if (!jointExists(jointTag)) {
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
+    }
+
     auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
     auto output = analysis->getOutput();
 
@@ -1264,8 +1268,70 @@ std::vector<double> BuildingModelerAPI::getDisplacements(int jointTag, std::stri
     return disp[jointTag][timeStep];
 }
 
+double BuildingModelerAPI::getFloorDR(int floorNumber, std::string analysisTag, size_t dof, size_t timeStep)
+{
+    if (!floorExists(floorNumber)) {
+        throw EntityNotFoundException("Floor number " + std::to_string(floorNumber) + " does not exist.");
+    }
+
+    if (dof < 1 || dof > 3) {
+        throw InvalidInputException("Drift ratio can be measured in translational directions, check your input dof!");
+    }
+
+    auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
+    if (!floor->isRigid()) {
+        throw InvalidOperationException("Floor must be rigid for DR recording!");
+    }
+
+    double storeyHeight;
+    if (floorNumber != physicalModel::Building::getInstance().m_floors.begin()->first) {
+        auto it = physicalModel::Building::getInstance().m_floors.find(floorNumber);
+        it--;
+
+        storeyHeight = floor->getFloorHeight() - it->second->getFloorHeight();
+    }
+    else {
+        storeyHeight = floor->getFloorHeight();
+    }
+
+    auto masterNodeTag = floor->getMassCenterJointTag();
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    auto output = analysis->getOutput();
+
+    auto disp = output->getNodeDisplacement();
+    return disp[masterNodeTag][timeStep][dof-1] / storeyHeight;
+}
+
+double BuildingModelerAPI::getBuildingDR(std::string analysisTag, size_t dof, size_t timeStep)
+{
+    if (physicalModel::Building::getInstance().m_floors.empty()) {
+        throw EntityNotFoundException("Building must have floors for DR recording.");
+    }
+
+    if (dof < 1 || dof > 3) {
+        throw InvalidInputException("Drift ratio can be measured in translational directions, check your input dof!");
+    }
+
+    auto floorNumber = (--physicalModel::Building::getInstance().m_floors.end())->first;
+    auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
+    if (!floor->isRigid()) {
+        throw InvalidOperationException("Floor must be rigid for DR recording!");
+    }
+
+    auto masterNodeTag = floor->getMassCenterJointTag();
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    auto output = analysis->getOutput();
+
+    auto disp = output->getNodeDisplacement();
+    return disp[masterNodeTag][timeStep][dof - 1] / floor->getFloorHeight();
+}
+
 double BuildingModelerAPI::getTranslationalDispX(int jointTag, std::string analysisTag, size_t timeStep)
 {
+    if (!jointExists(jointTag)) {
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
+    }
+
     auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
     auto output = analysis->getOutput();
 
@@ -1275,6 +1341,10 @@ double BuildingModelerAPI::getTranslationalDispX(int jointTag, std::string analy
 
 double BuildingModelerAPI::getTranslationalDispY(int jointTag, std::string analysisTag, size_t timeStep)
 {
+    if (!jointExists(jointTag)) {
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
+    }
+
     auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
     auto output = analysis->getOutput();
 
@@ -1284,6 +1354,10 @@ double BuildingModelerAPI::getTranslationalDispY(int jointTag, std::string analy
 
 double BuildingModelerAPI::getTranslationalDispZ(int jointTag, std::string analysisTag, size_t timeStep)
 {
+    if (!jointExists(jointTag)) {
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
+    }
+
     auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
     auto output = analysis->getOutput();
 
@@ -1293,6 +1367,10 @@ double BuildingModelerAPI::getTranslationalDispZ(int jointTag, std::string analy
 
 double BuildingModelerAPI::getRotationalDispX(int jointTag, std::string analysisTag, size_t timeStep)
 {
+    if (!jointExists(jointTag)) {
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
+    }
+
     auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
     auto output = analysis->getOutput();
 
@@ -1302,6 +1380,10 @@ double BuildingModelerAPI::getRotationalDispX(int jointTag, std::string analysis
 
 double BuildingModelerAPI::getRotationalDispY(int jointTag, std::string analysisTag, size_t timeStep)
 {
+    if (!jointExists(jointTag)) {
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
+    }
+
     auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
     auto output = analysis->getOutput();
 
@@ -1311,6 +1393,10 @@ double BuildingModelerAPI::getRotationalDispY(int jointTag, std::string analysis
 
 double BuildingModelerAPI::getRotationalDispZ(int jointTag, std::string analysisTag, size_t timeStep)
 {
+    if (!jointExists(jointTag)) {
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
+    }
+
     auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
     auto output = analysis->getOutput();
 
