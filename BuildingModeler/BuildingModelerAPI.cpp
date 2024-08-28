@@ -363,6 +363,10 @@ void BuildingModelerAPI::addShearWall(int elementTag, std::vector<int> jointTags
     if (!checkIfQuadConvex(joints)) {
         throw InvalidOperationException("Joints of area element with tag " + std::to_string(elementTag) + " do not form convex geometry.");
     }
+
+    if (!checkIfShearWallVertical(joints)) {
+        throw InvalidOperationException("Joints of area element with tag " + std::to_string(elementTag) + " do not form vertical shear wall.");
+    }
     
     std::shared_ptr<physicalModel::Section> section = physicalModel::Building::getInstance().m_sections[sectionTag];
     physicalModel::Building::getInstance().m_areaElements[elementTag] = std::make_unique<physicalModel::ShearWallElement>(elementTag, jointTags, section, areaElementFormulation);
@@ -1253,6 +1257,37 @@ bool BuildingModelerAPI::checkIfQuadConvex(const std::vector<utility::Vector3>& 
     }
 
     return false;
+}
+
+bool BuildingModelerAPI::checkIfShearWallVertical(const std::vector<utility::Vector3>& joints)
+{
+    // This function checks if shear wall vertical and node numbering for bottom left is 1
+    // and it is either on X or Y plane not combined
+    if (joints[0].z < joints[1].z - 1e-7 || joints[0].z > joints[1].z + 1e-7) {
+        return false;
+    }
+
+    if (joints[0].z > joints[2].z - 1e-7) {
+        return false;
+    }
+
+    if (joints[0].y > joints[1].y - 1e-7 && joints[0].y < joints[1].y + 1e-7) {
+
+        if (joints[0].x > joints[1].x) {
+            return false;
+        }
+    }
+    else if (joints[0].x > joints[1].x - 1e-7 && joints[0].x < joints[1].x + 1e-7) {
+
+        if (joints[0].y < joints[1].y) {
+            return false;
+        }
+    }
+    else {
+        return false;
+    }
+
+    return true;
 }
 
 std::vector<double> BuildingModelerAPI::getDisplacements(int jointTag, std::string analysisTag, size_t timeStep)

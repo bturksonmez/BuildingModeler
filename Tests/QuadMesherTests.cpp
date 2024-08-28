@@ -56,7 +56,7 @@ TEST_F(QuadMesherTests, NoSurroundingElementsWithNullN1Fail) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add element
-    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     try {
         api::meshAreaElement(1);
@@ -88,7 +88,7 @@ TEST_F(QuadMesherTests, UnbalancedSurroundingElementsWithNullN1Fail) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add area element
-    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
     api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
@@ -132,7 +132,7 @@ TEST_F(QuadMesherTests, NoSurroundingElementsWithMinusN1Fail) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add element
-    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     try {
         api::meshAreaElement(1, -1);
@@ -164,7 +164,7 @@ TEST_F(QuadMesherTests, SurroundingElementsWithN1Fail) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add area element
-    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
     api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
@@ -210,7 +210,7 @@ TEST_F(QuadMesherTests, UnbalancedSurroundingElementSegmentsFail) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add area element
-    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
     api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
@@ -256,7 +256,7 @@ TEST_F(QuadMesherTests, MeshWithN1nN2Success) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add element
-    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     //mesh the element
     api::meshAreaElement(1, 3, 2);
@@ -307,7 +307,7 @@ TEST_F(QuadMesherTests, NoMeshSuccess) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add element
-    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     //mesh the element
     api::meshAreaElement(1, 1, 1);
@@ -353,7 +353,7 @@ TEST_F(QuadMesherTests, MeshWith4SurroundingElementsSuccess) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add area element
-    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
     api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
@@ -422,7 +422,7 @@ TEST_F(QuadMesherTests, MeshWith2SurroundingElementsN1Success) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add area element
-    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
     api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
@@ -487,7 +487,7 @@ TEST_F(QuadMesherTests, MeshWith2SurroundingElementsN2Success) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add area element
-    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
     api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
@@ -554,8 +554,8 @@ TEST_F(QuadMesherTests, MeshWithN1nN2TwoElementsSuccess) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add area element
-    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(2, { 2, 5, 6, 3 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2, { 2, 5, 6, 3 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     //mesh the element
     api::meshAreaElement(1, 2, 2);
@@ -612,11 +612,11 @@ TEST_F(QuadMesherTests, MeshWithN1nN2FiveElementsSuccess) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add area element
-    api::addShearWall(1, { 1, 2, 5, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(2, { 2, 3, 6, 5 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(3, { 4, 5, 8, 7 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(4, { 5, 6, 9, 8 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(5, { 6, 10, 11, 9 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 5, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2, { 2, 3, 6, 5 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(3, { 4, 5, 8, 7 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(4, { 5, 6, 9, 8 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(5, { 6, 10, 11, 9 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     //mesh the element
     api::meshAreaElement(1, 3, 2);
@@ -752,11 +752,11 @@ TEST_F(QuadMesherTests, MeshWithN1nN2FiveElementsWithConstraintSuccess) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add area element
-    api::addShearWall(1, { 1, 2, 5, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(2, { 2, 3, 6, 5 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(3, { 4, 5, 8, 7 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(4, { 5, 6, 9, 8 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(5, { 6, 10, 11, 9 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 5, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2, { 2, 3, 6, 5 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(3, { 4, 5, 8, 7 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(4, { 5, 6, 9, 8 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(5, { 6, 10, 11, 9 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     //mesh the element
     api::meshAreaElement(1, 3, 2);
@@ -939,11 +939,11 @@ TEST_F(QuadMesherTests, MeshWithSurroundingElementsFiveElementsSuccess) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add area element
-    api::addShearWall(1, { 1, 2, 5, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(2, { 2, 3, 6, 5 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(3, { 4, 5, 8, 7 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(4, { 5, 6, 9, 8 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(5, { 6, 10, 11, 9 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 5, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2, { 2, 3, 6, 5 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(3, { 4, 5, 8, 7 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(4, { 5, 6, 9, 8 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(5, { 6, 10, 11, 9 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
     api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
@@ -1107,8 +1107,8 @@ TEST_F(QuadMesherTests, MeshWithN1nN2TwoElementsFail) {
     api::addElasticSection2D(1, 1, 2.0);
 
     // add area element
-    api::addShearWall(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(2, { 2, 5, 6, 3 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2, { 2, 5, 6, 3 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // update connectivity between line and area elements
     api::updateAreaElementProperties();

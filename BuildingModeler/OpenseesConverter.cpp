@@ -688,8 +688,6 @@ void OpenseesConverter::createMeshForQuadElement(physicalModel::AreaElement* ele
             element->addAnalyticalNodeTags(nodeTags);
             element->addAnalyticalElementTag(elementTag);
             opensees::OpenseesModel::getInstance().addOutputElement(elementTag, opensees::ElementType::QUADRILATERAL);
-
-            
         }
     }
 }

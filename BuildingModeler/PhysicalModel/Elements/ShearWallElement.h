@@ -7,6 +7,10 @@ namespace physicalModel
 {
 	class ShearWallElement : public AreaElement, public IShearWallOutputFetcher
 	{
+	private:
+		const std::vector<int> getBottomAnalyticalElements() const;
+		const std::vector<int> getTopAnalyticalElements() const;
+
 	public:
 		ShearWallElement(int elementTag, std::vector<int> jointTags, std::shared_ptr<Section> section, AreaElementFormulation areaElementFormulation);
 		ShearWallElement() = delete;

@@ -23,6 +23,7 @@ namespace buildingModeler
         static bool checkIfJointsCoplanar(const std::vector<utility::Vector3>& joints);
         static bool checkIfJointsCounterClockwise(const std::vector<utility::Vector3>& joints);
         static bool checkIfQuadConvex(const std::vector<utility::Vector3>& joints);
+        static bool checkIfShearWallVertical(const std::vector<utility::Vector3>& joints);
 
     public:
         BuildingModelerAPI() {}
