@@ -1,5 +1,6 @@
 #include "ShearWallElement.h"
 #include "../Building.h"
+#include "../../OpenSeesWrapper/OpenseesModel.h"
 
 using namespace physicalModel;
 
@@ -9,42 +10,102 @@ ShearWallElement::ShearWallElement(int elementTag, std::vector<int> jointTags, s
 	m_areaElementType = AreaElementType::SHEARWALL;
 }
 
-double ShearWallElement::calculateAxialForceGlobalZ(std::string analysisTag, size_t timeStep, size_t edgeNo)
+double ShearWallElement::calculateAxialForceGlobalZ(std::string analysisTag, size_t timeStep, bool atBottom)
+{
+	auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+	auto output = analysis->getOutput();
+	auto staticOutput = std::dynamic_pointer_cast<opensees::StaticOutput>(output);
+
+	auto forces = staticOutput->getElementForce();
+	auto elements = atBottom ? getBottomAnalyticalElements() : getTopAnalyticalElements();
+
+	auto axialForce = forces[elements[0]][timeStep][atBottom ? 2 : 20];
+
+	for (auto element : elements) {
+		axialForce += forces[element][timeStep][atBottom ? 8 : 14];
+	}
+
+	return axialForce;
+}
+
+double ShearWallElement::calculateShearForceGlobalX(std::string analysisTag, size_t timeStep, bool atBottom)
+{
+	auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+	auto output = analysis->getOutput();
+	auto staticOutput = std::dynamic_pointer_cast<opensees::StaticOutput>(output);
+
+	auto forces = staticOutput->getElementForce();
+	auto elements = atBottom ? getBottomAnalyticalElements() : getTopAnalyticalElements();
+
+	auto shearForce = forces[elements[0]][timeStep][atBottom ? 0 : 18];
+
+	for (auto element : elements) {
+		shearForce += forces[element][timeStep][atBottom ? 6 : 12];
+	}
+
+	return shearForce;
+}
+
+double ShearWallElement::calculateShearForceGlobalY(std::string analysisTag, size_t timeStep, bool atBottom)
+{
+	auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+	auto output = analysis->getOutput();
+	auto staticOutput = std::dynamic_pointer_cast<opensees::StaticOutput>(output);
+
+	auto forces = staticOutput->getElementForce();
+	auto elements = atBottom ? getBottomAnalyticalElements() : getTopAnalyticalElements();
+
+	auto shearForce = forces[elements[0]][timeStep][atBottom ? 1 : 19];
+
+	for (auto element : elements) {
+		shearForce += forces[element][timeStep][atBottom ? 7 : 13];
+	}
+
+	return shearForce;
+}
+
+double ShearWallElement::calculateMomentGlobalXX(std::string analysisTag, size_t timeStep, bool atBottom)
+{
+	auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+	auto output = analysis->getOutput();
+	auto staticOutput = std::dynamic_pointer_cast<opensees::StaticOutput>(output);
+
+	auto forces = staticOutput->getElementForce();
+	auto elements = atBottom ? getBottomAnalyticalElements() : getTopAnalyticalElements();
+
+	auto moment = forces[elements[0]][timeStep][atBottom ? 3 : 21];
+
+	for (auto element : elements) {
+		moment += forces[element][timeStep][atBottom ? 9 : 15];
+	}
+
+	return moment;
+}
+
+double ShearWallElement::calculateMomentGlobalYY(std::string analysisTag, size_t timeStep, bool atBottom)
+{
+	auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+	auto output = analysis->getOutput();
+	auto staticOutput = std::dynamic_pointer_cast<opensees::StaticOutput>(output);
+
+	auto forces = staticOutput->getElementForce();
+	auto elements = atBottom ? getBottomAnalyticalElements() : getTopAnalyticalElements();
+
+	auto moment = forces[elements[0]][timeStep][atBottom ? 4 : 22];
+
+	for (auto element : elements) {
+		moment += forces[element][timeStep][atBottom ? 10 : 16];
+	}
+
+	return moment;
+}
+
+double ShearWallElement::calculateDR(std::string analysisTag, size_t dof, size_t timeStep, bool fromBottom)
 {
 	return 1;
 }
 
-double ShearWallElement::calculateShearForceGlobalX(std::string analysisTag, size_t timeStep, size_t edgeNo)
-{
-	return 1;
-}
-
-double ShearWallElement::calculateShearForceGlobalY(std::string analysisTag, size_t timeStep, size_t edgeNo)
-{
-	return 1;
-}
-
-double ShearWallElement::calculateMomentGlobalXX(std::string analysisTag, size_t timeStep, size_t edgeNo)
-{
-	return 1;
-}
-
-double ShearWallElement::calculateMomentGlobalYY(std::string analysisTag, size_t timeStep, size_t edgeNo)
-{
-	return 1;
-}
-
-double ShearWallElement::calculateDR(std::string analysisTag, size_t timeStep, size_t edgeNo)
-{
-	return 1;
-}
-
-double ShearWallElement::calculateChordRotationGlobalX(std::string analysisTag, size_t timeStep, size_t edgeNo)
-{
-	return 1;
-}
-
-double ShearWallElement::calculateChordRotationGlobalZ(std::string analysisTag, size_t timeStep, size_t edgeNo)
+double ShearWallElement::calculateChordRotation(std::string analysisTag, size_t dofRot, size_t timeStep, bool fromBottom)
 {
 	return 1;
 }

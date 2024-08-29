@@ -16,13 +16,12 @@ namespace physicalModel
 		ShearWallElement() = delete;
 		~ShearWallElement() {}
 
-		double calculateAxialForceGlobalZ(std::string analysisTag, size_t timeStep, size_t edgeNo) override;
-		double calculateShearForceGlobalX(std::string analysisTag, size_t timeStep, size_t edgeNo) override;
-		double calculateShearForceGlobalY(std::string analysisTag, size_t timeStep, size_t edgeNo) override;
-		double calculateMomentGlobalXX(std::string analysisTag, size_t timeStep, size_t edgeNo) override;
-		double calculateMomentGlobalYY(std::string analysisTag, size_t timeStep, size_t edgeNo) override;
-		double calculateDR(std::string analysisTag, size_t timeStep, size_t edgeNo) override;
-		double calculateChordRotationGlobalX(std::string analysisTag, size_t timeStep, size_t edgeNo) override;
-		double calculateChordRotationGlobalZ(std::string analysisTag, size_t timeStep, size_t edgeNo) override;
+		double calculateAxialForceGlobalZ(std::string analysisTag, size_t timeStep, bool atBottom) override;
+		double calculateShearForceGlobalX(std::string analysisTag, size_t timeStep, bool atBottom) override;
+		double calculateShearForceGlobalY(std::string analysisTag, size_t timeStep, bool atBottom) override;
+		double calculateMomentGlobalXX(std::string analysisTag, size_t timeStep, bool atBottom) override;
+		double calculateMomentGlobalYY(std::string analysisTag, size_t timeStep, bool atBottom) override;
+		double calculateDR(std::string analysisTag, size_t dof, size_t timeStep, bool fromBottom) override;
+		double calculateChordRotation(std::string analysisTag, size_t dofRot, size_t timeStep, bool fromBottom) override;
 	};
 }
