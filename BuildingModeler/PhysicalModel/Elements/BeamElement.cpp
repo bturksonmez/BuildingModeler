@@ -16,7 +16,7 @@ double BeamElement::calculateChordRotation(std::string analysisTag, size_t dofRo
 	auto output = analysis->getOutput();
 
 	auto displacements = output->getNodeDisplacement();
-	auto chordRotation = displacements[fromIJoint ? m_jointTags[0] : m_jointTags[1]][timeStep][dofRot];
+	auto chordRotation = std::abs(displacements[fromIJoint ? m_jointTags[0] : m_jointTags[1]][timeStep][dofRot]);
 
 	return chordRotation;
 }

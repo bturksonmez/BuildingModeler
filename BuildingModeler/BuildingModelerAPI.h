@@ -109,6 +109,7 @@ namespace buildingModeler
         static void updateDeadAndLiveLoads();
 
         // Postprocessing
+        // displacement
         static std::vector<double> getDisplacements(int jointTag, std::string analysisTag, size_t timeStep = 0);
         static double getFloorDR(int floorNumber, std::string analysisTag, size_t dof, size_t timeStep = 0);
         static double getBuildingDR(std::string analysisTag, size_t dof, size_t timeStep = 0);
@@ -118,18 +119,31 @@ namespace buildingModeler
         static double getRotationalDispX(int jointTag, std::string analysisTag, size_t timeStep = 0);
         static double getRotationalDispY(int jointTag, std::string analysisTag, size_t timeStep = 0);
         static double getRotationalDispZ(int jointTag, std::string analysisTag, size_t timeStep = 0);
+
+        // line element
         static double getLineElementForceX(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
         static double getLineElementForceY(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
         static double getLineElementForceZ(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
-        static double getLineElementMomentX(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
-        static double getLineElementMomentY(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
-        static double getLineElementMomentZ(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
-        static double getLineElementDR(int elementTag, std::string analysisTag, size_t dof, size_t timeStep = 0, bool fromIJoint = true);
+        static double getLineElementMomentXX(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
+        static double getLineElementMomentYY(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
+        static double getLineElementMomentZZ(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atIJoint = true);
+        static double getLineElementDR(int elementTag, std::string analysisTag, size_t dof, size_t timeStep = 0);
         static double getLineElementCR(int elementTag, std::string analysisTag, size_t dofRot, size_t timeStep = 0, bool fromIJoint = true);
         static double getLineElementDisplacement(int elementTag, size_t segmentNode, std::string analysisTag, size_t dof, size_t timeStep = 0);
 
+        // shear wall
+        static double getShearWallForceX(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atBottom = true);
+        static double getShearWallForceY(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atBottom = true);
+        static double getShearWallForceZ(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atBottom = true);
+        static double getShearWallMomentXX(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atBottom = true);
+        static double getShearWallMomentYY(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atBottom = true);
+        static double getShearWallMomentZZ(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atBottom  = true);
+        static double getShearWallDR(int elementTag, std::string analysisTag, size_t dof, size_t timeStep = 0);
+        static double getShearWallCR(int elementTag, std::string analysisTag, size_t dofRot, size_t timeStep = 0, bool fromBottom = true);
+
         // To do
-        // Postprocessing for shear walls
+        // Shear wall chord rotation
+        // Shear wall in plane moments calculation
         // Add new test with shear walls
         // Return last time step value by default
 

@@ -95,7 +95,7 @@ namespace physicalModel
 		double calculateMomentXX(std::string analysisTag, bool atIJoint, size_t timeStep) override;
 		double calculateMomentYY(std::string analysisTag, bool atIJoint, size_t timeStep) override;
 		double calculateMomentZZ(std::string analysisTag, bool atIJoint, size_t timeStep) override;
-		double calculateDR(std::string analysisTag, size_t dof,  bool fromIJoint, size_t timeStep) override;
+		double calculateDR(std::string analysisTag, size_t dof, size_t timeStep) override;
 		double calculateDisplacement(std::string analysisTag, size_t segmentNode, size_t dof, size_t timeStep) override;
 	};
 }

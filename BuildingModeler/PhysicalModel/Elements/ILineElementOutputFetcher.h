@@ -13,7 +13,7 @@ namespace physicalModel
 		virtual double calculateMomentXX(std::string analysisTag, bool atIJoint, size_t timeStep) = 0;
 		virtual double calculateMomentYY(std::string analysisTag, bool atIJoint, size_t timeStep) = 0;
 		virtual double calculateMomentZZ(std::string analysisTag, bool atIJoint, size_t timeStep) = 0;
-		virtual double calculateDR(std::string analysisTag, size_t dof, bool fromIJoint, size_t timeStep) = 0;
+		virtual double calculateDR(std::string analysisTag, size_t dof, size_t timeStep) = 0;
 		virtual double calculateChordRotation(std::string analysisTag, size_t dofRot, bool fromIJoint, size_t timeStep) = 0;
 		virtual double calculateDisplacement(std::string analysisTag, size_t segmentNode, size_t dof, size_t timeStep) = 0;
 	};

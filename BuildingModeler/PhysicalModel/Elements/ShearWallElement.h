@@ -21,7 +21,8 @@ namespace physicalModel
 		double calculateShearForceGlobalY(std::string analysisTag, size_t timeStep, bool atBottom) override;
 		double calculateMomentGlobalXX(std::string analysisTag, size_t timeStep, bool atBottom) override;
 		double calculateMomentGlobalYY(std::string analysisTag, size_t timeStep, bool atBottom) override;
-		double calculateDR(std::string analysisTag, size_t dof, size_t timeStep, bool fromBottom) override;
+		double calculateMomentGlobalZZ(std::string analysisTag, size_t timeStep, bool atBottom) override;
+		double calculateDR(std::string analysisTag, size_t dof, size_t timeStep) override;
 		double calculateChordRotation(std::string analysisTag, size_t dofRot, size_t timeStep, bool fromBottom) override;
 	};
 }

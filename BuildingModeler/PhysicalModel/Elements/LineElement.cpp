@@ -213,7 +213,7 @@ double LineElement::calculateMomentZZ(std::string analysisTag, bool atIJoint, si
 	return forces[m_elementTag][timeStep][atIJoint ? 5 : 11];
 }
 
-double LineElement::calculateDR(std::string analysisTag, size_t dof, bool fromIJoint, size_t timeStep)
+double LineElement::calculateDR(std::string analysisTag, size_t dof, size_t timeStep)
 {
 	// To do: elaborate the method. Input drift direction and drift axis location. (For example for columns drift axis is z axis)
 	auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
@@ -222,10 +222,9 @@ double LineElement::calculateDR(std::string analysisTag, size_t dof, bool fromIJ
 	auto displacements = output->getNodeDisplacement();
 	auto dispI = displacements[m_jointTags[0]][timeStep][dof];
 	auto dispJ = displacements[m_jointTags[1]][timeStep][dof];
+	auto DR = std::abs(dispI - dispJ) / getLength();
 
-	auto DR = (dispI - dispJ) / getLength();
-
-	return fromIJoint ? DR : -1 * DR;
+	return DR;
 }
 
 double LineElement::calculateDisplacement(std::string analysisTag, size_t segmentNode, size_t dof, size_t timeStep)

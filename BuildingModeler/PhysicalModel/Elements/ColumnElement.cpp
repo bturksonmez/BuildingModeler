@@ -22,6 +22,7 @@ double ColumnElement::calculateChordRotation(std::string analysisTag, size_t dof
 	auto delta = displacements[m_jointTags[1]][timeStep][dofTrans] - displacements[m_jointTags[0]][timeStep][dofTrans];
 	delta = dofRot == 4 ? delta : -delta;
 	auto theta = fromIJoint ? displacements[m_jointTags[0]][timeStep][dofRot] : displacements[m_jointTags[0]][timeStep][dofRot];
+	auto chordRotation = std::abs(delta / getLength() - theta);
 
-	return delta / getLength() - theta;
+	return chordRotation;
 }

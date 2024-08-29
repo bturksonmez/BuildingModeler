@@ -100,13 +100,56 @@ double ShearWallElement::calculateMomentGlobalYY(std::string analysisTag, size_t
 	return moment;
 }
 
-double ShearWallElement::calculateDR(std::string analysisTag, size_t dof, size_t timeStep, bool fromBottom)
+double ShearWallElement::calculateMomentGlobalZZ(std::string analysisTag, size_t timeStep, bool atBottom)
 {
-	return 1;
+	auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+	auto output = analysis->getOutput();
+	auto staticOutput = std::dynamic_pointer_cast<opensees::StaticOutput>(output);
+
+	auto forces = staticOutput->getElementForce();
+	auto elements = atBottom ? getBottomAnalyticalElements() : getTopAnalyticalElements();
+
+	auto moment = forces[elements[0]][timeStep][atBottom ? 5 : 23];
+
+	for (auto element : elements) {
+		moment += forces[element][timeStep][atBottom ? 11 : 17];
+	}
+
+	return moment;
+}
+
+double ShearWallElement::calculateDR(std::string analysisTag, size_t dof, size_t timeStep)
+{
+	auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+	auto output = analysis->getOutput();
+
+	auto displacements = output->getNodeDisplacement();
+	auto dispI = (displacements[m_jointTags[0]][timeStep][dof] + displacements[m_jointTags[1]][timeStep][dof]) / 2.0;
+	auto dispJ = (displacements[m_jointTags[2]][timeStep][dof] + displacements[m_jointTags[3]][timeStep][dof]) / 2.0;
+
+	auto bottomZ = physicalModel::Building::getInstance().getJoint(m_jointTags[0])->getCoords().z;
+	auto topZ = physicalModel::Building::getInstance().getJoint(m_jointTags[3])->getCoords().z;
+	auto length = topZ - bottomZ;
+
+	auto DR = std::abs(dispI - dispJ) / length;
+
+	return DR;
 }
 
 double ShearWallElement::calculateChordRotation(std::string analysisTag, size_t dofRot, size_t timeStep, bool fromBottom)
 {
+	auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+	auto output = analysis->getOutput();
+
+	size_t dofTrans = dofRot == 4 ? 0 : 1;
+
+	auto displacements = output->getNodeDisplacement();
+
+	auto dispI = (displacements[m_jointTags[0]][timeStep][dofTrans] + displacements[m_jointTags[1]][timeStep][dofTrans]) / 2.0;
+	auto dispJ = (displacements[m_jointTags[2]][timeStep][dofTrans] + displacements[m_jointTags[3]][timeStep][dofTrans]) / 2.0;
+	auto delta = dispJ - dispI;
+	delta = dofRot == 4 ? delta : -delta;
+
 	return 1;
 }
 

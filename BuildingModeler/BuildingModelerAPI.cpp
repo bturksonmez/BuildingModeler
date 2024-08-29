@@ -1466,7 +1466,7 @@ double BuildingModelerAPI::getLineElementForceZ(int elementTag, std::string anal
     return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateForceZ(analysisTag, atIJoint, timeStep);
 }
 
-double BuildingModelerAPI::getLineElementMomentX(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint)
+double BuildingModelerAPI::getLineElementMomentXX(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint)
 {
     if (!lineElementExists(elementTag)) {
         throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
@@ -1475,7 +1475,7 @@ double BuildingModelerAPI::getLineElementMomentX(int elementTag, std::string ana
     return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateMomentXX(analysisTag, atIJoint, timeStep);
 }
 
-double BuildingModelerAPI::getLineElementMomentY(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint)
+double BuildingModelerAPI::getLineElementMomentYY(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint)
 {
     if (!lineElementExists(elementTag)) {
         throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
@@ -1484,7 +1484,7 @@ double BuildingModelerAPI::getLineElementMomentY(int elementTag, std::string ana
     return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateMomentYY(analysisTag, atIJoint, timeStep);
 }
 
-double BuildingModelerAPI::getLineElementMomentZ(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint)
+double BuildingModelerAPI::getLineElementMomentZZ(int elementTag, std::string analysisTag, size_t timeStep, bool atIJoint)
 {
     if (!lineElementExists(elementTag)) {
         throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
@@ -1493,7 +1493,7 @@ double BuildingModelerAPI::getLineElementMomentZ(int elementTag, std::string ana
     return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateMomentZZ(analysisTag, atIJoint, timeStep);
 }
 
-double BuildingModelerAPI::getLineElementDR(int elementTag, std::string analysisTag, size_t dof, size_t timeStep, bool fromIJoint)
+double BuildingModelerAPI::getLineElementDR(int elementTag, std::string analysisTag, size_t dof, size_t timeStep)
 {
     if (!lineElementExists(elementTag)) {
         throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
@@ -1503,7 +1503,7 @@ double BuildingModelerAPI::getLineElementDR(int elementTag, std::string analysis
         throw InvalidInputException("Drift ratio can be measured in translational directions, check your input dof!");
     }
 
-    return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateDR(analysisTag, dof - 1, fromIJoint, timeStep);
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateDR(analysisTag, dof - 1, timeStep);
 }
 
 double BuildingModelerAPI::getLineElementCR(int elementTag, std::string analysisTag, size_t dofRot, size_t timeStep, bool fromIJoint)
@@ -1537,6 +1537,129 @@ double BuildingModelerAPI::getLineElementDisplacement(int elementTag, size_t seg
     }
 
     return physicalModel::Building::getInstance().m_lineElements[elementTag]->calculateDisplacement(analysisTag, segmentNode, dof - 1, timeStep);
+}
+
+double BuildingModelerAPI::getShearWallForceX(int elementTag, std::string analysisTag, size_t timeStep, bool atBottom)
+{
+    if (!areaElementExists(elementTag)) {
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    physicalModel::ShearWallElement* element = dynamic_cast<physicalModel::ShearWallElement*>(physicalModel::Building::getInstance().getAreaElement(elementTag));
+    if (element == nullptr) {
+        throw InvalidInputException("Area element with tag " + std::to_string(elementTag) + " is not a shear wall element.");
+    }
+
+    return element->calculateShearForceGlobalX(analysisTag, atBottom, timeStep);
+}
+
+double BuildingModelerAPI::getShearWallForceY(int elementTag, std::string analysisTag, size_t timeStep, bool atBottom)
+{
+    if (!areaElementExists(elementTag)) {
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    physicalModel::ShearWallElement* element = dynamic_cast<physicalModel::ShearWallElement*>(physicalModel::Building::getInstance().getAreaElement(elementTag));
+    if (element == nullptr) {
+        throw InvalidInputException("Area element with tag " + std::to_string(elementTag) + " is not a shear wall element.");
+    }
+
+    return element->calculateShearForceGlobalY(analysisTag, atBottom, timeStep);
+}
+
+double BuildingModelerAPI::getShearWallForceZ(int elementTag, std::string analysisTag, size_t timeStep, bool atBottom)
+{
+    if (!areaElementExists(elementTag)) {
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    physicalModel::ShearWallElement* element = dynamic_cast<physicalModel::ShearWallElement*>(physicalModel::Building::getInstance().getAreaElement(elementTag));
+    if (element == nullptr) {
+        throw InvalidInputException("Area element with tag " + std::to_string(elementTag) + " is not a shear wall element.");
+    }
+
+    return element->calculateAxialForceGlobalZ(analysisTag, atBottom, timeStep);
+}
+
+double BuildingModelerAPI::getShearWallMomentXX(int elementTag, std::string analysisTag, size_t timeStep, bool atBottom)
+{
+    if (!areaElementExists(elementTag)) {
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    physicalModel::ShearWallElement* element = dynamic_cast<physicalModel::ShearWallElement*>(physicalModel::Building::getInstance().getAreaElement(elementTag));
+    if (element == nullptr) {
+        throw InvalidInputException("Area element with tag " + std::to_string(elementTag) + " is not a shear wall element.");
+    }
+
+    return element->calculateMomentGlobalXX(analysisTag, atBottom, timeStep);
+}
+
+double BuildingModelerAPI::getShearWallMomentYY(int elementTag, std::string analysisTag, size_t timeStep, bool atBottom)
+{
+    if (!areaElementExists(elementTag)) {
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    physicalModel::ShearWallElement* element = dynamic_cast<physicalModel::ShearWallElement*>(physicalModel::Building::getInstance().getAreaElement(elementTag));
+    if (element == nullptr) {
+        throw InvalidInputException("Area element with tag " + std::to_string(elementTag) + " is not a shear wall element.");
+    }
+
+    return element->calculateMomentGlobalYY(analysisTag, atBottom, timeStep);
+}
+
+double BuildingModelerAPI::getShearWallMomentZZ(int elementTag, std::string analysisTag, size_t timeStep, bool atBottom)
+{
+    if (!areaElementExists(elementTag)) {
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    physicalModel::ShearWallElement* element = dynamic_cast<physicalModel::ShearWallElement*>(physicalModel::Building::getInstance().getAreaElement(elementTag));
+    if (element == nullptr) {
+        throw InvalidInputException("Area element with tag " + std::to_string(elementTag) + " is not a shear wall element.");
+    }
+
+    return element->calculateMomentGlobalZZ(analysisTag, atBottom, timeStep);
+}
+
+double BuildingModelerAPI::getShearWallDR(int elementTag, std::string analysisTag, size_t dof, size_t timeStep)
+{
+    if (!areaElementExists(elementTag)) {
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    physicalModel::ShearWallElement* element = dynamic_cast<physicalModel::ShearWallElement*>(physicalModel::Building::getInstance().getAreaElement(elementTag));
+    if (element == nullptr) {
+        throw InvalidInputException("Area element with tag " + std::to_string(elementTag) + " is not a shear wall element.");
+    }
+
+    if (dof < 1 || dof > 3) {
+        throw InvalidInputException("Drift ratio can be measured in translational directions, check your input dof!");
+    }
+
+    return element->calculateDR(analysisTag, dof - 1, timeStep);
+}
+
+double BuildingModelerAPI::getShearWallCR(int elementTag, std::string analysisTag, size_t dofRot, size_t timeStep, bool fromBottom)
+{
+    if (!areaElementExists(elementTag)) {
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    physicalModel::ShearWallElement* element = dynamic_cast<physicalModel::ShearWallElement*>(physicalModel::Building::getInstance().getAreaElement(elementTag));
+    if (element == nullptr) {
+        throw InvalidInputException("Area element with tag " + std::to_string(elementTag) + " is not a shear wall element.");
+    }
+
+    // To do: chord rotation measuring planes are defined by gloal directions. However, local coordinate system would
+    // be more correct for skewed members. Since all our members' directions align with global coordinate system
+    // this part will remain as it is for now.
+    if (dofRot < 4 || dofRot > 5) {
+        throw InvalidInputException("Chord rotation can be measured in rotational directions X and Y, check your input rotation dof!");
+    }
+
+    return element->calculateChordRotation(analysisTag, dofRot - 1, fromBottom, timeStep);
 }
 
 void BuildingModelerAPI::createAnalyticalModel()
