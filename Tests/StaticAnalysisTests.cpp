@@ -196,3 +196,155 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
 
     EXPECT_NEAR(-900.0, totalShearForce, epsilon);
 }
+
+TEST_F(StaticAnalysisTests, SingleShearWallX) {
+    typedef buildingModeler::BuildingModelerAPI api;
+
+    // add joints
+    api::addJoint(0, { 0, 0, 0 });
+    api::addJoint(1, { 2, 0, 0 });
+    api::addJoint(2, { 2, 0, 4 });
+    api::addJoint(3, { 0, 0, 4 });
+
+    // add constraints
+    api::setConstraintVector(0, { 1, 1, 1, 1, 1, 1 });
+    api::setConstraintVector(1, { 1, 1, 1, 1, 1, 1 });
+
+    // add floors
+    api::addFloor(0, 0.0);
+    api::addFloor(1, 4.0);
+
+    // assign nodes to floor
+    api::setFloorNo(0, 0);
+    api::setFloorNo(1, 0);
+    api::setFloorNo(2, 1);
+    api::setFloorNo(3, 1);
+
+    // add material
+    api::addElasticMaterial(1, 30000000, 12500000, 2.4);
+
+    // add section 2D
+    api::addElasticSection2D(1, 1, 0.3);
+
+    // add shear wall element
+    api::addShearWall(1001, { 0, 1, 2, 3 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+
+    //mesh the element
+    api::meshAreaElement(1001, 4, 8);
+
+    // add gravity and live loads
+    api::includeDeadLoadFromMembers(true);
+    api::applyGravityLoadThroughLineElements(false);
+    api::updateDeadAndLiveLoads();
+
+    // add earthquake loads
+    api::addStaticLoadCase("eq", physicalModel::StaticLoadCaseType::EARTHQUAKE);
+    api::addPointLoad("eq", 3, 300, 0, 0, 0, 0, 0);
+
+    // add load combination
+    api::addStaticLoadCombination("combo1");
+    api::addLoadCaseToStaticLoadCombination("combo1", "dead", 1.0);
+    api::addLoadCaseToStaticLoadCombination("combo1", "eq", 1.0);
+    api::setStaticLoadCombinationActive("combo1", true);
+
+    // create analytical model and tcl file
+    api::createAnalyticalModel();
+    api::createModelAndLoadingFiles();
+    api::analyze();
+
+    // floating-point comparison tolerance
+    const double epsilon = 1e-2;
+    const double epsilonSmall = 1e-6;
+
+    double axialForce = api::getShearWallForceZ(1001, "combo1");
+    double shearForce = api::getShearWallForceX(1001, "combo1");
+    double moment = api::getShearWallMomentYY(1001, "combo1");
+    double bottomCR = api::getShearWallCR(1001, "combo1", 5);
+    double bottomDR = api::getShearWallDR(1001, "combo1", 1);
+
+    double topDispJoint2 = api::getTranslationalDispX(2, "combo1");
+    double topDispJoint3 = api::getTranslationalDispX(3, "combo1");
+    double expectedBottomCR = (topDispJoint2 + topDispJoint3) / 2.0 / 4.0;
+
+    EXPECT_NEAR(52.974, axialForce, epsilon);
+    EXPECT_NEAR(-300, shearForce, epsilon);
+    EXPECT_NEAR(-1200, moment, epsilon);
+    EXPECT_NEAR(expectedBottomCR, bottomCR, epsilonSmall);
+    EXPECT_NEAR(bottomDR, bottomCR, epsilonSmall);
+}
+
+TEST_F(StaticAnalysisTests, SingleShearWallY) {
+    typedef buildingModeler::BuildingModelerAPI api;
+
+    // add joints
+    api::addJoint(0, { 0, 2, 0 });
+    api::addJoint(1, { 0, 0, 0 });
+    api::addJoint(2, { 0, 0, 4 });
+    api::addJoint(3, { 0, 2, 4 });
+
+    // add constraints
+    api::setConstraintVector(0, { 1, 1, 1, 1, 1, 1 });
+    api::setConstraintVector(1, { 1, 1, 1, 1, 1, 1 });
+
+    // add floors
+    api::addFloor(0, 0.0);
+    api::addFloor(1, 4.0);
+
+    // assign nodes to floor
+    api::setFloorNo(0, 0);
+    api::setFloorNo(1, 0);
+    api::setFloorNo(2, 1);
+    api::setFloorNo(3, 1);
+
+    // add material
+    api::addElasticMaterial(1, 30000000, 12500000, 2.4);
+
+    // add section 2D
+    api::addElasticSection2D(1, 1, 0.3);
+
+    // add shear wall element
+    api::addShearWall(1001, { 0, 1, 2, 3 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+
+    //mesh the element
+    api::meshAreaElement(1001, 4, 8);
+
+    // add gravity and live loads
+    api::includeDeadLoadFromMembers(true);
+    api::applyGravityLoadThroughLineElements(false);
+    api::updateDeadAndLiveLoads();
+
+    // add earthquake loads
+    api::addStaticLoadCase("eq", physicalModel::StaticLoadCaseType::EARTHQUAKE);
+    api::addPointLoad("eq", 3, 0, 300, 0, 0, 0, 0);
+
+    // add load combination
+    api::addStaticLoadCombination("combo1");
+    api::addLoadCaseToStaticLoadCombination("combo1", "dead", 1.0);
+    api::addLoadCaseToStaticLoadCombination("combo1", "eq", 1.0);
+    api::setStaticLoadCombinationActive("combo1", true);
+
+    // create analytical model and tcl file
+    api::createAnalyticalModel();
+    api::createModelAndLoadingFiles();
+    api::analyze();
+
+    // floating-point comparison tolerance
+    const double epsilon = 1e-2;
+    const double epsilonSmall = 1e-6;
+
+    double axialForce = api::getShearWallForceZ(1001, "combo1");
+    double shearForce = api::getShearWallForceY(1001, "combo1");
+    double moment = api::getShearWallMomentXX(1001, "combo1");
+    double bottomCR = api::getShearWallCR(1001, "combo1", 4);
+    double bottomDR = api::getShearWallDR(1001, "combo1", 2);
+
+    double topDispJoint2 = api::getTranslationalDispY(2, "combo1");
+    double topDispJoint3 = api::getTranslationalDispY(3, "combo1");
+    double expectedBottomCR = (topDispJoint2 + topDispJoint3) / 2.0 / 4.0;
+
+    EXPECT_NEAR(52.974, axialForce, epsilon);
+    EXPECT_NEAR(-300, shearForce, epsilon);
+    EXPECT_NEAR(1200, moment, epsilon);
+    EXPECT_NEAR(expectedBottomCR, bottomCR, epsilonSmall);
+    EXPECT_NEAR(bottomDR, bottomCR, epsilonSmall);
+}

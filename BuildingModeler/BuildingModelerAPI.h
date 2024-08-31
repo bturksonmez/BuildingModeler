@@ -143,7 +143,6 @@ namespace buildingModeler
 
         // To do
         // Shear wall chord rotation
-        // Shear wall in plane moments calculation
         // Add new test with shear walls
         // Return last time step value by default
 

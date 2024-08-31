@@ -75,6 +75,24 @@ namespace utility
         return std::acos(dotProduct(vecA, vecB) / (vecA.norm2() * vecB.norm2()));
     }
 
+    double VectorUtilities::getSignedAngleBtw(const Vector3& vecA, const Vector3& vecB, const Vector3& referenceAxis)
+    {
+        Vector3 normA = normalize(vecA);
+        Vector3 normB = normalize(vecB);
+
+        double angle = std::acos(dotProduct(normA, normB));
+
+        Vector3 crossProd = crossProduct(normA, normB);
+
+        double sign = dotProduct(crossProd, referenceAxis);
+
+        if (sign < 0) {
+            angle = -angle;
+        }
+
+        return angle;
+    }
+
     double VectorUtilities::calculateSlope(const Vector2& pA, const Vector2& pB)
     {
         if (pB.x - pA.x == 0) {
@@ -117,6 +135,16 @@ namespace utility
         projectedVec.y = utility::VectorUtilities::dotProduct(vec, v);
 
         return projectedVec;
+    }
+
+    Vector3 VectorUtilities::normalize(const Vector3& vec)
+    {
+        return vec / vec.norm2();
+    }
+
+    Vector2 VectorUtilities::normalize(const Vector2& vec)
+    {
+        return vec / vec.norm2();
     }
 
     bool VectorUtilities::isBetween(const Vector2& pA, const Vector2& pB, const Vector2& point)

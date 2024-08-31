@@ -1243,20 +1243,24 @@ bool BuildingModelerAPI::checkIfQuadConvex(const std::vector<utility::Vector3>& 
     vecs.push_back(joints[3] - joints[2]);
     vecs.push_back(joints[0] - joints[3]);
 
-    auto totalSignBit = 0;
+    std::vector<utility::Vector3> normals;
     for (int i = 0; i < 4; ++i) {
         auto startInd = i;
         auto endInd = (i == 3) ? 0 : i + 1;
-
-        auto crossProduct = utility::VectorUtilities::crossProduct(vecs[startInd], vecs[endInd]);
-        totalSignBit += std::signbit(crossProduct.z);
+        normals.push_back(utility::VectorUtilities::crossProduct(vecs[startInd], vecs[endInd]));
     }
 
-    if (totalSignBit == 4 || totalSignBit == 0) {
-        return true;
+    auto referenceNormal = utility::VectorUtilities::normalize(normals[0]);
+    for (int i = 1; i < 4; ++i) {
+        auto normalizedNormal = utility::VectorUtilities::normalize(normals[i]);
+        auto dotProduct = utility::VectorUtilities::dotProduct(referenceNormal, normalizedNormal);
+
+        if (dotProduct < 0) {
+            return false;
+        }
     }
 
-    return false;
+    return true;
 }
 
 bool BuildingModelerAPI::checkIfShearWallVertical(const std::vector<utility::Vector3>& joints)
@@ -1550,7 +1554,7 @@ double BuildingModelerAPI::getShearWallForceX(int elementTag, std::string analys
         throw InvalidInputException("Area element with tag " + std::to_string(elementTag) + " is not a shear wall element.");
     }
 
-    return element->calculateShearForceGlobalX(analysisTag, atBottom, timeStep);
+    return element->calculateShearForceGlobalX(analysisTag, timeStep, atBottom);
 }
 
 double BuildingModelerAPI::getShearWallForceY(int elementTag, std::string analysisTag, size_t timeStep, bool atBottom)
@@ -1564,7 +1568,7 @@ double BuildingModelerAPI::getShearWallForceY(int elementTag, std::string analys
         throw InvalidInputException("Area element with tag " + std::to_string(elementTag) + " is not a shear wall element.");
     }
 
-    return element->calculateShearForceGlobalY(analysisTag, atBottom, timeStep);
+    return element->calculateShearForceGlobalY(analysisTag, timeStep, atBottom);
 }
 
 double BuildingModelerAPI::getShearWallForceZ(int elementTag, std::string analysisTag, size_t timeStep, bool atBottom)
@@ -1578,7 +1582,7 @@ double BuildingModelerAPI::getShearWallForceZ(int elementTag, std::string analys
         throw InvalidInputException("Area element with tag " + std::to_string(elementTag) + " is not a shear wall element.");
     }
 
-    return element->calculateAxialForceGlobalZ(analysisTag, atBottom, timeStep);
+    return element->calculateAxialForceGlobalZ(analysisTag, timeStep, atBottom);
 }
 
 double BuildingModelerAPI::getShearWallMomentXX(int elementTag, std::string analysisTag, size_t timeStep, bool atBottom)
@@ -1592,7 +1596,7 @@ double BuildingModelerAPI::getShearWallMomentXX(int elementTag, std::string anal
         throw InvalidInputException("Area element with tag " + std::to_string(elementTag) + " is not a shear wall element.");
     }
 
-    return element->calculateMomentGlobalXX(analysisTag, atBottom, timeStep);
+    return element->calculateMomentGlobalXX(analysisTag, timeStep, atBottom);
 }
 
 double BuildingModelerAPI::getShearWallMomentYY(int elementTag, std::string analysisTag, size_t timeStep, bool atBottom)
@@ -1606,7 +1610,7 @@ double BuildingModelerAPI::getShearWallMomentYY(int elementTag, std::string anal
         throw InvalidInputException("Area element with tag " + std::to_string(elementTag) + " is not a shear wall element.");
     }
 
-    return element->calculateMomentGlobalYY(analysisTag, atBottom, timeStep);
+    return element->calculateMomentGlobalYY(analysisTag, timeStep, atBottom);
 }
 
 double BuildingModelerAPI::getShearWallMomentZZ(int elementTag, std::string analysisTag, size_t timeStep, bool atBottom)
@@ -1620,7 +1624,7 @@ double BuildingModelerAPI::getShearWallMomentZZ(int elementTag, std::string anal
         throw InvalidInputException("Area element with tag " + std::to_string(elementTag) + " is not a shear wall element.");
     }
 
-    return element->calculateMomentGlobalZZ(analysisTag, atBottom, timeStep);
+    return element->calculateMomentGlobalZZ(analysisTag, timeStep, atBottom);
 }
 
 double BuildingModelerAPI::getShearWallDR(int elementTag, std::string analysisTag, size_t dof, size_t timeStep)
@@ -1659,7 +1663,7 @@ double BuildingModelerAPI::getShearWallCR(int elementTag, std::string analysisTa
         throw InvalidInputException("Chord rotation can be measured in rotational directions X and Y, check your input rotation dof!");
     }
 
-    return element->calculateChordRotation(analysisTag, dofRot - 1, fromBottom, timeStep);
+    return element->calculateChordRotation(analysisTag, dofRot - 1, timeStep, fromBottom);
 }
 
 void BuildingModelerAPI::createAnalyticalModel()

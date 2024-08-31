@@ -1,6 +1,9 @@
 #include "Analysis.h"
 #include "../Utilities/Process.h"
 
+#include <thread>
+#include <chrono>
+
 using namespace opensees;
 
 size_t Analysis::counter = 0;
@@ -38,5 +41,6 @@ std::shared_ptr<Output> Analysis::getOutput() const
 void Analysis::perform()
 {
 	utilities::Process::runOpensees("source " + m_analysisName + ".tcl");
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	m_output->retrieveOutput();
 }

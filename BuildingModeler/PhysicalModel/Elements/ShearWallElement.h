@@ -10,6 +10,10 @@ namespace physicalModel
 	private:
 		const std::vector<int> getBottomAnalyticalElements() const;
 		const std::vector<int> getTopAnalyticalElements() const;
+		bool onXdirection() const;
+		double calculateMomentInPlaneXX(std::string analysisTag, size_t timeStep, bool atBottom);
+		double calculateMomentInPlaneYY(std::string analysisTag, size_t timeStep, bool atBottom);
+		double calculateRotation(std::string analysisTag, size_t dofTrans, size_t timeStep, bool fromBottom);
 
 	public:
 		ShearWallElement(int elementTag, std::vector<int> jointTags, std::shared_ptr<Section> section, AreaElementFormulation areaElementFormulation);
