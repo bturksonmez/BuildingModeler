@@ -12,6 +12,7 @@ AreaElement::AreaElement(int elementTag, std::vector<int> jointTags, std::shared
 {
 	m_meshable = false;
 	m_surroundingLineElementTags.resize(4, -1);
+	m_surroundingShearWallTags.resize(4, -1);
 	m_area = calculateArea();
 
 	if (auto tempSection = std::dynamic_pointer_cast<ElasticSection2D>(section)) {
@@ -32,6 +33,11 @@ double AreaElement::calculateArea()
 void AreaElement::addSurroundingLineElement(int index, int surroundingLineElementTag)
 {
 	m_surroundingLineElementTags[index] = surroundingLineElementTag;
+}
+
+void AreaElement::addSurroundingShearWallElement(int index, int surroundingShearWallTag)
+{
+	m_surroundingShearWallTags[index] = surroundingShearWallTag;
 }
 
 void AreaElement::mesh(bool meshable, int n1, int n2)
@@ -122,6 +128,11 @@ std::pair<int, int> AreaElement::getMeshDivisions() const
 const std::vector<int>& AreaElement::getSurroundingLineElementTags()
 {
 	return m_surroundingLineElementTags;
+}
+
+const std::vector<int>& AreaElement::getSurroundingShearWallTags()
+{
+	return m_surroundingShearWallTags;
 }
 
 const std::shared_ptr<Section> AreaElement::getSection() const

@@ -437,22 +437,41 @@ void BuildingModelerAPI::meshAreaElement(int elementTag, std::optional<int> n1, 
     }
 
     auto areaElement = physicalModel::Building::getInstance().getAreaElement(elementTag);
-    auto surroundingElementTags = areaElement->getSurroundingLineElementTags();
+    auto surroundingLineElementTags = areaElement->getSurroundingLineElementTags();
+    auto surroundingShearWallTags = areaElement->getSurroundingShearWallTags();
+    std::vector<int> surroundingElementDivisions(4, -1);
+    for (size_t i = 0; i < surroundingLineElementTags.size(); ++i) {
 
-    if ((surroundingElementTags[0] != -1 || surroundingElementTags[2] != -1) && n1 != std::nullopt) {
+        if (surroundingLineElementTags[i] != -1) {
+            auto element = physicalModel::Building::getInstance().getLineElement(surroundingLineElementTags[i]);
+            if (element == nullptr) {
+                throw EntityNotFoundException("Surrounding line elements with tag " + std::to_string(surroundingLineElementTags[i]) + " does not exist.");
+            }
+            surroundingElementDivisions[i] = element->getSegmentLengths().size();
+        }
+        else if (surroundingShearWallTags[i] != -1) {
+            auto element = physicalModel::Building::getInstance().getAreaElement(surroundingShearWallTags[i]);
+            if (element == nullptr) {
+                throw EntityNotFoundException("Surrounding shear wall with tag " + std::to_string(surroundingShearWallTags[i]) + " does not exist.");
+            }
+            surroundingElementDivisions[i] = element->getMeshDivisions().first;
+        }
+    }
+
+    if ((surroundingElementDivisions[0] != -1 || surroundingElementDivisions[2] != -1) && n1 != std::nullopt) {
         throw InvalidInputException("n1 cannot be assigned while there are surrounding elements in that direction.");
     }
 
-    if ((surroundingElementTags[1] != -1 || surroundingElementTags[3] != -1) && n2 != std::nullopt) {
+    if ((surroundingElementDivisions[1] != -1 || surroundingElementDivisions[3] != -1) && n2 != std::nullopt) {
         throw InvalidInputException("n2 cannot be assigned while there are surrounding elements in that direction.");
     }
     
-    if ((surroundingElementTags[0] * surroundingElementTags[2] < 0) && n1 == std::nullopt)
+    if ((surroundingElementDivisions[0] * surroundingElementDivisions[2] < 0) && n1 == std::nullopt)
     {
         throw InvalidInputException("There must be surrounding elements on the opposite sides when n1 is not assigned.");
     }
     
-    if ((surroundingElementTags[1] * surroundingElementTags[3] < 0) && n2 == std::nullopt)
+    if ((surroundingElementDivisions[1] * surroundingElementDivisions[3] < 0) && n2 == std::nullopt)
     {
         throw InvalidInputException("There must be surrounding elements on the opposite sides when n2 is not assigned.");
     }
@@ -460,23 +479,15 @@ void BuildingModelerAPI::meshAreaElement(int elementTag, std::optional<int> n1, 
     bool meshIJ = true;
     if (n1 == std::nullopt)
     {
-        if (surroundingElementTags[0] < 0 || surroundingElementTags[2] < 0) {
+        if (surroundingElementDivisions[0] < 0 || surroundingElementDivisions[2] < 0) {
             throw InvalidInputException("There must be surrounding elements on the opposite sides when n1 is not assigned.");
         }
 
-        auto element1 = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[0]);
-        auto element2 = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[2]);
-
-        if (element1 == nullptr || element2 == nullptr) {
-            throw EntityNotFoundException("Surrounding line elements with tags " + std::to_string(surroundingElementTags[0]) + " or "
-                + std::to_string(surroundingElementTags[1])  + " does not exist.");
-        }
-
-        if (element1->getSegmentLengths().size() != element2->getSegmentLengths().size()) {
+        if (surroundingElementDivisions[0] != surroundingElementDivisions[2]) {
             throw InvalidInputException("Surrounding elements on the opposite sides must have the same number of elements.");
         }
 
-        if (element1->getSegmentLengths().size() == 1) {
+        if (surroundingElementDivisions[0] == 1) {
             meshIJ = false;
         }
     }
@@ -488,22 +499,14 @@ void BuildingModelerAPI::meshAreaElement(int elementTag, std::optional<int> n1, 
     bool meshJK = true;
     if (n2 == std::nullopt)
     {
-        if (surroundingElementTags[1] < 0 || surroundingElementTags[3] < 0) {
+        if (surroundingElementDivisions[1] < 0 || surroundingElementDivisions[3] < 0) {
             throw InvalidInputException("There must be surrounding elements on the opposite sides when n2 is not assigned.");
         }
 
-        auto element1 = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[1]);
-        auto element2 = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[3]);
-
-        if (element1 == nullptr || element2 == nullptr) {
-            throw EntityNotFoundException("Surrounding line elements with tags " + std::to_string(surroundingElementTags[0]) + " or "
-                + std::to_string(surroundingElementTags[1]) + " does not exist.");
-        }
-
-        if (element1->getSegmentLengths().size() != element2->getSegmentLengths().size()) {
+        if (surroundingElementDivisions[1] != surroundingElementDivisions[3]) {
             throw InvalidInputException("Surrounding elements on the opposite sides must have the same number of elements.");
         }
-        if (element1->getSegmentLengths().size() == 1) {
+        if (surroundingElementDivisions[1] == 1) {
             meshJK = false;
         }
     }

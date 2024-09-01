@@ -115,22 +115,6 @@ void Building::updateSurroundingLineElements()
             auto jointTagJ = (i + 1 < joints.size()) ? joints[i + 1] : joints[0];
 
             bool found = false;
-            for (const auto& beamTagI : m_joints[jointTagI]->getConnectedBeamTags()) {
-
-                for (const auto& beamTagJ : m_joints[jointTagJ]->getConnectedBeamTags()) {
-                    if (beamTagI == beamTagJ) {
-                        it->second->addSurroundingLineElement(i, beamTagI);
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (found) {
-                    break;
-                }
-            }
-
-            found = false;
             for (const auto& columnTagI : m_joints[jointTagI]->getConnectedColumnTags()) {
 
                 for (const auto& columnTagJ : m_joints[jointTagJ]->getConnectedColumnTags()) {
@@ -143,6 +127,40 @@ void Building::updateSurroundingLineElements()
 
                 if (found) {
                     break;
+                }
+            }
+
+            if (it->second->getAreaElementType() == physicalModel::AreaElementType::SLAB) {
+                found = false;
+                for (const auto& beamTagI : m_joints[jointTagI]->getConnectedBeamTags()) {
+
+                    for (const auto& beamTagJ : m_joints[jointTagJ]->getConnectedBeamTags()) {
+                        if (beamTagI == beamTagJ) {
+                            it->second->addSurroundingLineElement(i, beamTagI);
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        break;
+                    }
+                }
+
+                found = false;
+                for (const auto& shearWallTagI : m_joints[jointTagI]->getConnectedWallTags()) {
+
+                    for (const auto& shearWallTagJ : m_joints[jointTagJ]->getConnectedWallTags()) {
+                        if (shearWallTagI == shearWallTagJ) {
+                            it->second->addSurroundingShearWallElement(i, shearWallTagI);
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (found) {
+                        break;
+                    }
                 }
             }
         }

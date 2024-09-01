@@ -33,6 +33,7 @@ namespace physicalModel
 		double m_area;
 		double m_thickness;
 		std::vector<int> m_surroundingLineElementTags;
+		std::vector<int> m_surroundingShearWallTags;
 		std::shared_ptr<Section> m_section;
 		std::vector<std::vector<int>> m_analyticalNodeTags;
 		std::vector<std::vector<utility::Vector3>> m_analyticalNodeCoords;
@@ -52,6 +53,7 @@ namespace physicalModel
 		virtual ~AreaElement() {}
 
 		void addSurroundingLineElement(int index, int surroundingLineElementTag);
+		void addSurroundingShearWallElement(int index, int surroundingShearWallTag);
 		void mesh(bool meshable, int n1 = -1, int n2 = -1);
 		void setMeshable(bool meshable);
 		void addAnalyticalNodeTags(std::vector<int> analyticalNodeTags);
@@ -70,6 +72,7 @@ namespace physicalModel
 		const std::vector<int>& getJointTags() const;
 		std::pair<int, int> getMeshDivisions() const;
 		const std::vector<int>& getSurroundingLineElementTags();
+		const std::vector<int>& getSurroundingShearWallTags();
 		const std::shared_ptr<Section> getSection() const;
 		AreaElementType getAreaElementType() const;
 		AreaElementFormulation getAreaElementFormulation() const;

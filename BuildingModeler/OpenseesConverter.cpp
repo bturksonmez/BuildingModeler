@@ -179,7 +179,31 @@ void OpenseesConverter::toQuadrilateralElement(physicalModel::AreaElement* eleme
     if (element->isMeshable()) {
         auto surroundingElementTags = element->getSurroundingLineElementTags();
 
+        std::vector<std::vector<int>> edgeNodes(4);
+        for (size_t i = 0; i < edgeNodes.size(); ++i) {
+
+            if (surroundingElementTags[i] != -1) {
+                edgeNodes[i] = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[i])->getAnalyticalNodeTags();
+                // Check surrounding element and element directions on edge are in the same direction
+                if (edgeNodes[i][0] == elementNodes[1]) {
+                    std::reverse(nodesIJ.begin(), nodesIJ.end());
+                }
+            }
+        }
+
         std::vector<int> nodesIJ;
+        if (surroundingElementTags[0] != -1)
+        {
+            nodesIJ = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[0])->getAnalyticalNodeTags();
+            // Check surrounding element and element directions on IJ edge are in the same direction
+            if (nodesIJ[0] == elementNodes[1]) {
+                std::reverse(nodesIJ.begin(), nodesIJ.end());
+            }
+
+
+        }
+
+
         std::vector<int> nodesLK;
         // We do not check if surroundingElementTags[2] is also -1 as we do that check in BuildingModelerAPI.cpp
         if (surroundingElementTags[0] != -1)
@@ -190,11 +214,14 @@ void OpenseesConverter::toQuadrilateralElement(physicalModel::AreaElement* eleme
                 std::reverse(nodesIJ.begin(), nodesIJ.end());
             }
 
-            // Check surrounding element and element directions on LK edge are in the same direction
-            nodesLK = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[2])->getAnalyticalNodeTags();
-            if (nodesLK[0] == elementNodes[2]) {
-                std::reverse(nodesLK.begin(), nodesLK.end());
+            if (surroundingElementTags[2] != -1) {
+                // Check surrounding element and element directions on LK edge are in the same direction
+                nodesLK = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[2])->getAnalyticalNodeTags();
+                if (nodesLK[0] == elementNodes[2]) {
+                    std::reverse(nodesLK.begin(), nodesLK.end());
+                }
             }
+            
         }
         else
         {
@@ -560,7 +587,7 @@ std::vector<int> OpenseesConverter::createNodesBetweenTwoJoints(int jointTagA, i
     auto constraintB = opensees::OpenseesModel::getInstance().getSPConstraint(jointTagB);
     auto assignConstraint = false;
     std::vector<int> constraintVector;
-    if ((constraintA && constraintB) && (*constraintA == *constraintB)) {
+    if ((constraintA && constraintB) && (*constraintA == *constraintB) && (constraintA->getConstraintType() == opensees::ConstraintType::SINGLE)) {
         assignConstraint = true;
         constraintVector = dynamic_cast<opensees::SingleConstraint*>(constraintA)->getFixedDOFs();
     }

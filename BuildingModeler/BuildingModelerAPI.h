@@ -142,7 +142,6 @@ namespace buildingModeler
         static double getShearWallCR(int elementTag, std::string analysisTag, size_t dofRot, size_t timeStep = 0, bool fromBottom = true);
 
         // To do
-        // Shear wall chord rotation
         // Add new test with shear walls
         // Return last time step value by default
 
