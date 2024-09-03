@@ -175,152 +175,48 @@ void OpenseesConverter::toQuadrilateralElement(physicalModel::AreaElement* eleme
     }
 
     auto elementNodes = element->getJointTags();
+    std::vector<std::pair<int, int>> edgeNodePairs{ {elementNodes[0], elementNodes[1]}, {elementNodes[1], elementNodes[2]}, {elementNodes[3], elementNodes[2]}, {elementNodes[0], elementNodes[3]} };
     std::vector<std::vector<int>> nodes;
     if (element->isMeshable()) {
         auto surroundingElementTags = element->getSurroundingLineElementTags();
 
         std::vector<std::vector<int>> edgeNodes(4);
         for (size_t i = 0; i < edgeNodes.size(); ++i) {
+            auto n = i % 2 == 0 ? element->getMeshDivisions().first : element->getMeshDivisions().second;
 
             if (surroundingElementTags[i] != -1) {
                 edgeNodes[i] = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[i])->getAnalyticalNodeTags();
                 // Check surrounding element and element directions on edge are in the same direction
-                if (edgeNodes[i][0] == elementNodes[1]) {
-                    std::reverse(nodesIJ.begin(), nodesIJ.end());
-                }
-            }
-        }
-
-        std::vector<int> nodesIJ;
-        if (surroundingElementTags[0] != -1)
-        {
-            nodesIJ = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[0])->getAnalyticalNodeTags();
-            // Check surrounding element and element directions on IJ edge are in the same direction
-            if (nodesIJ[0] == elementNodes[1]) {
-                std::reverse(nodesIJ.begin(), nodesIJ.end());
-            }
-
-
-        }
-
-
-        std::vector<int> nodesLK;
-        // We do not check if surroundingElementTags[2] is also -1 as we do that check in BuildingModelerAPI.cpp
-        if (surroundingElementTags[0] != -1)
-        {
-            nodesIJ = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[0])->getAnalyticalNodeTags();
-            // Check surrounding element and element directions on IJ edge are in the same direction
-            if (nodesIJ[0] == elementNodes[1]) {
-                std::reverse(nodesIJ.begin(), nodesIJ.end());
-            }
-
-            if (surroundingElementTags[2] != -1) {
-                // Check surrounding element and element directions on LK edge are in the same direction
-                nodesLK = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[2])->getAnalyticalNodeTags();
-                if (nodesLK[0] == elementNodes[2]) {
-                    std::reverse(nodesLK.begin(), nodesLK.end());
-                }
-            }
-            
-        }
-        else
-        {
-            nodesIJ = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[0], elementNodes[1]);
-            if (nodesIJ.empty()) {
-                nodesIJ = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[1], elementNodes[0]);
-
-                if (nodesIJ.empty()) {
-                    nodesIJ = createNodesBetweenTwoJoints(elementNodes[0], elementNodes[1], element->getMeshDivisions().first);
-                    opensees::OpenseesModel::getInstance().addDivisionsBetweenNodes(elementNodes[0], elementNodes[1], nodesIJ);
-                }
-                else {
-                    std::reverse(nodesIJ.begin(), nodesIJ.end());
-                }
-                
-            }
-            else {
-                if ((int)nodesIJ.size() - 1 != element->getMeshDivisions().first) {
-                    throw InvalidInputException("Area elements sharing an edge must have the same mesh size along that edge!.");
-                }
-            }
-
-            nodesLK = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[3], elementNodes[2]);
-            if (nodesLK.empty()) {
-                nodesLK = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[2], elementNodes[3]);
-
-                if (nodesLK.empty()) {
-                    nodesLK = createNodesBetweenTwoJoints(elementNodes[3], elementNodes[2], element->getMeshDivisions().first);
-                    opensees::OpenseesModel::getInstance().addDivisionsBetweenNodes(elementNodes[3], elementNodes[2], nodesLK);
-                }
-                else {
-                    std::reverse(nodesLK.begin(), nodesLK.end());
+                if (edgeNodes[i][0] == edgeNodePairs[i].second) {
+                    std::reverse(edgeNodes[i].begin(), edgeNodes[i].end());
                 }
             }
             else {
-                if ((int)nodesLK.size() - 1 != element->getMeshDivisions().first) {
-                    throw InvalidInputException("Area elements sharing an edge must have the same mesh size along that edge!.");
-                }
-            }
-        }
+                edgeNodes[i] = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(edgeNodePairs[i].first, edgeNodePairs[i].second);
+                if (edgeNodes[i].empty()) {
+                    edgeNodes[i] = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(edgeNodePairs[i].second, edgeNodePairs[i].first);
 
-        std::vector<int> nodesIL;
-        std::vector<int> nodesJK;
-        // We do not check if surroundingElementTags[3] is also -1 as we do that check in BuildingModelerAPI.cpp
-        if (surroundingElementTags[1] != -1)
-        {
-            nodesIL = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[3])->getAnalyticalNodeTags();
-            // Check surrounding element and element directions on IJ edge are in the same direction
-            if (nodesIL[0] == elementNodes[3]) {
-                std::reverse(nodesIL.begin(), nodesIL.end());
-            }
+                    if (edgeNodes[i].empty()) {
+                        edgeNodes[i] = createNodesBetweenTwoJoints(edgeNodePairs[i].first, edgeNodePairs[i].second, n);
+                        opensees::OpenseesModel::getInstance().addDivisionsBetweenNodes(edgeNodePairs[i].first, edgeNodePairs[i].second, edgeNodes[i]);
+                    }
+                    else {
+                        if ((int)edgeNodes[i].size() - 1 != n) {
+                            throw InvalidInputException("Area elements sharing an edge must have the same mesh size along that edge!.");
+                        }
+                        std::reverse(edgeNodes[i].begin(), edgeNodes[i].end());
+                    }
 
-            // Check surrounding element and element directions on LK edge are in the same direction
-            nodesJK = physicalModel::Building::getInstance().getLineElement(surroundingElementTags[1])->getAnalyticalNodeTags();
-            if (nodesJK[0] == elementNodes[2]) {
-                std::reverse(nodesJK.begin(), nodesJK.end());
-            }
-        }
-        else
-        {
-            nodesIL = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[0], elementNodes[3]);
-            if (nodesIL.empty()) {
-                nodesIL = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[3], elementNodes[0]);
-
-                if (nodesIL.empty()) {
-                    nodesIL = createNodesBetweenTwoJoints(elementNodes[0], elementNodes[3], element->getMeshDivisions().second);
-                    opensees::OpenseesModel::getInstance().addDivisionsBetweenNodes(elementNodes[0], elementNodes[3], nodesIL);
                 }
                 else {
-                    std::reverse(nodesIL.begin(), nodesIL.end());
+                    if ((int)edgeNodes[i].size() - 1 != n) {
+                        throw InvalidInputException("Area elements sharing an edge must have the same mesh size along that edge!.");
+                    }
                 }
             }
-            else {
-                if ((int)nodesIL.size() - 1 != element->getMeshDivisions().second) {
-                    throw InvalidInputException("Area elements sharing an edge must have the same mesh size along that edge!.");
-                }
-            }
-
-            nodesJK = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[1], elementNodes[2]);
-            if (nodesJK.empty()) {
-                nodesJK = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(elementNodes[2], elementNodes[1]);
-
-                if (nodesJK.empty()) {
-                    nodesJK = createNodesBetweenTwoJoints(elementNodes[1], elementNodes[2], element->getMeshDivisions().second);
-                    opensees::OpenseesModel::getInstance().addDivisionsBetweenNodes(elementNodes[1], elementNodes[2], nodesJK);
-                }
-                else {
-                    std::reverse(nodesJK.begin(), nodesJK.end());
-                }
-            }
-            else {
-                if ((int)nodesJK.size() - 1 != element->getMeshDivisions().second) {
-                    throw InvalidInputException("Area elements sharing an edge must have the same mesh size along that edge!.");
-                }
-            }
-
         }
 
-        nodes = createNodesForMesh(nodesIJ, nodesLK, nodesIL, nodesJK);
+        nodes = createNodesForMesh(edgeNodes[0], edgeNodes[2], edgeNodes[3], edgeNodes[1]);
     }
     else {
         nodes.resize(2);
