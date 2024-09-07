@@ -77,11 +77,13 @@ namespace physicalModel
 		AreaElementType getAreaElementType() const;
 		AreaElementFormulation getAreaElementFormulation() const;
 		double getWeight() const;
+		double getEdgeLength(size_t edgeNumber) const;
 		std::pair<double, double> getTributaryLineLength() const; // to be called only for rectangle areas
 
 		// analytical model getters
 		const std::vector<std::vector<int>>& getAnalyticalNodeTags() const;
 		const std::vector<std::vector<utility::Vector3>>& getAnalyticalNodeCoords() const;
 		const std::vector<int>& getAnalyticalElementTags() const;
+		void resetAnalyticalProperties();
 	};
 }

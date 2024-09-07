@@ -51,7 +51,7 @@ namespace physicalModel
         std::map<std::string, std::shared_ptr<StaticLoadCombination>> m_staticLoadCombinations;
 
 
-        Building() {}
+        Building();
 
         void addMemberMasses();
         void convertJoints();

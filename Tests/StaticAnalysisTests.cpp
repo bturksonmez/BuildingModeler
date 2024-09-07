@@ -138,13 +138,9 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
     api::confineFloorMassOnDiaphragmNode(1, true);
     api::confineFloorMassOnDiaphragmNode(2, true);
 
-    // add modal analysis
-    api::addModalLoadCase("modal", 3);
-    api::setLoadCaseActive("modal", true);
-
     // add gravity and live loads
     api::includeDeadLoadFromMembers(true);
-    //api::applyGravityLoadThroughLineElements(false);
+    api::applyGravityLoadThroughLineElements(false);
     api::setLiveLoadForFloor(1, 2);
     api::setLiveLoadForFloor(2, 2);
     api::updateDeadAndLiveLoads();
@@ -168,15 +164,16 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
 
     // floating-point comparison tolerance
     const double epsilon = 1e-3;
+    const double epsilonSmall = 1e-6;
 
     // get floor DRs and building DR
     double floor1DRX = api::getFloorDR(1, "combo1", 1);
     double floor2DRX = api::getFloorDR(2, "combo1", 1);
     double buildingDRX = api::getBuildingDR("combo1", 1);
     
-    EXPECT_NEAR(0.0023349, floor1DRX, epsilon);
-    EXPECT_NEAR(0.0052545, floor2DRX, epsilon);
-    EXPECT_NEAR(0.0026273, buildingDRX, epsilon);
+    EXPECT_NEAR(0.0023349, floor1DRX, epsilonSmall);
+    EXPECT_NEAR(0.0029196, floor2DRX, epsilonSmall);
+    EXPECT_NEAR(0.0026273, buildingDRX, epsilonSmall);
 
     // get axial forces for bottom columns
     double axialForce101 = api::getLineElementForceZ(101, "combo1", 0, true);
@@ -379,93 +376,145 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameWallStructureWithNx3Ny3) {
     api::addBeam(220, { 43, 47 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
 
     // add beam segments
-    api::setSegmentRatios(101, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(102, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(103, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(104, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(105, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(106, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(107, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(108, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(109, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(110, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(111, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(112, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(113, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(114, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(115, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(116, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(117, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(118, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(119, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(120, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(201, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(202, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(203, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(204, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(205, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(206, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(207, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(208, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(209, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(210, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(211, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(212, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(213, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(214, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(215, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(216, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(217, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(218, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(219, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
-    api::setSegmentRatios(220, { 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125 });
+    api::setSegmentRatios(101, { 0.5, 0.5 });
+    api::setSegmentRatios(102, { 0.5, 0.5 });
+    api::setSegmentRatios(103, { 0.5, 0.5 });
+    api::setSegmentRatios(104, { 0.5, 0.5 });
+    api::setSegmentRatios(105, { 0.5, 0.5 });
+    api::setSegmentRatios(106, { 0.5, 0.5 });
+    api::setSegmentRatios(107, { 0.5, 0.5 });
+    api::setSegmentRatios(108, { 0.5, 0.5 });
+    api::setSegmentRatios(109, { 0.5, 0.5 });
+    api::setSegmentRatios(110, { 0.5, 0.5 });
+    api::setSegmentRatios(111, { 0.5, 0.5 });
+    api::setSegmentRatios(112, { 0.5, 0.5 });
+    api::setSegmentRatios(113, { 0.5, 0.5 });
+    api::setSegmentRatios(114, { 0.5, 0.5 });
+    api::setSegmentRatios(115, { 0.5, 0.5 });
+    api::setSegmentRatios(116, { 0.5, 0.5 });
+    api::setSegmentRatios(117, { 0.5, 0.5 });
+    api::setSegmentRatios(118, { 0.5, 0.5 });
+    api::setSegmentRatios(119, { 0.5, 0.5 });
+    api::setSegmentRatios(120, { 0.5, 0.5 });
+    api::setSegmentRatios(201, { 0.5, 0.5 });
+    api::setSegmentRatios(202, { 0.5, 0.5 });
+    api::setSegmentRatios(203, { 0.5, 0.5 });
+    api::setSegmentRatios(204, { 0.5, 0.5 });
+    api::setSegmentRatios(205, { 0.5, 0.5 });
+    api::setSegmentRatios(206, { 0.5, 0.5 });
+    api::setSegmentRatios(207, { 0.5, 0.5 });
+    api::setSegmentRatios(208, { 0.5, 0.5 });
+    api::setSegmentRatios(209, { 0.5, 0.5 });
+    api::setSegmentRatios(210, { 0.5, 0.5 });
+    api::setSegmentRatios(211, { 0.5, 0.5 });
+    api::setSegmentRatios(212, { 0.5, 0.5 });
+    api::setSegmentRatios(213, { 0.5, 0.5 });
+    api::setSegmentRatios(214, { 0.5, 0.5 });
+    api::setSegmentRatios(215, { 0.5, 0.5 });
+    api::setSegmentRatios(216, { 0.5, 0.5 });
+    api::setSegmentRatios(217, { 0.5, 0.5 });
+    api::setSegmentRatios(218, { 0.5, 0.5 });
+    api::setSegmentRatios(219, { 0.5, 0.5 });
+    api::setSegmentRatios(220, { 0.5, 0.5 });
 
     // add column elements
-    api::addColumn(1001, { 0, 16 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(1002, { 3, 19 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(1003, { 5, 21 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(1004, { 6, 22 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(1005, { 9, 25 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(1006, { 10, 26 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(1007, { 12, 28 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(1008, { 15, 31 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(2001, { 16, 32 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(2002, { 19, 35 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(2003, { 21, 37 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(2004, { 22, 38 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(2005, { 25, 41 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(2006, { 26, 42 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(2007, { 28, 44 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-    api::addColumn(2008, { 31, 47 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1101, { 0, 16 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1102, { 3, 19 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1103, { 5, 21 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1104, { 6, 22 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1105, { 9, 25 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1106, { 10, 26 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1107, { 12, 28 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1108, { 15, 31 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1201, { 16, 32 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1202, { 19, 35 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1203, { 21, 37 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1204, { 22, 38 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1205, { 25, 41 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1206, { 26, 42 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1207, { 28, 44 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+    api::addColumn(1208, { 31, 47 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
 
     // add column section modifiers
-    api::setSectionModifiers(1001, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(1002, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(1003, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(1004, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(1005, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(1006, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(1007, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(1008, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(2001, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(2002, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(2003, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(2004, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(2005, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(2006, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(2007, 0, 1.0, 0.7, 0.7, 1.0);
-    api::setSectionModifiers(2008, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1101, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1102, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1103, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1104, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1105, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1106, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1107, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1108, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1201, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1202, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1203, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1204, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1205, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1206, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1207, 0, 1.0, 0.7, 0.7, 1.0);
+    api::setSectionModifiers(1208, 0, 1.0, 0.7, 0.7, 1.0);
 
     // add slab elements
-    api::addSlab(1001, { 4, 5, 6, 7 }, 2, physicalModel::AreaElementFormulation::LINEAR);
-    api::addSlab(2001, { 8, 9, 10, 11 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2101, { 16, 17, 21, 20 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2102, { 17, 18, 22, 21 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2103, { 18, 19, 23, 22 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2104, { 20, 21, 25, 24 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2105, { 21, 22, 26, 25 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2106, { 22, 23, 27, 26 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2107, { 24, 25, 29, 28 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2108, { 25, 26, 30, 29 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2109, { 26, 27, 31, 30 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2201, { 32, 33, 37, 36 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2202, { 33, 34, 38, 37 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2203, { 34, 35, 39, 38 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2204, { 36, 37, 41, 40 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2205, { 37, 38, 42, 41 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2206, { 38, 39, 43, 42 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2207, { 40, 41, 45, 44 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2208, { 41, 42, 46, 45 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addSlab(2209, { 42, 43, 47, 46 }, 2, physicalModel::AreaElementFormulation::LINEAR);
 
+    // add shear wall elements
+    api::addShearWall(3101, { 1, 2, 18, 17 }, 3, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(3102, { 8, 4, 20, 24 }, 3, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(3103, { 11, 7, 23, 27 }, 3, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(3104, { 13, 14, 30, 29 }, 3, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(3201, { 17, 18, 34, 33 }, 3, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(3202, { 24, 20, 36, 40 }, 3, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(3203, { 27, 23, 39, 43 }, 3, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(3204, { 29, 30, 46, 45 }, 3, physicalModel::AreaElementFormulation::LINEAR);
+    
     // update connectivity between line and area elements
     api::updateAreaElementProperties();
 
-    //mesh the element
-    api::meshAreaElement(1001);
-    api::meshAreaElement(2001);
+    // mesh shear wall elements
+    api::meshAreaElement(3101, 2, 3);
+    api::meshAreaElement(3102, 2, 3);
+    api::meshAreaElement(3103, 2, 3);
+    api::meshAreaElement(3104, 2, 3);
+    api::meshAreaElement(3201, 2, 3);
+    api::meshAreaElement(3202, 2, 3);
+    api::meshAreaElement(3203, 2, 3);
+    api::meshAreaElement(3204, 2, 3);
+
+    // mesh slab elements
+    api::meshAreaElement(2101);
+    api::meshAreaElement(2102);
+    api::meshAreaElement(2103);
+    api::meshAreaElement(2104);
+    api::meshAreaElement(2105);
+    api::meshAreaElement(2106);
+    api::meshAreaElement(2107);
+    api::meshAreaElement(2108);
+    api::meshAreaElement(2109);
+    api::meshAreaElement(2201);
+    api::meshAreaElement(2202);
+    api::meshAreaElement(2203);
+    api::meshAreaElement(2204);
+    api::meshAreaElement(2205);
+    api::meshAreaElement(2206);
+    api::meshAreaElement(2207);
+    api::meshAreaElement(2208);
+    api::meshAreaElement(2209);
 
     // make rigid
     api::updateMassSourceFromMembers();
@@ -474,13 +523,9 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameWallStructureWithNx3Ny3) {
     api::confineFloorMassOnDiaphragmNode(1, true);
     api::confineFloorMassOnDiaphragmNode(2, true);
 
-    // add modal analysis
-    api::addModalLoadCase("modal", 3);
-    api::setLoadCaseActive("modal", true);
-
     // add gravity and live loads
     api::includeDeadLoadFromMembers(true);
-    //api::applyGravityLoadThroughLineElements(false);
+    api::applyGravityLoadThroughLineElements(false);
     api::setLiveLoadForFloor(1, 2);
     api::setLiveLoadForFloor(2, 2);
     api::updateDeadAndLiveLoads();
@@ -504,33 +549,92 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameWallStructureWithNx3Ny3) {
 
     // floating-point comparison tolerance
     const double epsilon = 1e-3;
-
+    const double epsilonSmall = 1e-6;
+    
     // get floor DRs and building DR
     double floor1DRX = api::getFloorDR(1, "combo1", 1);
     double floor2DRX = api::getFloorDR(2, "combo1", 1);
     double buildingDRX = api::getBuildingDR("combo1", 1);
 
-    EXPECT_NEAR(0.0023349, floor1DRX, epsilon);
-    EXPECT_NEAR(0.0052545, floor2DRX, epsilon);
-    EXPECT_NEAR(0.0026273, buildingDRX, epsilon);
+    EXPECT_NEAR(0.0004354, floor1DRX, epsilonSmall);
+    EXPECT_NEAR(0.0007542, floor2DRX, epsilonSmall);
+    EXPECT_NEAR(0.0005948, buildingDRX, epsilonSmall);
 
+    double totalAxialForce = 0;
     // get axial forces for bottom columns
-    double axialForce101 = api::getLineElementForceZ(101, "combo1", 0, true);
-    double axialForce102 = api::getLineElementForceZ(102, "combo1", 0, true);
-    double axialForce103 = api::getLineElementForceZ(103, "combo1", 0, true);
-    double axialForce104 = api::getLineElementForceZ(104, "combo1", 0, true);
-    double totalAxialForce = axialForce101 + axialForce102 + axialForce103 + axialForce104;
+    double axialForce1101 = api::getLineElementForceZ(1101, "combo1", 0, true);
+    double axialForce1102 = api::getLineElementForceZ(1102, "combo1", 0, true);
+    double axialForce1103 = api::getLineElementForceZ(1103, "combo1", 0, true);
+    double axialForce1104 = api::getLineElementForceZ(1104, "combo1", 0, true);
+    double axialForce1105 = api::getLineElementForceZ(1105, "combo1", 0, true);
+    double axialForce1106 = api::getLineElementForceZ(1106, "combo1", 0, true);
+    double axialForce1107 = api::getLineElementForceZ(1107, "combo1", 0, true);
+    double axialForce1108 = api::getLineElementForceZ(1108, "combo1", 0, true);
+    totalAxialForce = axialForce1101 + axialForce1102 + axialForce1103 + axialForce1104 
+                    + axialForce1105 + axialForce1106 + axialForce1107 + axialForce1108;
 
-    EXPECT_NEAR(160.897, totalAxialForce, epsilon);
+    // get axial forces for bottom shear walls
+    double axialForce3101 = api::getShearWallForceZ(3101, "combo1", 0, true);
+    double axialForce3102 = api::getShearWallForceZ(3102, "combo1", 0, true);
+    double axialForce3103 = api::getShearWallForceZ(3103, "combo1", 0, true);
+    double axialForce3104 = api::getShearWallForceZ(3104, "combo1", 0, true);
+    totalAxialForce = totalAxialForce + axialForce3101 + axialForce3102 + axialForce3103 + axialForce3104;
 
+    EXPECT_NEAR(1101.434, totalAxialForce, epsilon);
+
+    double totalShearForce = 0;
     // get shear forces for bottom columns in X direction
-    double shearForce101 = api::getLineElementForceX(101, "combo1", 0, true);
-    double shearForce102 = api::getLineElementForceX(102, "combo1", 0, true);
-    double shearForce103 = api::getLineElementForceX(103, "combo1", 0, true);
-    double shearForce104 = api::getLineElementForceX(104, "combo1", 0, true);
-    double totalShearForce = shearForce101 + shearForce102 + shearForce103 + shearForce104;
+    double shearForce1101 = api::getLineElementForceX(1101, "combo1", 0, true);
+    double shearForce1102 = api::getLineElementForceX(1102, "combo1", 0, true);
+    double shearForce1103 = api::getLineElementForceX(1103, "combo1", 0, true);
+    double shearForce1104 = api::getLineElementForceX(1104, "combo1", 0, true);
+    double shearForce1105 = api::getLineElementForceX(1105, "combo1", 0, true);
+    double shearForce1106 = api::getLineElementForceX(1106, "combo1", 0, true);
+    double shearForce1107 = api::getLineElementForceX(1107, "combo1", 0, true);
+    double shearForce1108 = api::getLineElementForceX(1108, "combo1", 0, true);
+    totalShearForce = shearForce1101 + shearForce1102 + shearForce1103 + shearForce1104
+                    + shearForce1105 + shearForce1106 + shearForce1107 + shearForce1108;
 
+    // get axial forces for bottom shear walls
+    double shearForce3101 = api::getShearWallForceX(3101, "combo1", 0, true);
+    double shearForce3102 = api::getShearWallForceX(3102, "combo1", 0, true);
+    double shearForce3103 = api::getShearWallForceX(3103, "combo1", 0, true);
+    double shearForce3104 = api::getShearWallForceX(3104, "combo1", 0, true);
+    totalShearForce = totalShearForce + shearForce3101 + shearForce3102 + shearForce3103 + shearForce3104;
+    
     EXPECT_NEAR(-900.0, totalShearForce, epsilon);
+
+    // reset the analytical model and redo analysis for applying gravity loads through line elements
+    api::clearAnalyticalModel();
+    api::applyGravityLoadThroughLineElements(true);
+    api::updateDeadAndLiveLoads();
+
+    // create analytical model and tcl file
+    api::createAnalyticalModel();
+    api::createModelAndLoadingFiles();
+    api::analyze();
+
+    totalAxialForce = 0;
+    // get axial forces for bottom columns
+    axialForce1101 = api::getLineElementForceZ(1101, "combo1", 0, true);
+    axialForce1102 = api::getLineElementForceZ(1102, "combo1", 0, true);
+    axialForce1103 = api::getLineElementForceZ(1103, "combo1", 0, true);
+    axialForce1104 = api::getLineElementForceZ(1104, "combo1", 0, true);
+    axialForce1105 = api::getLineElementForceZ(1105, "combo1", 0, true);
+    axialForce1106 = api::getLineElementForceZ(1106, "combo1", 0, true);
+    axialForce1107 = api::getLineElementForceZ(1107, "combo1", 0, true);
+    axialForce1108 = api::getLineElementForceZ(1108, "combo1", 0, true);
+    totalAxialForce = axialForce1101 + axialForce1102 + axialForce1103 + axialForce1104
+                     + axialForce1105 + axialForce1106 + axialForce1107 + axialForce1108;
+
+    // get axial forces for bottom shear walls
+    axialForce3101 = api::getShearWallForceZ(3101, "combo1", 0, true);
+    axialForce3102 = api::getShearWallForceZ(3102, "combo1", 0, true);
+    axialForce3103 = api::getShearWallForceZ(3103, "combo1", 0, true);
+    axialForce3104 = api::getShearWallForceZ(3104, "combo1", 0, true);
+    totalAxialForce = totalAxialForce + axialForce3101 + axialForce3102 + axialForce3103 + axialForce3104;
+
+    EXPECT_NEAR(1101.434, totalAxialForce, epsilon);
 }
 
 TEST_F(StaticAnalysisTests, SingleShearWallX) {

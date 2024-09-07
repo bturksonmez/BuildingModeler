@@ -24,6 +24,11 @@ OutputType Output::getOutputType() const
 	return m_outputType;
 }
 
+void Output::resetCounter()
+{
+	counter = 0;
+}
+
 const std::unordered_map<int, std::vector<std::vector<double>>>& Output::getNodeDisplacement() const
 {
 	return m_nodeDispOutput;

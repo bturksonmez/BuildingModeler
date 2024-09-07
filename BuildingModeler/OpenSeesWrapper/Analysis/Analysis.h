@@ -32,6 +32,7 @@ namespace opensees
 		std::string getAnalysisName() const;
 		AnalysisType getAnalysisType() const;
 		std::shared_ptr<Output> getOutput() const;
+		static void resetCounter();
 		
 		void perform();
 	};

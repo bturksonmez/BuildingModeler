@@ -8,9 +8,11 @@ namespace opensees
 	{
 	private:
 		std::unordered_map<int, std::vector<std::vector<double>>> m_eleForceOutput;
+		std::unordered_map<int, std::vector<std::vector<double>>> m_reactionOutput;
 
 		void retrieveNodeDisplacements();
 		void retrieveElementForces();
+		void retrieveReactions();
 
 	public:
 		StaticOutput(std::string loadTag);

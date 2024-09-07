@@ -31,6 +31,8 @@ namespace opensees
 		TimeSeriesType getTimeSeriesType() const;
 		const std::vector<std::shared_ptr<Load>>& getLoadVector() const;
 		void addLoad(std::shared_ptr<Load> load);
+		static void resetCounter();
+
 		std::string getOpenseesCommand() const override;
 	};
 }

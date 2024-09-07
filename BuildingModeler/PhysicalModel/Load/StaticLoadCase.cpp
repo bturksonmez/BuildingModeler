@@ -23,6 +23,13 @@ void StaticLoadCase::addDistributedAreaLoad(std::shared_ptr<Load> load)
 	m_distributedAreaLoads.push_back(load);
 }
 
+void StaticLoadCase::clear()
+{
+	m_pointLoads.clear();
+	m_distributedLineLoads.clear();
+	m_distributedAreaLoads.clear();
+}
+
 StaticLoadCaseType StaticLoadCase::getStaticLoadCaseType() const
 {
 	return m_staticLoadCaseType;

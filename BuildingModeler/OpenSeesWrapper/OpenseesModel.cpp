@@ -1,4 +1,5 @@
 #include "OpenseesModel.h"
+#include "Utilities/TagGenerator.h"
 
 using namespace opensees;
 
@@ -29,6 +30,11 @@ void OpenseesModel::clear()
     m_analyses.clear();
     m_divisionsBetweenNodes.clear();
     m_outputElements.clear();
+
+    opensees::utilities::TagGenerator::getInstance().resetTags();
+    opensees::LoadPattern::resetCounter();
+    opensees::Output::resetCounter();
+    opensees::Analysis::resetCounter();
 }
 
 std::string OpenseesModel::getModelName() const

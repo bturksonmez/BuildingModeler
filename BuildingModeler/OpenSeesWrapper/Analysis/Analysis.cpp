@@ -38,6 +38,11 @@ std::shared_ptr<Output> Analysis::getOutput() const
 	return m_output;
 }
 
+void Analysis::resetCounter()
+{
+	counter = 0;
+}
+
 void Analysis::perform()
 {
 	utilities::Process::runOpensees("source " + m_analysisName + ".tcl");

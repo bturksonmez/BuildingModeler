@@ -27,6 +27,7 @@ namespace physicalModel
 		virtual ~LoadCase() {}
 
 		void setActive(bool active);
+		virtual void clear() {};
 
 		bool isActive() const;
 		std::string getLoadCaseTag() const;

@@ -84,10 +84,11 @@ namespace buildingModeler
         // Building API
         static void includePDeltaEffects(bool includePDeltEffects);
         static void clear();
+        static void clearAnalyticalModel();
 
         // Loading API
         static void includeDeadLoadFromMembers(bool includeDeadLoadFromMembers);
-        static void applyGravityLoadThroughLineElements(bool m_gravityThroughLineElements);
+        static void applyGravityLoadThroughLineElements(bool gravityThroughLineElements);
         static void setLiveLoadForFloor(int floorNumber, double liveLoadPerArea);
         static void addStaticLoadCase(std::string loadCaseTag, physicalModel::StaticLoadCaseType loadCaseType);
         static void addModalLoadCase(std::string loadCaseTag, size_t numberOfModes);
@@ -142,7 +143,6 @@ namespace buildingModeler
         static double getShearWallCR(int elementTag, std::string analysisTag, size_t dofRot, size_t timeStep = 0, bool fromBottom = true);
 
         // To do
-        // Add new test with shear walls
         // Return last time step value by default
 
         // Input File Generation

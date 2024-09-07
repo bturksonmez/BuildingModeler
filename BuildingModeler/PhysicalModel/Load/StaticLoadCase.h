@@ -34,6 +34,7 @@ namespace physicalModel
 		void addPointLoad(std::shared_ptr<Load> load);
 		void addDistributedLineLoad(std::shared_ptr<Load> load);
 		void addDistributedAreaLoad(std::shared_ptr<Load> load);
+		void clear() override;
 
 		StaticLoadCaseType getStaticLoadCaseType() const;
 		const std::vector<std::shared_ptr<Load>>& getPointLoads() const;

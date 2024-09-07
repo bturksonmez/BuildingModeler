@@ -153,6 +153,13 @@ const std::vector<int>& LineElement::getAnalyticalElementTags() const
 	return m_analyticalElementTags;
 }
 
+void LineElement::resetAnalyticalProperties()
+{
+	m_analyticalNodeTags.clear();
+	m_analyticalNodeCoords.clear();
+	m_analyticalElementTags.clear();
+}
+
 double LineElement::calculateForceX(std::string analysisTag, bool atIJoint, size_t timeStep)
 {
 	auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);

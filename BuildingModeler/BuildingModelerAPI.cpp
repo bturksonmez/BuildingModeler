@@ -712,14 +712,27 @@ void BuildingModelerAPI::clear()
     physicalModel::Building::getInstance().clear();
 }
 
+void BuildingModelerAPI::clearAnalyticalModel()
+{
+    opensees::OpenseesModel::getInstance().clear();
+
+    for (auto it = physicalModel::Building::getInstance().m_lineElements.begin(); it != physicalModel::Building::getInstance().m_lineElements.end(); it++) {
+        it->second->resetAnalyticalProperties();
+    }
+    
+    for (auto it = physicalModel::Building::getInstance().m_areaElements.begin(); it != physicalModel::Building::getInstance().m_areaElements.end(); it++) {
+        it->second->resetAnalyticalProperties();
+    }
+}
+
 void BuildingModelerAPI::includeDeadLoadFromMembers(bool includeDeadLoadFromMembers)
 {
     physicalModel::Building::getInstance().m_includeDeadLoadFromMembers = includeDeadLoadFromMembers;
 }
 
-void BuildingModelerAPI::applyGravityLoadThroughLineElements(bool m_gravityThroughLineElements)
+void BuildingModelerAPI::applyGravityLoadThroughLineElements(bool gravityThroughLineElements)
 {
-    physicalModel::Building::getInstance().m_gravityThroughLineElements = m_gravityThroughLineElements;
+    physicalModel::Building::getInstance().m_gravityThroughLineElements = gravityThroughLineElements;
 }
 
 void BuildingModelerAPI::setLiveLoadForFloor(int floorNumber, double liveLoadPerArea)
@@ -960,6 +973,9 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
         if (physicalModel::Building::getInstance().m_loadCases.find(loadCaseTag) == physicalModel::Building::getInstance().m_loadCases.end()) {
             physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_shared<physicalModel::StaticLoadCase>(loadCaseTag, staticLoadCaseType);
         }
+        else {
+            physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->clear();
+        }
 
         auto staticLoadCase = std::dynamic_pointer_cast<physicalModel::StaticLoadCase>(physicalModel::Building::getInstance().m_loadCases[loadCaseTag]);
         
@@ -997,6 +1013,7 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
             if (it->second->getAreaElementType() == physicalModel::AreaElementType::SLAB && physicalModel::Building::getInstance().m_gravityThroughLineElements) {
 
                 auto beamTags = it->second->getSurroundingLineElementTags();
+                auto shearWallTags = it->second->getSurroundingShearWallTags();
                 auto gamma = it->second->getWeight() / it->second->getArea();
                 auto lineLength = it->second->getTributaryLineLength();
 
@@ -1017,6 +1034,30 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
 
                         staticLoadCase->addDistributedLineLoad(load);
                     }
+                    else {
+                        std::shared_ptr<physicalModel::Load> loadI;
+                        std::shared_ptr<physicalModel::Load> loadJ;
+                        double magnitude;
+
+                        if (i % 2 == 0) {
+                            magnitude = -gamma * lineLength.first * it->second->getEdgeLength(i) / 2.0;
+                        }
+                        else {
+                            magnitude = -gamma * lineLength.second * it->second->getEdgeLength(i) / 2.0;
+                        }
+
+                        size_t jointI = i;
+                        size_t jointJ = i == 3 ? 0 : i + 1;
+
+                        loadI = std::make_shared<physicalModel::PointLoad>(it->second->getJointTags()[jointI], 0.0, 0.0, magnitude);
+                        loadJ = std::make_shared<physicalModel::PointLoad>(it->second->getJointTags()[jointJ], 0.0, 0.0, magnitude);
+
+                        physicalModel::Building::getInstance().m_distributedLineLoads[loadI->getUniqueID()] = loadI;
+                        physicalModel::Building::getInstance().m_distributedLineLoads[loadJ->getUniqueID()] = loadJ;
+
+                        staticLoadCase->addPointLoad(loadI);
+                        staticLoadCase->addPointLoad(loadJ);
+                    }
                 }
             }
             else {
@@ -1036,6 +1077,9 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
     auto staticLoadCaseType = physicalModel::StaticLoadCaseType::LIVE;
     if (physicalModel::Building::getInstance().m_loadCases.find(loadCaseTag) == physicalModel::Building::getInstance().m_loadCases.end()) {
         physicalModel::Building::getInstance().m_loadCases[loadCaseTag] = std::make_shared<physicalModel::StaticLoadCase>(loadCaseTag, staticLoadCaseType);
+    }
+    else {
+        physicalModel::Building::getInstance().m_loadCases[loadCaseTag]->clear();
     }
 
     auto staticLoadCase = std::dynamic_pointer_cast<physicalModel::StaticLoadCase>(physicalModel::Building::getInstance().m_loadCases[loadCaseTag]);
@@ -1078,6 +1122,30 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
                             physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
 
                             staticLoadCase->addDistributedLineLoad(load);
+                        }
+                        else {
+                            std::shared_ptr<physicalModel::Load> loadI;
+                            std::shared_ptr<physicalModel::Load> loadJ;
+                            double magnitude;
+
+                            if (i % 2 == 0) {
+                                magnitude = -liveLoad.value() * lineLength.first * slab->getEdgeLength(i) / 2.0;
+                            }
+                            else {
+                                magnitude = -liveLoad.value() * lineLength.second * slab->getEdgeLength(i) / 2.0;
+                            }
+
+                            size_t jointI = i;
+                            size_t jointJ = i == 3 ? 0 : i + 1;
+
+                            loadI = std::make_shared<physicalModel::PointLoad>(slab->getJointTags()[jointI], 0.0, 0.0, magnitude);
+                            loadJ = std::make_shared<physicalModel::PointLoad>(slab->getJointTags()[jointJ], 0.0, 0.0, magnitude);
+
+                            physicalModel::Building::getInstance().m_distributedLineLoads[loadI->getUniqueID()] = loadI;
+                            physicalModel::Building::getInstance().m_distributedLineLoads[loadJ->getUniqueID()] = loadJ;
+
+                            staticLoadCase->addPointLoad(loadI);
+                            staticLoadCase->addPointLoad(loadJ);
                         }
                     }
                 }
@@ -1316,32 +1384,43 @@ double BuildingModelerAPI::getFloorDR(int floorNumber, std::string analysisTag, 
         throw EntityNotFoundException("Floor number " + std::to_string(floorNumber) + " does not exist.");
     }
 
+    if (floorNumber < 1) {
+        throw InvalidInputException("Drift ratio can be recorded starting from fist storey!");
+    }
+
     if (dof < 1 || dof > 3) {
         throw InvalidInputException("Drift ratio can be measured in translational directions, check your input dof!");
     }
 
     auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
     if (!floor->isRigid()) {
-        throw InvalidOperationException("Floor must be rigid for DR recording!");
+        throw InvalidOperationException("Both floors must be rigid for DR recording!");
     }
 
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    auto output = analysis->getOutput();
+    auto disp = output->getNodeDisplacement();
+
     double storeyHeight;
-    if (floorNumber != physicalModel::Building::getInstance().m_floors.begin()->first) {
+    double previousFloorDisp = 0.0;
+    if (floorNumber != (++physicalModel::Building::getInstance().m_floors.begin())->first) {
         auto it = physicalModel::Building::getInstance().m_floors.find(floorNumber);
         it--;
 
+        if (!floor->isRigid()) {
+            throw InvalidOperationException("Both floors must be rigid for DR recording!");
+        }
+
         storeyHeight = floor->getFloorHeight() - it->second->getFloorHeight();
+        previousFloorDisp = disp[it->second->getMassCenterJointTag()][timeStep][dof - 1];
     }
     else {
         storeyHeight = floor->getFloorHeight();
     }
 
     auto masterNodeTag = floor->getMassCenterJointTag();
-    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
-    auto output = analysis->getOutput();
-
-    auto disp = output->getNodeDisplacement();
-    return disp[masterNodeTag][timeStep][dof-1] / storeyHeight;
+   
+    return (disp[masterNodeTag][timeStep][dof-1] - previousFloorDisp) / storeyHeight;
 }
 
 double BuildingModelerAPI::getBuildingDR(std::string analysisTag, size_t dof, size_t timeStep)

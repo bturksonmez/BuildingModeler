@@ -13,6 +13,12 @@ void Building::deleteJoint(int jointTag)
     // To do: delete also the elements connected to a joint, and remove that joint from its floor member
 }
 
+Building::Building()
+{
+    m_loadCases["dead"] = std::make_shared<physicalModel::StaticLoadCase>("dead", physicalModel::StaticLoadCaseType::DEAD);
+    m_loadCases["live"] = std::make_shared<physicalModel::StaticLoadCase>("live", physicalModel::StaticLoadCaseType::LIVE);
+}
+
 Building& Building::getInstance()
 {
     static Building instance;

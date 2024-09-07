@@ -179,6 +179,7 @@ void OpenseesConverter::toQuadrilateralElement(physicalModel::AreaElement* eleme
     std::vector<std::vector<int>> nodes;
     if (element->isMeshable()) {
         auto surroundingElementTags = element->getSurroundingLineElementTags();
+        auto surroundingShearWallTags = element->getSurroundingShearWallTags();
 
         std::vector<std::vector<int>> edgeNodes(4);
         for (size_t i = 0; i < edgeNodes.size(); ++i) {
@@ -192,6 +193,11 @@ void OpenseesConverter::toQuadrilateralElement(physicalModel::AreaElement* eleme
                 }
             }
             else {
+                if (n == -1) {
+                    auto shearWall = physicalModel::Building::getInstance().getAreaElement(surroundingShearWallTags[i]);
+                    n = shearWall->getMeshDivisions().first;
+                }
+
                 edgeNodes[i] = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(edgeNodePairs[i].first, edgeNodePairs[i].second);
                 if (edgeNodes[i].empty()) {
                     edgeNodes[i] = opensees::OpenseesModel::getInstance().getDivisionsBetweenNodes(edgeNodePairs[i].second, edgeNodePairs[i].first);

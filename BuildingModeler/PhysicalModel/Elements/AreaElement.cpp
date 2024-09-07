@@ -157,6 +157,17 @@ double AreaElement::getWeight() const
 	return weight;
 }
 
+double AreaElement::getEdgeLength(size_t edgeNumber) const
+{
+	size_t i = edgeNumber;
+	size_t j = edgeNumber == 3 ? 0 : edgeNumber + 1;
+
+	auto coordA = Building::getInstance().getJoint(m_jointTags[i])->getCoords();
+	auto coordB = Building::getInstance().getJoint(m_jointTags[j])->getCoords();
+
+	return (coordB - coordA).norm2();
+}
+
 std::pair<double, double> AreaElement::getTributaryLineLength() const
 {
 	auto coordA = Building::getInstance().getJoint(m_jointTags[0])->getCoords();
@@ -167,7 +178,7 @@ std::pair<double, double> AreaElement::getTributaryLineLength() const
 	auto l2 = (coordC - coordB).norm2();
 
 	auto lx = std::min(l1, l2);
-	auto ly = std::min(l1, l2);
+	auto ly = std::max(l1, l2);
 
 	auto wx = lx / 4.0;
 	auto wy = (2.0 * ly - lx) * (lx / 2.0) / ly / 2.0;
@@ -192,4 +203,11 @@ const std::vector<std::vector<utility::Vector3>>& AreaElement::getAnalyticalNode
 const std::vector<int>& AreaElement::getAnalyticalElementTags() const
 {
 	return m_analyticalElementTags;
+}
+
+void AreaElement::resetAnalyticalProperties()
+{
+	m_analyticalNodeTags.clear();
+	m_analyticalNodeCoords.clear();
+	m_analyticalElementTags.clear();
 }

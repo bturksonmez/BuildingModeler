@@ -29,6 +29,11 @@ void LoadPattern::addLoad(std::shared_ptr<Load> load)
 	m_loadVector.push_back(load);
 }
 
+void LoadPattern::resetCounter()
+{
+	counter = 0;
+}
+
 std::string LoadPattern::getOpenseesCommand() const
 {
 	if (m_loadVector.empty())
