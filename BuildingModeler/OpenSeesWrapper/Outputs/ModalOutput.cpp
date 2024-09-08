@@ -1,5 +1,7 @@
 #include "ModalOutput.h"
 
+#include <cmath>
+
 using namespace opensees;
 
 ModalOutput::ModalOutput(std::string loadTag, std::vector<int> masterNodeTags) : Output(loadTag)
@@ -26,7 +28,7 @@ void ModalOutput::retrievePeriods()
 
 	for (auto lambda : lambdas) {
 		// To do: add PI global
-		auto period = 2.0 * 3.141593 / pow(lambda, 0.5);
+		auto period = 2.0 * 3.141593 / std::pow(lambda, 0.5);
 		m_periods.push_back(period);
 	}
 }
