@@ -142,9 +142,6 @@ namespace buildingModeler
         static double getShearWallDR(int elementTag, std::string analysisTag, size_t dof, size_t timeStep = 0);
         static double getShearWallCR(int elementTag, std::string analysisTag, size_t dofRot, size_t timeStep = 0, bool fromBottom = true);
 
-        // To do
-        // Return last time step value by default
-
         // Input File Generation
         static void createAnalyticalModel();
         static void createModelAndLoadingFiles();

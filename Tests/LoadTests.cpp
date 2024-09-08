@@ -161,8 +161,10 @@ TEST_F(LoadTests, SelfWeightWithFramesOnlySuccess) {
     }
 
     for (auto lineLoad : lineLoads) {
-        auto load = lineLoad->getLoadVector()[1] * api::getLength(std::dynamic_pointer_cast<physicalModel::DistributedLineLoad>(lineLoad)->getBeamElementTag());
-        totalWeight += load;
+        auto load1 = lineLoad->getLoadVector()[1] * api::getLength(std::dynamic_pointer_cast<physicalModel::DistributedLineLoad>(lineLoad)->getBeamElementTag());
+        auto load2 = lineLoad->getLoadVector()[2] * api::getLength(std::dynamic_pointer_cast<physicalModel::DistributedLineLoad>(lineLoad)->getBeamElementTag());
+        totalWeight += load1;
+        totalWeight += load2;
     }
 
     auto expectedTotalWeight = -741.636;
@@ -341,8 +343,10 @@ TEST_F(LoadTests, SelfWeightAndLiveLoadSuccess) {
     }
 
     for (auto lineLoad : lineLoads) {
-        auto load = lineLoad->getLoadVector()[1] * api::getLength(std::dynamic_pointer_cast<physicalModel::DistributedLineLoad>(lineLoad)->getBeamElementTag());
-        totalWeight += load;
+        auto load1 = lineLoad->getLoadVector()[1] * api::getLength(std::dynamic_pointer_cast<physicalModel::DistributedLineLoad>(lineLoad)->getBeamElementTag());
+        auto load2 = lineLoad->getLoadVector()[2] * api::getLength(std::dynamic_pointer_cast<physicalModel::DistributedLineLoad>(lineLoad)->getBeamElementTag());
+        totalWeight += load1;
+        totalWeight += load2;
     }
 
     for (auto areaLoad : areaLoads) {
@@ -532,8 +536,10 @@ TEST_F(LoadTests, SelfWeightAndLiveLoadThroughLineElementsSuccess) {
     }
 
     for (auto lineLoad : lineLoads) {
-        auto load = lineLoad->getLoadVector()[1] * api::getLength(std::dynamic_pointer_cast<physicalModel::DistributedLineLoad>(lineLoad)->getBeamElementTag());
-        totalWeight += load;
+        auto load1 = lineLoad->getLoadVector()[1] * api::getLength(std::dynamic_pointer_cast<physicalModel::DistributedLineLoad>(lineLoad)->getBeamElementTag());
+        auto load2 = lineLoad->getLoadVector()[2] * api::getLength(std::dynamic_pointer_cast<physicalModel::DistributedLineLoad>(lineLoad)->getBeamElementTag());
+        totalWeight += load1;
+        totalWeight += load2;
     }
 
     for (auto lineLoad : lineLoadsL) {
@@ -749,6 +755,7 @@ TEST_F(LoadTests, SelfWeightLiveEqWindLoadCombinationSuccess) {
             auto length = dynamic_cast<opensees::BeamColumnElement*>(opensees::OpenseesModel::getInstance().getBeamColumnElement(elementLoad->getElementTag()))->getLength();
 
             actualFz += loadVec[1] * length;
+            actualFz += loadVec[2] * length;
         }
         else {
 
@@ -972,6 +979,7 @@ TEST_F(LoadTests, SelfWeightLiveEqWindLoadCombinationThroughLineElementsSuccess)
             auto length = dynamic_cast<opensees::BeamColumnElement*>(opensees::OpenseesModel::getInstance().getBeamColumnElement(elementLoad->getElementTag()))->getLength();
 
             actualFz += loadVec[1] * length;
+            actualFz += loadVec[2] * length;
         }
         else {
 

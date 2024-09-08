@@ -182,7 +182,7 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
     double axialForce104 = api::getLineElementForceZ(104, "combo1", 0, true);
     double totalAxialForce = axialForce101 + axialForce102 + axialForce103 + axialForce104;
 
-    EXPECT_NEAR(160.897, totalAxialForce, epsilon);
+    EXPECT_NEAR(179.966, totalAxialForce, epsilon);
 
     // get shear forces for bottom columns in X direction
     double shearForce101 = api::getLineElementForceX(101, "combo1", 0, true);
@@ -580,7 +580,7 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameWallStructureWithNx3Ny3) {
     double axialForce3104 = api::getShearWallForceZ(3104, "combo1", 0, true);
     totalAxialForce = totalAxialForce + axialForce3101 + axialForce3102 + axialForce3103 + axialForce3104;
 
-    EXPECT_NEAR(1101.434, totalAxialForce, epsilon);
+    EXPECT_NEAR(1126.862, totalAxialForce, epsilon);
 
     double totalShearForce = 0;
     // get shear forces for bottom columns in X direction
@@ -634,7 +634,148 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameWallStructureWithNx3Ny3) {
     axialForce3104 = api::getShearWallForceZ(3104, "combo1", 0, true);
     totalAxialForce = totalAxialForce + axialForce3101 + axialForce3102 + axialForce3103 + axialForce3104;
 
-    EXPECT_NEAR(1101.434, totalAxialForce, epsilon);
+    EXPECT_NEAR(1126.862, totalAxialForce, epsilon);
+}
+
+TEST_F(StaticAnalysisTests, OneStoryWallStructureWithNx1Ny1) {
+    typedef buildingModeler::BuildingModelerAPI api;
+
+    // add joints
+    // basement floor
+    api::addJoint(0, { 0, 0, 0 });
+    api::addJoint(1, { 3, 0, 0 });
+    api::addJoint(2, { 3, 3, 0 });
+    api::addJoint(3, { 0, 3, 0 });
+    api::addJoint(4, { 0, 0, 3 });
+    api::addJoint(5, { 3, 0, 3 });
+    api::addJoint(6, { 3, 3, 3 });
+    api::addJoint(7, { 0, 3, 3 });
+
+    // add constraints
+    api::setConstraintVector(0, { 1, 1, 1, 1, 1, 1 });
+    api::setConstraintVector(1, { 1, 1, 1, 1, 1, 1 });
+    api::setConstraintVector(2, { 1, 1, 1, 1, 1, 1 });
+    api::setConstraintVector(3, { 1, 1, 1, 1, 1, 1 });
+
+    // add floors
+    api::addFloor(0, 0.0);
+    api::addFloor(1, 3.0);
+
+    // assign nodes to floor
+    api::setFloorNo(0, 0);
+    api::setFloorNo(1, 0);
+    api::setFloorNo(2, 0);
+    api::setFloorNo(3, 0);
+    api::setFloorNo(4, 1);
+    api::setFloorNo(5, 1);
+    api::setFloorNo(6, 1);
+    api::setFloorNo(7, 1);
+
+    // add material
+    api::addElasticMaterial(1, 30000000, 12500000, 2.4);
+
+    // add section 2D
+    api::addElasticSection2D(1, 1, 0.15);
+    api::addElasticSection2D(2, 1, 0.25);
+
+    // add slab elements
+    api::addSlab(1001, { 4, 5, 6, 7 }, 1, physicalModel::AreaElementFormulation::LINEAR);
+
+    // add shear wall elements
+    api::addShearWall(2001, { 0, 1, 5, 4 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(2002, { 2, 1, 5, 6 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(2003, { 3, 2, 6, 7 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+    api::addShearWall(2004, { 3, 0, 4, 7 }, 2, physicalModel::AreaElementFormulation::LINEAR);
+
+    // update connectivity between line and area elements
+    api::updateAreaElementProperties();
+
+    // mesh shear wall elements
+    api::meshAreaElement(2001, 3, 3);
+    api::meshAreaElement(2002, 3, 3);
+    api::meshAreaElement(2003, 3, 3);
+    api::meshAreaElement(2004, 3, 3);
+
+    // mesh slab elements
+    api::meshAreaElement(1001);
+
+    // make rigid
+    api::updateMassSourceFromMembers();
+    api::makeRigid(1, 1000);
+    api::confineFloorMassOnDiaphragmNode(1, true);
+
+    // add gravity and live loads
+    api::includeDeadLoadFromMembers(true);
+    api::applyGravityLoadThroughLineElements(false);
+    api::setLiveLoadForFloor(1, 2);
+    api::updateDeadAndLiveLoads();
+
+    // add earthquake loads
+    api::addStaticLoadCase("eq", physicalModel::StaticLoadCaseType::EARTHQUAKE);
+    api::addPointLoad("eq", 1000, 3000, 0, 0, 0, 0, 0);
+
+    // add load combination
+    api::addStaticLoadCombination("combo1");
+    api::addLoadCaseToStaticLoadCombination("combo1", "dead", 1.0);
+    api::addLoadCaseToStaticLoadCombination("combo1", "live", 0.3);
+    api::addLoadCaseToStaticLoadCombination("combo1", "eq", 1.0);
+    api::setStaticLoadCombinationActive("combo1", true);
+
+    // create analytical model and tcl file
+    api::createAnalyticalModel();
+    api::createModelAndLoadingFiles();
+    api::analyze();
+
+    // floating-point comparison tolerance
+    const double epsilon = 1e-2;
+    const double epsilonSmall = 1e-6;
+
+    // get floor DRs and building DR
+    double floor1DRX = api::getFloorDR(1, "combo1", 1);
+    double buildingDRX = api::getBuildingDR("combo1", 1);
+
+    EXPECT_NEAR(0.0002777, floor1DRX, epsilonSmall);
+    EXPECT_NEAR(0.0002777, buildingDRX, epsilonSmall);
+
+    double totalAxialForce = 0;
+    // get axial forces for bottom shear walls
+    double axialForce2001 = api::getShearWallForceZ(2001, "combo1", 0, true);
+    double axialForce2002 = api::getShearWallForceZ(2002, "combo1", 0, true);
+    double axialForce2003 = api::getShearWallForceZ(2003, "combo1", 0, true);
+    double axialForce2004 = api::getShearWallForceZ(2004, "combo1", 0, true);
+    totalAxialForce = axialForce2001 + axialForce2002 + axialForce2003 + axialForce2004;
+
+    EXPECT_NEAR(213.7644, totalAxialForce, epsilon);
+
+    double totalShearForce = 0;
+    // get axial forces for bottom shear walls
+    double shearForce2001 = api::getShearWallForceX(2001, "combo1", 0, true);
+    double shearForce2002 = api::getShearWallForceX(2002, "combo1", 0, true);
+    double shearForce2003 = api::getShearWallForceX(2003, "combo1", 0, true);
+    double shearForce2004 = api::getShearWallForceX(2004, "combo1", 0, true);
+    totalShearForce = shearForce2001 + shearForce2002 + shearForce2003 + shearForce2004;
+
+    EXPECT_NEAR(-3000.0, totalShearForce, epsilon);
+
+    // reset the analytical model and redo analysis for applying gravity loads through line elements
+    api::clearAnalyticalModel();
+    api::applyGravityLoadThroughLineElements(true);
+    api::updateDeadAndLiveLoads();
+
+    // create analytical model and tcl file
+    api::createAnalyticalModel();
+    api::createModelAndLoadingFiles();
+    api::analyze();
+
+    totalAxialForce = 0;
+    // get axial forces for bottom shear walls
+    axialForce2001 = api::getShearWallForceZ(2001, "combo1", 0, true);
+    axialForce2002 = api::getShearWallForceZ(2002, "combo1", 0, true);
+    axialForce2003 = api::getShearWallForceZ(2003, "combo1", 0, true);
+    axialForce2004 = api::getShearWallForceZ(2004, "combo1", 0, true);
+    totalAxialForce = axialForce2001 + axialForce2002 + axialForce2003 + axialForce2004;
+
+    EXPECT_NEAR(213.7644, totalAxialForce, epsilon);
 }
 
 TEST_F(StaticAnalysisTests, SingleShearWallX) {

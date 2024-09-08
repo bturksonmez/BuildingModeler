@@ -982,29 +982,20 @@ void BuildingModelerAPI::updateDeadAndLiveLoads()
         // line elements
         for (auto it = physicalModel::Building::getInstance().m_lineElements.begin(); it != physicalModel::Building::getInstance().m_lineElements.end(); it++) {
 
+            auto elementTag = it->second->getElementTag();
+            auto gamma = it->second->getWeight() / it->second->getLength();
+            std::shared_ptr<physicalModel::Load> load;
+
             if (it->second->getLineElementType() == physicalModel::LineElementType::COLUMN) {
-
-                auto jointI = it->second->getIJointTag();
-                auto jointJ = it->second->getJJointTag();
-                auto weight = it->second->getWeight();
-                std::shared_ptr<physicalModel::Load> loadI = std::make_shared<physicalModel::PointLoad>(jointI, 0, 0, -weight / 2.0, 0, 0, 0);
-                std::shared_ptr<physicalModel::Load> loadJ = std::make_shared<physicalModel::PointLoad>(jointJ, 0, 0, -weight / 2.0, 0, 0, 0);
-
-                physicalModel::Building::getInstance().m_pointLoads[loadI->getUniqueID()] = loadI;
-                physicalModel::Building::getInstance().m_pointLoads[loadJ->getUniqueID()] = loadJ;
-
-                staticLoadCase->addPointLoad(loadI);
-                staticLoadCase->addPointLoad(loadJ);
+                load = std::make_shared<physicalModel::DistributedLineLoad>(elementTag, 0, 0, -gamma);
             }
             else {
-                auto beamTag = it->second->getElementTag();
-                auto gamma = it->second->getWeight() / it->second->getLength();
-                std::shared_ptr<physicalModel::Load> load = std::make_shared<physicalModel::DistributedLineLoad>(beamTag, 0, -gamma, 0);
-
-                physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
-
-                staticLoadCase->addDistributedLineLoad(load);
+                load  = std::make_shared<physicalModel::DistributedLineLoad>(elementTag, 0, -gamma, 0);
             }
+
+            physicalModel::Building::getInstance().m_distributedLineLoads[load->getUniqueID()] = load;
+
+            staticLoadCase->addDistributedLineLoad(load);
         }
 
         // area elements

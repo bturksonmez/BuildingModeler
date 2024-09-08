@@ -12,7 +12,6 @@ namespace opensees
 
 		void retrieveNodeDisplacements();
 		void retrieveElementForces();
-		void retrieveReactions();
 
 	public:
 		StaticOutput(std::string loadTag);
