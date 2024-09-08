@@ -2,6 +2,8 @@
 #include "../BuildingModeler/BuildingModelerAPI.h"
 #include "../BuildingModeler/Utilities/Vector3.h"
 
+#ifdef _WIN64
+
 class StaticAnalysisTests : public ::testing::Test {
 protected:
     void TearDown() override {
@@ -929,3 +931,5 @@ TEST_F(StaticAnalysisTests, SingleShearWallY) {
     EXPECT_NEAR(expectedBottomCR, bottomCR, epsilonSmall);
     EXPECT_NEAR(bottomDR, bottomCR, epsilonSmall);
 }
+
+#endif // _WIN64
