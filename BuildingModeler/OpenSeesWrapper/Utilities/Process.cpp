@@ -1,3 +1,5 @@
+#ifdef _WIN64
+
 #include "Process.h"
 
 using namespace opensees::utilities;
@@ -34,3 +36,5 @@ LPWSTR Process::convertString(const std::string& inStr)
 
 	return wideStr;
 }
+
+#endif // _WIN64

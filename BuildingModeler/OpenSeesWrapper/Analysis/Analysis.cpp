@@ -45,7 +45,9 @@ void Analysis::resetCounter()
 
 void Analysis::perform()
 {
+#ifdef _WIN64
 	utilities::Process::runOpensees("source " + m_analysisName + ".tcl");
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	m_output->retrieveOutput();
+#endif
 }

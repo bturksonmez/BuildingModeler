@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef _WIN64
+
 #include <Windows.h>
 #include <string>
 
@@ -16,3 +18,5 @@ namespace opensees
 		};
 	}
 }
+
+#endif // _WIN64
