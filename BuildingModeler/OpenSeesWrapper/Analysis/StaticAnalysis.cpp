@@ -1,6 +1,8 @@
 #include "StaticAnalysis.h"
 #include "../OpenseesModel.h"
 
+#include <algorithm>
+
 using namespace opensees;
 
 StaticAnalysis::StaticAnalysis(std::string sourceModelName, std::string analysisName, std::shared_ptr<Output> output, std::shared_ptr<LoadPattern> loadPattern) : Analysis(sourceModelName, analysisName, output)
