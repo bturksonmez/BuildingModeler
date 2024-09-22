@@ -18,3 +18,8 @@ std::vector<double> Load::getLoadVector() const
 {
 	return m_loadVector;
 }
+
+void Load::resetCounter()
+{
+	counter = 0;
+}

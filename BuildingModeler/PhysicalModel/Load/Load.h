@@ -28,6 +28,7 @@ namespace physicalModel
 		int getUniqueID() const;
 		LoadType getLoadType() const;
 		std::vector<double> getLoadVector() const;
+		static void resetCounter();
 	};
 }
 

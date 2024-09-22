@@ -22,6 +22,7 @@ Building::Building()
 Building& Building::getInstance()
 {
     static Building instance;
+
     return instance;
 }
 
@@ -43,6 +44,8 @@ void Building::clear()
     m_distributedAreaLoads.clear();
     m_loadCases.clear();
     m_staticLoadCombinations.clear();
+
+    physicalModel::Load::resetCounter();
 }
 
 Joint* Building::getJoint(int jointTag) const
