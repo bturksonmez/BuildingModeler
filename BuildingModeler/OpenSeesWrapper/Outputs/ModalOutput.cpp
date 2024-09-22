@@ -15,10 +15,39 @@ const std::vector<double>& ModalOutput::getPeriods() const
 	return m_periods;
 }
 
+double ModalOutput::getFundamentalPeriod(size_t dof)
+{
+	std::vector<double> desiredEigenVector;
+	std::vector<double> candidateEigenVector;
+
+	for (int i = 0; i < m_periods.size(); ++i) {
+
+		if (dof == 1) {
+			desiredEigenVector = m_modeShapeX[i];
+			candidateEigenVector = m_modeShapeY[i];
+		}
+		else {
+			desiredEigenVector = m_modeShapeX[i];
+			candidateEigenVector = m_modeShapeY[i];
+		}
+
+		if (isMonotonicallyIncreasingEigenVector(desiredEigenVector)) {
+
+			if (isBetterThanCandidate(desiredEigenVector, candidateEigenVector)) {
+
+				return m_periods[i];
+			}
+		}
+	}
+
+	return -1.0;
+}
+
 void ModalOutput::retrieveOutput()
 {
 	retrievePeriods();
 	retrieveModeShapes();
+	retrieveModeShapesAsDisplacements();
 }
 
 void ModalOutput::retrievePeriods()
@@ -34,6 +63,26 @@ void ModalOutput::retrievePeriods()
 }
 
 void ModalOutput::retrieveModeShapes()
+{
+	auto numOfModes = m_periods.size();
+	
+	m_modeShapeX.resize(numOfModes);
+	m_modeShapeY.resize(numOfModes);
+	m_modeShapeXY.resize(numOfModes);
+
+	for (int i = 0; i < numOfModes; i++)
+	{
+		auto vecX = utilities::DataReader::readContinuosLine<double>("mode1" + std::to_string(i + 1) + ".out");
+		auto vecY = utilities::DataReader::readContinuosLine<double>("mode2" + std::to_string(i + 1) + ".out");
+		auto vecXY = utilities::DataReader::readContinuosLine<double>("mode6" + std::to_string(i + 1) + ".out");
+
+		m_modeShapeX[i] = vecX;
+		m_modeShapeY[i] = vecY;
+		m_modeShapeXY[i] = vecXY;
+	}
+}
+
+void ModalOutput::retrieveModeShapesAsDisplacements()
 {
 	auto numOfModes = m_periods.size();
 
@@ -53,4 +102,31 @@ void ModalOutput::retrieveModeShapes()
 			m_nodeDispOutput[m_masterNodeTags[j]][i].push_back(vecXY[j]);
 		}
 	}
+}
+
+bool ModalOutput::isMonotonicallyIncreasingEigenVector(const std::vector<double>& eigenVector)
+{
+	double sign1 = eigenVector[0] > 0 ? 1 : -1;
+	for (int i = 1; i < eigenVector.size(); i++)
+		if (eigenVector[i] * sign1 < 0)
+			return false;
+
+	for (int i = 1; i < eigenVector.size(); i++)
+		if (std::abs(eigenVector[i]) < std::abs(eigenVector[i - 1]))
+			return false;
+
+	return true;
+}
+
+bool ModalOutput::isBetterThanCandidate(const std::vector<double>& desiredEigenVector, const std::vector<double>& candidateEigenVector)
+{
+	if (abs(desiredEigenVector[desiredEigenVector.size() - 1]) >= abs(candidateEigenVector[candidateEigenVector.size() - 1]))
+		return true;
+
+	double sign2 = candidateEigenVector[0] > 0 ? 1 : -1;
+	for (int i = 1; i < candidateEigenVector.size(); i++)
+		if (candidateEigenVector[i] * sign2 < 0)
+			return true;
+
+	return false;
 }

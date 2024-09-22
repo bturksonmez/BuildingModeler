@@ -9,9 +9,17 @@ namespace opensees
 	private:
 		std::vector<double> m_periods;
 		std::vector<int> m_masterNodeTags;
+		std::vector<std::vector<double>> m_modeShapeX;
+		std::vector<std::vector<double>> m_modeShapeY;
+		std::vector<std::vector<double>> m_modeShapeXY;
+
 
 		void retrievePeriods();
 		void retrieveModeShapes();
+		void retrieveModeShapesAsDisplacements();
+		bool isMonotonicallyIncreasingEigenVector(const std::vector<double>& eigenVector);
+		// Compares if desired eigen vector is bigger in amplitude compared to its candidate
+		bool isBetterThanCandidate(const std::vector<double>& desiredEigenVector, const std::vector<double>& candidateEigenVector);
 
 	public:
 		ModalOutput(std::string loadTag, std::vector<int> masterNodeTags);
@@ -19,6 +27,7 @@ namespace opensees
 		~ModalOutput() {}
 
 		const std::vector<double>& getPeriods() const;
+		double getFundamentalPeriod(size_t dof);
 
 		void retrieveOutput() override;
 	};

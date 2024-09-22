@@ -525,6 +525,9 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameWallStructureWithNx3Ny3) {
     api::confineFloorMassOnDiaphragmNode(1, true);
     api::confineFloorMassOnDiaphragmNode(2, true);
 
+    // add modal load case
+    api::addModalLoadCase("MODAL", 5);
+
     // add gravity and live loads
     api::includeDeadLoadFromMembers(true);
     api::applyGravityLoadThroughLineElements(false);

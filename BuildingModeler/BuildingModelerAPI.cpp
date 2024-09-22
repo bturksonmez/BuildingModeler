@@ -1775,6 +1775,62 @@ double BuildingModelerAPI::getShearWallCR(int elementTag, std::string analysisTa
     return element->calculateChordRotation(analysisTag, dofRot - 1, timeStep, fromBottom);
 }
 
+double BuildingModelerAPI::getPeriod(std::string analysisTag, int modeNumber)
+{
+    if (!loadCaseExists(analysisTag)) {
+        throw EntityNotFoundException("Load case: " + analysisTag + " does not exists.");
+    }
+
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    if (analysis == nullptr) {
+        throw EntityNotFoundException("Analysis with tag: " + analysisTag + " has not been performed yet.");
+    }
+
+    auto modalAnalysis = std::dynamic_pointer_cast<opensees::ModalAnalysis>(analysis);
+    if (modalAnalysis == nullptr) {
+        throw EntityNotFoundException("Modal analysis with tag: " + analysisTag + " does not exists.");
+    }
+
+    if (modeNumber > modalAnalysis->getNumberOfModes()) {
+        throw InvalidInputException("Mode number exceeds number of modes.");
+    }
+
+    auto modalOutput = std::dynamic_pointer_cast<opensees::ModalOutput>(analysis->getOutput());
+    auto periods = modalOutput->getPeriods();
+
+    return periods[modeNumber - 1];
+}
+
+double BuildingModelerAPI::getFundamentalPeriod(std::string analysisTag, size_t dof)
+{
+    if (!loadCaseExists(analysisTag)) {
+        throw EntityNotFoundException("Load case: " + analysisTag + " does not exists.");
+    }
+
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    if (analysis == nullptr) {
+        throw EntityNotFoundException("Analysis with tag: " + analysisTag + " has not been performed yet.");
+    }
+
+    auto modalAnalysis = std::dynamic_pointer_cast<opensees::ModalAnalysis>(analysis);
+    if (modalAnalysis == nullptr) {
+        throw EntityNotFoundException("Modal analysis with tag: " + analysisTag + " does not exists.");
+    }
+
+    if (dof != 1 || dof != 2) {
+        throw InvalidInputException("Fundamental period could be calculated in either global x or y direction.");
+    }
+
+    auto modalOutput = std::dynamic_pointer_cast<opensees::ModalOutput>(analysis->getOutput());
+    auto fundamentalPeriod = modalOutput->getFundamentalPeriod(dof);
+
+    if (fundamentalPeriod <= 0.0) {
+        throw InvalidOperationException("There is no fundamental period in the desired dof.");
+    }
+
+    return fundamentalPeriod;
+}
+
 void BuildingModelerAPI::createAnalyticalModel()
 {
     // Clear analytical model - modifications are only allowed in physical model

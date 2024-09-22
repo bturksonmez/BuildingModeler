@@ -149,7 +149,8 @@ namespace buildingModeler
         static double getShearWallCR(int elementTag, std::string analysisTag, size_t dofRot, size_t timeStep = 0, bool fromBottom = true);
 
         // modal output
-
+        static double getPeriod(std::string analysisTag, int modeNumber);
+        static double getFundamentalPeriod(std::string analysisTag, size_t dof);
 
         // Input File Generation
         static void createAnalyticalModel();
