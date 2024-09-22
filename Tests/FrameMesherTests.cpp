@@ -22,7 +22,7 @@ TEST_F(FrameMesherTests, ElementNotFoundFail) {
     api::addElasticMaterial(1, 20, 20, 2);
 
     // add section
-    api::addElasticSection1D(1, 1, 0.2, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(1, 1, new physicalModel::ArbitraryShape(0.2, 0.02, 0.02, 0.04));
 
     try {
         api::setSegmentRatios(1, { 0.2, 0.4, 0.2, 0.2 });
@@ -49,7 +49,7 @@ TEST_F(FrameMesherTests, SegmentRatiosIncorrectFail) {
     api::addElasticMaterial(1, 20, 20, 2);
 
     // add section
-    api::addElasticSection1D(1, 1, 0.2, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(1, 1, new physicalModel::ArbitraryShape(0.2, 0.02, 0.02, 0.04));
 
     // add element
     api::addBeam(1, { 1, 2 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
@@ -79,7 +79,7 @@ TEST_F(FrameMesherTests, MeshSuccess) {
     api::addElasticMaterial(1, 20, 20, 2);
 
     // add section
-    api::addElasticSection1D(1, 1, 0.2, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(1, 1, new physicalModel::ArbitraryShape(0.2, 0.02, 0.02, 0.04));
 
     // add element
     api::addBeam(1, { 1, 2 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);

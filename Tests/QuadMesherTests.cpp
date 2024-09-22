@@ -91,7 +91,7 @@ TEST_F(QuadMesherTests, UnbalancedSurroundingElementsWithNullN1Fail) {
     api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
-    api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(2, 1, new physicalModel::ArbitraryShape(0.2, 0.02, 0.02, 0.04));
 
     // add line element
     api::addBeam(1, { 1, 2 }, 2, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
@@ -167,7 +167,7 @@ TEST_F(QuadMesherTests, SurroundingElementsWithN1Fail) {
     api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
-    api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(2, 1, new physicalModel::ArbitraryShape(0.2, 0.02, 0.02, 0.04));
 
     // add line element
     api::addBeam(1, { 1, 2 }, 2, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
@@ -213,7 +213,7 @@ TEST_F(QuadMesherTests, UnbalancedSurroundingElementSegmentsFail) {
     api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
-    api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(2, 1, new physicalModel::ArbitraryShape(0.2, 0.02, 0.02, 0.04));
 
     // add line element
     api::addBeam(1, { 1, 2 }, 2, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
@@ -356,7 +356,7 @@ TEST_F(QuadMesherTests, MeshWith4SurroundingElementsSuccess) {
     api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
-    api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(2, 1, new physicalModel::ArbitraryShape(0.2, 0.02, 0.02, 0.04));
 
     // add line element
     api::addBeam(1, { 1, 2 }, 2, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
@@ -425,7 +425,7 @@ TEST_F(QuadMesherTests, MeshWith2SurroundingElementsN1Success) {
     api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
-    api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(2, 1, new physicalModel::ArbitraryShape(0.2, 0.02, 0.02, 0.04));
 
     // add line element
     api::addBeam(2, { 2, 3 }, 2, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
@@ -490,7 +490,7 @@ TEST_F(QuadMesherTests, MeshWith2SurroundingElementsN2Success) {
     api::addSlab(1, { 1, 2, 3, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
-    api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(2, 1, new physicalModel::ArbitraryShape(0.2, 0.02, 0.02, 0.04));
 
     // add line element
     api::addBeam(1, { 1, 2 }, 2, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
@@ -946,7 +946,7 @@ TEST_F(QuadMesherTests, MeshWithSurroundingElementsFiveElementsSuccess) {
     api::addSlab(5, { 6, 10, 11, 9 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
-    api::addElasticSection1D(2, 1, 0.2, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(2, 1, new physicalModel::ArbitraryShape(0.2, 0.02, 0.02, 0.04));
 
     // add line element
     api::addBeam(1, { 1, 2 }, 2, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);

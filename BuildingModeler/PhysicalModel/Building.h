@@ -2,6 +2,9 @@
 
 #include "Joint.h"
 #include "Materials/ElasticMaterial.h"
+#include "Sections/Rectangle.h"
+#include "Sections/Circle.h"
+#include "Sections/ArbitraryShape.h"
 #include "Sections/ElasticSection1D.h"
 #include "Sections/ElasticSection2D.h"
 #include "Elements/ColumnElement.h"

@@ -190,7 +190,7 @@ void BuildingModelerAPI::addElasticMaterial(int materialTag, double E, double G,
     physicalModel::Building::getInstance().m_materials[materialTag] = std::make_shared<physicalModel::ElasticMaterial>(materialTag, E, G, rho);
 }
 
-void BuildingModelerAPI::addElasticSection1D(int sectionTag, int materialTag, double A, double Iyy, double Izz, double J)
+void BuildingModelerAPI::addElasticSection1D(int sectionTag, int materialTag, physicalModel::Shape* shape)
 {
     if (sectionExists(sectionTag)) {
         throw EntityFoundException("Section with tag " + std::to_string(sectionTag) + " already exists.");
@@ -201,7 +201,7 @@ void BuildingModelerAPI::addElasticSection1D(int sectionTag, int materialTag, do
     }
     
     std::shared_ptr<physicalModel::Material> material = physicalModel::Building::getInstance().m_materials[materialTag];
-    physicalModel::Building::getInstance().m_sections[sectionTag] = std::make_shared<physicalModel::ElasticSection1D>(sectionTag, material, A, Iyy, Izz, J);
+    physicalModel::Building::getInstance().m_sections[sectionTag] = std::make_shared<physicalModel::ElasticSection1D>(sectionTag, material, shape);
 }
 
 void BuildingModelerAPI::addElasticSection2D(int sectionTag, int materialTag, double thickness)
@@ -325,6 +325,42 @@ double BuildingModelerAPI::getLength(int elementTag)
     }
 
     return physicalModel::Building::getInstance().m_lineElements[elementTag]->getLength();
+}
+
+double BuildingModelerAPI::getArea(int elementTag, int segmentNo)
+{
+    if (!lineElementExists(elementTag)) {
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->getSection(segmentNo)->getA().value();
+}
+
+double BuildingModelerAPI::getMomentOfInertiaYY(int elementTag, int segmentNo)
+{
+    if (!lineElementExists(elementTag)) {
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->getSection(segmentNo)->getIyy().value();
+}
+
+double BuildingModelerAPI::getMomentOfInertiaZZ(int elementTag, int segmentNo)
+{
+    if (!lineElementExists(elementTag)) {
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->getSection(segmentNo)->getIzz().value();
+}
+
+double BuildingModelerAPI::getTorsionalConstant(int elementTag, int segmentNo)
+{
+    if (!lineElementExists(elementTag)) {
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->getSection(segmentNo)->getJ().value();
 }
 
 void BuildingModelerAPI::addShearWall(int elementTag, std::vector<int> jointTags, int sectionTag,
@@ -563,7 +599,7 @@ const std::vector<std::vector<utility::Vector3>>& BuildingModelerAPI::getNodeCoo
     return physicalModel::Building::getInstance().getAreaElement(elementTag)->getAnalyticalNodeCoords();
 }
 
-double BuildingModelerAPI::getArea(int elementTag)
+double BuildingModelerAPI::getSurfaceArea(int elementTag)
 {
     if (!areaElementExists(elementTag)) {
         throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");

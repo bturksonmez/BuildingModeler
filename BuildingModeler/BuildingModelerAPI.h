@@ -5,6 +5,8 @@
 #include "BuildingModelerExceptions.h"
 #include "PhysicalModel/Load/LoadCase.h"
 
+// To do export class is to be written for dll
+
 namespace buildingModeler
 {
     class BuildingModelerAPI
@@ -48,7 +50,7 @@ namespace buildingModeler
         static void addElasticMaterial(int materialTag, double E, double G, double rho);
 
         // Section API
-        static void addElasticSection1D(int sectionTag, int materialTag, double A, double Iyy, double Izz, double J);
+        static void addElasticSection1D(int sectionTag, int materialTag, physicalModel::Shape* shape);
         static void addElasticSection2D(int sectionTag, int materialTag, double thickness);
         
         // Line Element API
@@ -61,6 +63,10 @@ namespace buildingModeler
         static void setSectionModifiers(int elementTag, int segmentNo, double modifierA, double modifierIyy, double modifierIzz, double modifierJ);
         static const std::vector<utility::Vector3>& getNodeCoordinatesOfLineElement(int elementTag);
         static double getLength(int elementTag);
+        static double getArea(int elementTag, int segmentNo);
+        static double getMomentOfInertiaYY(int elementTag, int segmentNo);
+        static double getMomentOfInertiaZZ(int elementTag, int segmentNo);
+        static double getTorsionalConstant(int elementTag, int segmentNo);
 
         // Area Element API
         static void addShearWall(int elementTag, std::vector<int> jointTags, int sectionTag,
@@ -71,7 +77,7 @@ namespace buildingModeler
         static void disableMeshForAreaElement(int elementTag);
         static void disableSlabElements(bool disableSlabElements);
         static const std::vector<std::vector<utility::Vector3>>& getNodeCoordinatesOfAreaElement(int elementTag);
-        static double getArea(int elementTag);
+        static double getSurfaceArea(int elementTag);
         
         // Floor API
         static void addFloor(int floorNumber, double height);
@@ -141,6 +147,9 @@ namespace buildingModeler
         static double getShearWallMomentZZ(int elementTag, std::string analysisTag, size_t timeStep = 0, bool atBottom  = true);
         static double getShearWallDR(int elementTag, std::string analysisTag, size_t dof, size_t timeStep = 0);
         static double getShearWallCR(int elementTag, std::string analysisTag, size_t dofRot, size_t timeStep = 0, bool fromBottom = true);
+
+        // modal output
+
 
         // Input File Generation
         static void createAnalyticalModel();

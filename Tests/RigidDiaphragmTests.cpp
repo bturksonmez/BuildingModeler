@@ -169,7 +169,7 @@ TEST_F(RigidDiaphragmTests, DiaphragmMassXYSuccessWithMemberMasses) {
     api::addSlab(4, { 5, 6, 9, 8 }, 1, physicalModel::AreaElementFormulation::LINEAR);
 
     // add section 1D
-    api::addElasticSection1D(2, 1, 0.5, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(2, 1, new physicalModel::ArbitraryShape(0.5, 0.02, 0.02, 0.04));
 
     // add line element
     api::addBeam(1, { 1, 2 }, 2, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);

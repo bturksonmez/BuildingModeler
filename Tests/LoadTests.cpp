@@ -92,7 +92,7 @@ TEST_F(LoadTests, SelfWeightWithFramesOnlySuccess) {
     api::addElasticMaterial(1, 20, 20, 2.4);
 
     // add section 1D
-    api::addElasticSection1D(1, 1, 0.25, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(1, 1, new physicalModel::ArbitraryShape(0.25, 0.02, 0.02, 0.04));
 
     // add beam elements
     api::addBeam(1, { 10, 11 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
@@ -253,7 +253,7 @@ TEST_F(LoadTests, SelfWeightAndLiveLoadSuccess) {
     api::addElasticMaterial(1, 20, 20, 2.4);
 
     // add section 1D
-    api::addElasticSection1D(1, 1, 0.25, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(1, 1, new physicalModel::ArbitraryShape(0.25, 0.02, 0.02, 0.04));
 
     // add beam elements
     api::addBeam(1, { 10, 11 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
@@ -350,12 +350,12 @@ TEST_F(LoadTests, SelfWeightAndLiveLoadSuccess) {
     }
 
     for (auto areaLoad : areaLoads) {
-        auto load = areaLoad->getLoadVector()[1] * api::getArea(std::dynamic_pointer_cast<physicalModel::DistributedAreaLoad>(areaLoad)->getAreaElementTag());
+        auto load = areaLoad->getLoadVector()[1] * api::getSurfaceArea(std::dynamic_pointer_cast<physicalModel::DistributedAreaLoad>(areaLoad)->getAreaElementTag());
         totalWeight += load;
     }
 
     for (auto areaLoad : areaLoadsL) {
-        auto load = areaLoad->getLoadVector()[1] * api::getArea(std::dynamic_pointer_cast<physicalModel::DistributedAreaLoad>(areaLoad)->getAreaElementTag());
+        auto load = areaLoad->getLoadVector()[1] * api::getSurfaceArea(std::dynamic_pointer_cast<physicalModel::DistributedAreaLoad>(areaLoad)->getAreaElementTag());
         totalWeight += load;
     }
 
@@ -445,7 +445,7 @@ TEST_F(LoadTests, SelfWeightAndLiveLoadThroughLineElementsSuccess) {
     api::addElasticMaterial(1, 20, 20, 2.4);
 
     // add section 1D
-    api::addElasticSection1D(1, 1, 0.25, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(1, 1, new physicalModel::ArbitraryShape(0.25, 0.02, 0.02, 0.04));
 
     // add beam elements
     api::addBeam(1, { 10, 11 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
@@ -643,7 +643,7 @@ TEST_F(LoadTests, SelfWeightLiveEqWindLoadCombinationSuccess) {
     api::addElasticMaterial(1, 20, 20, 2.4);
 
     // add section 1D
-    api::addElasticSection1D(1, 1, 0.25, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(1, 1, new physicalModel::ArbitraryShape(0.25, 0.02, 0.02, 0.04));
 
     // add beam elements
     api::addBeam(1, { 10, 11 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
@@ -867,7 +867,7 @@ TEST_F(LoadTests, SelfWeightLiveEqWindLoadCombinationThroughLineElementsSuccess)
     api::addElasticMaterial(1, 20, 20, 2.4);
 
     // add section 1D
-    api::addElasticSection1D(1, 1, 0.25, 0.02, 0.02, 0.04);
+    api::addElasticSection1D(1, 1, new physicalModel::ArbitraryShape(0.25, 0.02, 0.02, 0.04));
 
     // add beam elements
     api::addBeam(1, { 10, 11 }, 1, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);

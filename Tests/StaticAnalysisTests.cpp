@@ -59,7 +59,7 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameStructureWithNx1Ny1) {
     api::addElasticMaterial(1, 30000000, 12500000, 2.4);
 
     // add section 1D
-    api::addElasticSection1D(1, 1, 0.2025, 0.0034171875, 0.0034171875, 0.006834375);
+    api::addElasticSection1D(1, 1, new physicalModel::ArbitraryShape(0.2025, 0.0034171875, 0.0034171875, 0.006834375));
 
     // add section 2D
     api::addElasticSection2D(2, 1, 0.12);
@@ -329,7 +329,7 @@ TEST_F(StaticAnalysisTests, TwoStoryFrameWallStructureWithNx3Ny3) {
     api::addElasticMaterial(1, 30000000, 12500000, 2.4);
 
     // add section 1D
-    api::addElasticSection1D(1, 1, 0.09, 0.000675, 0.000675, 0.00135);
+    api::addElasticSection1D(1, 1, new physicalModel::ArbitraryShape(0.09, 0.000675, 0.000675, 0.00135));
 
     // add section 2D
     api::addElasticSection2D(2, 1, 0.15);

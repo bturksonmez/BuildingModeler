@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "../Materials/Material.h"
+#include "Shape.h"
 
 namespace physicalModel
 {
@@ -20,10 +21,7 @@ namespace physicalModel
 		int m_sectionTag;
 		SectionType m_sectionType;
 		std::shared_ptr<Material> m_material;
-		std::optional<double> m_A;
-		std::optional<double> m_Iyy;
-		std::optional<double> m_Izz;
-		std::optional<double> m_J;
+		std::optional<Shape*> m_shape;
 
 		Section(int sectionTag, std::shared_ptr<Material> material) : m_sectionTag(sectionTag), m_material(material){}
 
@@ -31,7 +29,7 @@ namespace physicalModel
 		Section() = delete;
 		Section(Section&& other) = default;
 		Section& operator=(Section&& other) = default;
-		virtual ~Section() {}
+		virtual ~Section();
 
 		int getSectionTag() const;
 		SectionType getSectionType() const;
