@@ -1,6 +1,12 @@
 #pragma once
 
 #include <memory>
+#include <nlohmann/json.hpp>
+
+namespace buildingModeler
+{
+	class BuildingModelerAPI;
+}
 
 namespace buildingGenerator
 {
@@ -11,10 +17,10 @@ namespace buildingGenerator
 		double maxBayWidth;
 		int minNumberOfStoreys;
 		int maxNumberOfStoreys;
-		double minFirstFloorHeight;
-		double maxFirstFloorHeight;
-		double minFloorHeight;
-		double maxFloorHeight;
+		double minFirstStoreyHeight;
+		double maxFirstStoreyHeight;
+		double minStoreyHeight;
+		double maxStoreyHeight;
 		double maxAspectRatioForColumns;
 		double maxAreaRatioInnerToOuterColumns;
 		double minEquivalentSquareColumnWidth;
@@ -31,15 +37,20 @@ namespace buildingGenerator
 		double maxConcreteYoungsModulus;
 	};
 
+	typedef nlohmann::json json;
+
 	class IBuildingGenerator
 	{
+	protected:
+		typedef buildingModeler::BuildingModelerAPI api;
+
 	public:
-		virtual void build() = 0;
+		virtual json generate() = 0;
 		virtual ~IBuildingGenerator() = default;
 
 		template<typename T, typename... Args>
-		static std::unique_ptr<IBuildingGenerator> create(const Parameters& baseParams, Args&&... args) {
-			return std::make_unique<T>(baseParams, std::forward<Args>(args)...);
+		static std::unique_ptr<IBuildingGenerator> create(const Parameters& params, Args&&... args) {
+			return std::make_unique<T>(params, std::forward<Args>(args)...);
 		}
 	};
 }

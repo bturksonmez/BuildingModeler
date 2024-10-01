@@ -18,11 +18,15 @@ add_subdirectory(PhysicalModel)
 add_subdirectory(BuildingGenerator)
 add_subdirectory(Utilities)
 
-target_include_directories(BuildingModeler PRIVATE
+target_include_directories(BuildingModeler PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/OpenSeesWrapper
     ${CMAKE_CURRENT_SOURCE_DIR}/PhysicalModel
     ${CMAKE_CURRENT_SOURCE_DIR}/BuildingGenerator
     ${CMAKE_CURRENT_SOURCE_DIR}/Utilities
 )
 
-target_link_libraries(BuildingModeler PRIVATE BuildingModelerLib)
+if (WIN32)
+    target_link_libraries(BuildingModelerLib PUBLIC BuildingGenerator)
+endif (WIN32)
+
+target_link_libraries(BuildingModeler PUBLIC BuildingModelerLib)
