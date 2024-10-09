@@ -1,59 +1,62 @@
 ﻿#include <iostream>
-#include "BuildingModelerAPI.h"
+#include <fstream>
+#include "BuildingGenerator/RegularPlanBuildingGenerator.h"
 #include "Utilities/VectorUtilities.h"
 
 using namespace std;
+using namespace buildingGenerator;
 
 int main()
 {
-    typedef buildingModeler::BuildingModelerAPI api;
+	Parameters params;
+	params.geometricParameters.minNumberOfBays = 3;
+	params.geometricParameters.maxNumberOfBays = 6;
+	params.geometricParameters.minBayWidth = 2.5;
+	params.geometricParameters.maxBayWidth = 6.0;
+	params.geometricParameters.minNumberOfStoreys = 3;
+	params.geometricParameters.maxNumberOfStoreys = 10;
+	params.geometricParameters.minFirstStoreyHeight = 2.8;
+	params.geometricParameters.maxFirstStoreyHeight = 4.5;
+	params.geometricParameters.minStoreyHeight = 2.8;
+	params.geometricParameters.maxStoreyHeight = 3.5;
+	params.columnParameters.maxAspectRatioForColumns = 1.5;
+	params.columnParameters.maxAreaRatioInnerToOuterColumns = 2.0;
+	params.columnParameters.minEquivalentSquareColumnWidth = 0.35;
+	params.columnParameters.maxEquivalentSquareColumnWidth = 0.60;
+	params.columnParameters.minColumnCrackedSectionModifier = 0.5;
+	params.columnParameters.maxColumnCrackedSectionModifier = 0.7;
+	//params.maxAspectRatioForColumns;
+	//params.maxAreaRatioInnerToOuterColumns;
+	//params.minEquivalentSquareColumnWidth;
+	//params.maxEquivalentSquareColumnWidth;
+	//params.minBeamWidth;
+	//params.maxBeamWidth;
+	//params.minBeamDepth;
+	//params.maxBeamDepth;
+	params.shearWallParameters.includeShearWallInXDir = true;
+	params.shearWallParameters.includeShearWallInYDir = false;
+	params.shearWallParameters.maxShearWallRatio = 0.03;
+	params.shearWallParameters.minShearWallThickness = 0.25;
+	params.shearWallParameters.maxShearWallThickness = 0.3;
+	params.shearWallParameters.minShearWallCrackedSectionModifier = 0.5;
+	params.shearWallParameters.maxShearWallCrackedSectionModifier = 0.7;
+	params.slabParameters.minSlabThickness = 0.15;
+	params.slabParameters.maxSlabThickness = 0.20;
+	params.minConcreteYoungsModulus = 30000000;
+	params.maxConcreteYoungsModulus = 40000000;
+	params.meshInfo.meshSensitivity = 0.5;
+	params.meshInfo.meshColumn = false;
+	params.meshInfo.meshSlabBeam = false;
 
-    // add quad joints
-    api::addJoint(1, { 0, 0, 0 });
-    api::addJoint(2, { 3, 0, 0 });
-    api::addJoint(3, { 6, 0, 0 });
-    api::addJoint(4, { 0, 2, 0 });
-    api::addJoint(5, { 3, 2, 0 });
-    api::addJoint(6, { 6, 2, 0 });
-    api::addJoint(7, { 0, 4, 0 });
-    api::addJoint(8, { 3, 4, 0 });
-    api::addJoint(9, { 6, 4, 0 });
-    api::addJoint(10, { 9, 2, 0 });
-    api::addJoint(11, { 9, 4, 0 });
+	for (int i = 0; i < 10; ++i) {
 
-    api::setConstraintVector(1, { 1, 1, 1, 1, 1, 1 });
-    api::setConstraintVector(2, { 1, 1, 1, 1, 1, 1 });
-    api::setConstraintVector(7, { 1, 1, 1, 1, 1, 1 });
-    api::setConstraintVector(8, { 1, 1, 1, 1, 1, 1 });
-    api::setConstraintVector(9, { 1, 1, 1, 1, 1, 1 });
-    api::setConstraintVector(11, { 1, 1, 1, 1, 1, 1 });
+		auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params);
+		json buildingInfo = generator->generate();
 
-    // add material
-    api::addElasticMaterial(1, 20, 20, 2);
-
-    // add section 2D
-    api::addElasticSection2D(1, 1, 2.0);
-
-    // add area element
-    api::addShearWall(1, { 1, 2, 5, 4 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(2, { 2, 3, 6, 5 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(3, { 4, 5, 8, 7 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(4, { 5, 6, 9, 8 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-    api::addShearWall(5, { 6, 10, 11, 9 }, 1, physicalModel::AreaElementFormulation::LINEAR);
-
-    //mesh the element
-    api::meshAreaElement(1, 3, 2);
-    api::meshAreaElement(2, 3, 2);
-    api::meshAreaElement(3, 3, 2);
-    api::meshAreaElement(4, 3, 2);
-    api::meshAreaElement(5, 3, 2);
-
-    api::includeMassFromMembers(false);
-
-    // create analytical model
-    api::createAnalyticalModel();
-    api::createModelAndLoadingFiles();
-    api::analyze();
+		std::ofstream file("building_info" + std::to_string(i) + ".json");
+		file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
+		file.close();
+	}
 
 	return 0;
 }

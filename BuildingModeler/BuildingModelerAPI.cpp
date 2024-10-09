@@ -70,6 +70,17 @@ void BuildingModelerAPI::includeMassFromMembers(bool includeMassFromMembers)
     physicalModel::Building::getInstance().m_includeMassFromMembers = includeMassFromMembers;
 }
 
+utility::Vector3 BuildingModelerAPI::getCoordinates(int jointTag)
+{
+    if (!jointExists(jointTag)) {
+        throw EntityNotFoundException("Joint with tag " + std::to_string(jointTag) + " does not exist.");
+    }
+
+    auto joint = physicalModel::Building::getInstance().getJoint(jointTag);
+
+    return joint->getCoords();
+}
+
 std::vector<int> BuildingModelerAPI::getConstraintVectorFromAnalyticalModel(int jointTag)
 {
     if (!jointExists(jointTag)) {
@@ -606,6 +617,38 @@ double BuildingModelerAPI::getSurfaceArea(int elementTag)
     }
 
     return physicalModel::Building::getInstance().m_areaElements[elementTag]->getArea();
+}
+
+std::vector<int> BuildingModelerAPI::getShearWallElementTags()
+{
+    std::vector<int> elementTags;
+
+    auto it = physicalModel::Building::getInstance().m_areaElements.begin();
+
+    for (; it != physicalModel::Building::getInstance().m_areaElements.end(); it++) {
+
+        if (physicalModel::AreaElementType::SHEARWALL == it->second.get()->getAreaElementType()) {
+            elementTags.push_back(it->first);
+        }
+    }
+
+    return elementTags;
+}
+
+std::vector<int> BuildingModelerAPI::getSlabElementTags()
+{
+    std::vector<int> elementTags;
+
+    auto it = physicalModel::Building::getInstance().m_areaElements.begin();
+
+    for (; it != physicalModel::Building::getInstance().m_areaElements.end(); it++) {
+
+        if (physicalModel::AreaElementType::SLAB == it->second.get()->getAreaElementType()) {
+            elementTags.push_back(it->first);
+        }
+    }
+
+    return elementTags;
 }
 
 void BuildingModelerAPI::addFloor(int floorNumber, double height)

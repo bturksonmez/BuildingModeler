@@ -38,6 +38,7 @@ namespace buildingModeler
         static void setConstraintVector(int jointTag, std::vector<int> constraintVector);
         static void setFloorNo(int jointTag, int floorNo);
         static void includeMassFromMembers(bool includeMassFromMembers);
+        static utility::Vector3 getCoordinates(int jointTag);
         static std::vector<int> getConstraintVectorFromAnalyticalModel(int jointTag);
         static std::optional<std::vector<int>> getConstraintVectorFromPhysicalModel(int jointTag);
         static std::vector<std::vector<int>> getConstraintVectorForNodesBetween(int jointTagA, int jointTagB);
@@ -63,10 +64,10 @@ namespace buildingModeler
         static void setSectionModifiers(int elementTag, int segmentNo, double modifierA, double modifierIyy, double modifierIzz, double modifierJ);
         static const std::vector<utility::Vector3>& getNodeCoordinatesOfLineElement(int elementTag);
         static double getLength(int elementTag);
-        static double getArea(int elementTag, int segmentNo);
-        static double getMomentOfInertiaYY(int elementTag, int segmentNo);
-        static double getMomentOfInertiaZZ(int elementTag, int segmentNo);
-        static double getTorsionalConstant(int elementTag, int segmentNo);
+        static double getArea(int elementTag, int segmentNo = 0);
+        static double getMomentOfInertiaYY(int elementTag, int segmentNo = 0);
+        static double getMomentOfInertiaZZ(int elementTag, int segmentNo = 0);
+        static double getTorsionalConstant(int elementTag, int segmentNo = 0);
 
         // Area Element API
         static void addShearWall(int elementTag, std::vector<int> jointTags, int sectionTag,
@@ -78,6 +79,8 @@ namespace buildingModeler
         static void disableSlabElements(bool disableSlabElements);
         static const std::vector<std::vector<utility::Vector3>>& getNodeCoordinatesOfAreaElement(int elementTag);
         static double getSurfaceArea(int elementTag);
+        static std::vector<int> getShearWallElementTags();
+        static std::vector<int> getSlabElementTags();
         
         // Floor API
         static void addFloor(int floorNumber, double height);

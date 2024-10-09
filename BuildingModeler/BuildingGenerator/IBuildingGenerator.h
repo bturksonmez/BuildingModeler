@@ -10,7 +10,7 @@ namespace buildingModeler
 
 namespace buildingGenerator
 {
-	struct Parameters {
+	struct GeometricParameters {
 		int minNumberOfBays;
 		int maxNumberOfBays;
 		double minBayWidth;
@@ -21,20 +21,56 @@ namespace buildingGenerator
 		double maxFirstStoreyHeight;
 		double minStoreyHeight;
 		double maxStoreyHeight;
-		double maxAspectRatioForColumns;
-		double maxAreaRatioInnerToOuterColumns;
-		double minEquivalentSquareColumnWidth;
-		double maxEquivalentSquareColumnWidth;
+	};
+
+	struct BeamParameters {
 		double minBeamWidth;
 		double maxBeamWidth;
 		double minBeamDepth;
 		double maxBeamDepth;
+		double minBeamCrackedSectionModifier;
+		double maxBeamCrackedSectionModifier;
+	};
+
+	struct ColumnParameters {
+		double maxAspectRatioForColumns;
+		double maxAreaRatioInnerToOuterColumns;
+		double minEquivalentSquareColumnWidth;
+		double maxEquivalentSquareColumnWidth;
+		double minColumnCrackedSectionModifier;
+		double maxColumnCrackedSectionModifier;
+	};
+
+	struct ShearWallParameters {
+		bool includeShearWallInXDir;
+		bool includeShearWallInYDir;
+		double maxShearWallRatio;
 		double minShearWallThickness;
 		double maxShearWallThickness;
+		double minShearWallCrackedSectionModifier;
+		double maxShearWallCrackedSectionModifier;
+	};
+
+	struct SlabParameters {
 		double minSlabThickness;
 		double maxSlabThickness;
+	};
+
+	struct MeshInfo {
+		double meshSensitivity = 1.0;
+		bool meshSlabBeam = false;
+		bool meshColumn = false;
+	};
+
+	struct Parameters {
+		GeometricParameters geometricParameters;
+		ColumnParameters columnParameters;
+		BeamParameters beamParameters;
+		ShearWallParameters shearWallParameters;
+		SlabParameters slabParameters;
 		double minConcreteYoungsModulus;
 		double maxConcreteYoungsModulus;
+		MeshInfo meshInfo;
 	};
 
 	typedef nlohmann::json json;
