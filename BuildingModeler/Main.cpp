@@ -2,6 +2,7 @@
 #include <fstream>
 #include "BuildingGenerator/RegularPlanBuildingGenerator.h"
 #include "Utilities/VectorUtilities.h"
+#include "BuildingModelerAPI.h"
 
 using namespace std;
 using namespace buildingGenerator;
@@ -25,14 +26,12 @@ int main()
 	params.columnParameters.maxEquivalentSquareColumnWidth = 0.60;
 	params.columnParameters.minColumnCrackedSectionModifier = 0.5;
 	params.columnParameters.maxColumnCrackedSectionModifier = 0.7;
-	//params.maxAspectRatioForColumns;
-	//params.maxAreaRatioInnerToOuterColumns;
-	//params.minEquivalentSquareColumnWidth;
-	//params.maxEquivalentSquareColumnWidth;
-	//params.minBeamWidth;
-	//params.maxBeamWidth;
-	//params.minBeamDepth;
-	//params.maxBeamDepth;
+	params.beamParameters.minBeamWidth = 0.25;
+	params.beamParameters.maxBeamWidth = 0.35;
+	params.beamParameters.minBeamDepth = 0.45;
+	params.beamParameters.maxBeamDepth = 0.7;
+	params.beamParameters.minBeamCrackedSectionModifier = 0.5;
+	params.beamParameters.maxBeamCrackedSectionModifier = 0.7;
 	params.shearWallParameters.includeShearWallInXDir = true;
 	params.shearWallParameters.includeShearWallInYDir = false;
 	params.shearWallParameters.maxShearWallRatio = 0.03;
@@ -48,15 +47,24 @@ int main()
 	params.meshInfo.meshColumn = false;
 	params.meshInfo.meshSlabBeam = false;
 
-	for (int i = 0; i < 10; ++i) {
+	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params);
+	json buildingInfo = generator->generate();
+	buildingModeler::BuildingModelerAPI::createAnalyticalModel();
+	buildingModeler::BuildingModelerAPI::createModelAndLoadingFiles();
+	
 
-		auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params);
-		json buildingInfo = generator->generate();
 
-		std::ofstream file("building_info" + std::to_string(i) + ".json");
-		file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
-		file.close();
-	}
+	//for (int i = 0; i < 1000; ++i) {
+	//
+	//	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params);
+	//	json buildingInfo = generator->generate();
+	//	buildingModeler::BuildingModelerAPI::createAnalyticalModel();
+	//	buildingModeler::BuildingModelerAPI::createModelAndLoadingFiles();
+	//
+	//	//std::ofstream file("building_info" + std::to_string(i) + ".json");
+	//	//file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
+	//	//file.close();
+	//}
 
 	return 0;
 }

@@ -2,7 +2,9 @@
 #include "../BuildingModelerAPI.h"
 
 #include <chrono>
+#include <cmath>
 #include <map>
+#include <unordered_map>
 
 using namespace buildingGenerator;
 
@@ -215,7 +217,7 @@ void RegularPlanBuildingGenerator::generateShearWalls(json& buildingInfo)
 	int numOfJointsPerFloor = (numOfBaysX + 1) * (numOfBaysY + 1);
 	for (int i = 0; i < ns; ++i) {
 
-		int elementTag = 3100 + 100 * i;
+		int elementTag = 30100 + 100 * i + 1;
 		for (int j = 0; j < shearWallArrangementXDir[1].size(); ++j) {
 
 			for (int k = 0; k < shearWallArrangementXDir[0].size(); ++k) {
@@ -265,7 +267,7 @@ void RegularPlanBuildingGenerator::generateSlabs(json& buildingInfo)
 	int numOfJointsPerFloor = (numOfBaysX + 1) * (numOfBaysY + 1);
 	for (int i = 0; i < ns; ++i) {
 
-		int elementTag = 4100 + 100 * i;
+		int elementTag = 40100 + 100 * i + 1;
 		for (int j = 0; j < numOfBaysY; ++j) {
 
 			for (int k = 0; k < numOfBaysX; ++k) {
@@ -324,6 +326,7 @@ void RegularPlanBuildingGenerator::generateColumns(json& buildingInfo)
 	buildingInfo["column"]["outerColumns"]["depth"] = widthOuterL;
 	buildingInfo["column"]["innerColumns"]["width"] = widthInnerS;
 	buildingInfo["column"]["innerColumns"]["depth"] = widthInnerL;
+	buildingInfo["column"]["crackedMod"] = crackedMod;
 
 	// To do: array yap bunlari
 	api::addElasticSection1D(101, 1, new physicalModel::Rectangle(widthOuterL, widthOuterS)); // outer column strong in x direction
@@ -337,7 +340,7 @@ void RegularPlanBuildingGenerator::generateColumns(json& buildingInfo)
 	int numOfJointsPerFloor = (numOfBaysX + 1) * (numOfBaysY + 1);
 	for (int i = 0; i < ns; ++i) {
 
-		int elementTag = 1100 + 100 * i;
+		int elementTag = 10100 + 100 * i + 1;
 		for (int j = 0; j <= numOfBaysY / 2; ++j) {
 
 			for (int k = 0; k <= numOfBaysX; ++k) {
@@ -360,6 +363,14 @@ void RegularPlanBuildingGenerator::generateColumns(json& buildingInfo)
 						int jointITag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
 						int jointJTag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k + numOfJointsPerFloor;
 						api::addColumn(elementTag, { jointITag, jointJTag }, sectionTag, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+						api::setSectionModifiers(elementTag, 0, 1.0, 1.0, crackedMod, 1.0);
+
+						if (m_parameters.meshInfo.meshColumn) {
+
+							int numOfSegments = api::getLength(elementTag) / m_parameters.meshInfo.meshSensitivity + 1;
+							std::vector<double> segmentRatios(numOfSegments, api::getLength(elementTag) / (double)numOfSegments);
+							api::setSegmentRatios(elementTag, segmentRatios);
+						}
 
 						if (0 == i) {
 
@@ -402,6 +413,182 @@ void RegularPlanBuildingGenerator::generateColumns(json& buildingInfo)
 
 	buildingInfo["column"]["area"] = totalA;
 	buildingInfo["column"]["momentOfInertia"] = totalIx;
+}
+
+void RegularPlanBuildingGenerator::generateBeams(json& buildingInfo)
+{
+	int ns = buildingInfo["numberOfStoreys"];
+	int numOfBaysX = buildingInfo["numberOfBaysX"];
+	int numOfBaysY = buildingInfo["numberOfBaysY"];
+	std::vector<double> bayWidthsX = buildingInfo["bayWidthsX"];
+	std::vector<double> bayWidthsY = buildingInfo["bayWidthsY"];
+	std::vector<int> shearWallArrangementX = buildingInfo["shearWall"]["arrangementX"];
+	std::vector<int> shearWallArrangementY = buildingInfo["shearWall"]["arrangementY"];
+
+	std::uniform_real_distribution<double> beamWidthDist(m_parameters.beamParameters.minBeamWidth, m_parameters.beamParameters.maxBeamWidth);
+	std::uniform_real_distribution<double> equivalentBeamDepthDist(m_parameters.beamParameters.minBeamDepth, m_parameters.beamParameters.maxBeamDepth);
+	std::uniform_real_distribution<double> beamCrackedSectionModifierDist(m_parameters.beamParameters.minBeamCrackedSectionModifier, m_parameters.beamParameters.maxBeamCrackedSectionModifier);
+
+	double width = beamWidthDist(m_generator);
+	double equivalentDepth = equivalentBeamDepthDist(m_generator);
+	double crackedMod = beamCrackedSectionModifierDist(m_generator);
+	double difDepth = m_parameters.beamParameters.maxBeamDepth - m_parameters.beamParameters.minBeamDepth;
+
+	double minLength = std::numeric_limits<double>::max();
+	double maxLength = std::numeric_limits<double>::min();
+	double totalLength = 0;
+
+	for (int i = 0; i < numOfBaysX; ++i) {
+		minLength = std::min(minLength, bayWidthsX[i]);
+		maxLength = std::max(maxLength, bayWidthsX[i]);
+		totalLength += bayWidthsX[i];
+	}
+
+	for (int i = 0; i < numOfBaysY; ++i) {
+		minLength = std::min(minLength, bayWidthsY[i]);
+		maxLength = std::max(maxLength, bayWidthsY[i]);
+		totalLength += bayWidthsY[i];
+	}
+	double aveLength = totalLength / (double)(numOfBaysX + numOfBaysY);
+	double thresholdVal = (aveLength - minLength) / (maxLength - minLength);
+
+	double minDepth = m_parameters.beamParameters.minBeamDepth;
+	double maxDepth = m_parameters.beamParameters.maxBeamDepth;
+	if ((equivalentDepth - m_parameters.beamParameters.minBeamDepth) / thresholdVal) {
+		minDepth = (equivalentDepth - thresholdVal * maxDepth) / (1 - thresholdVal);
+	}
+	else {
+		maxDepth = (equivalentDepth - minDepth * (1 - thresholdVal)) / thresholdVal;
+	}
+
+	buildingInfo["beam"]["width"] = width;
+	buildingInfo["beam"]["equivalentDepth"] = equivalentDepth;
+	buildingInfo["beam"]["minDepth"] = minDepth;
+	buildingInfo["beam"]["maxDepth"] = maxDepth;
+	buildingInfo["beam"]["minLength"] = minLength;
+	buildingInfo["beam"]["maxLength"] = maxLength;
+	buildingInfo["beam"]["crackedMod"] = crackedMod;
+
+	auto getDepth{
+		[=](double length) {
+			return minDepth + (maxDepth - minDepth) * (length - minLength) / (maxLength - minLength);
+		}
+	};
+
+	double totalBeamIndex = 0.0;
+
+	std::vector<int> sectionTagsX((numOfBaysX + 1) / 2, 0);
+	int numOfJointsPerFloor = (numOfBaysX + 1) * (numOfBaysY + 1);
+	int sectionTag = 201;
+	int currentSectionTag;
+	for (int i = 0; i < ns; ++i) {
+
+		int elementTag = 20100 + 100 * i + 1;
+		for (int j = 0; j <= numOfBaysY; ++j) {
+
+			for (int k = 0; k < numOfBaysX; ++k) {
+
+				int jointITag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
+				int jointJTag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k + 1;
+
+				double depth = getDepth(bayWidthsX[k]);
+				
+				if (k > (numOfBaysX - 1) / 2) {
+
+					currentSectionTag = sectionTagsX[numOfBaysX - 1 - k];
+				}
+				else {
+
+					if (sectionTagsX[k] == 0) {
+
+						api::addElasticSection1D(sectionTag, 1, new physicalModel::Rectangle(width, depth));
+						sectionTagsX[k] = sectionTag;
+						currentSectionTag = sectionTag++;
+					}
+					else {
+						currentSectionTag = sectionTagsX[k];
+					}
+				}
+
+				if (1 != shearWallArrangementX[k] || 1 != shearWallArrangementY[j]) {
+
+					api::addBeam(elementTag, { jointITag, jointJTag }, currentSectionTag, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+					api::setSectionModifiers(elementTag, 0, 1.0, crackedMod, 1.0, 1.0);
+
+					if (m_parameters.meshInfo.meshSlabBeam) {
+
+						int numOfSegments = bayWidthsX[k] / m_parameters.meshInfo.meshSensitivity;
+						numOfSegments = numOfSegments % 2 == 0 ? numOfSegments : numOfSegments + 1;
+						std::vector<double> segmentRatios(numOfSegments, bayWidthsX[k] / (double)numOfSegments);
+						api::setSegmentRatios(elementTag, segmentRatios);
+					}
+
+					if (0 == i) {
+
+						totalBeamIndex += api::getMomentOfInertiaYY(elementTag) / std::pow(bayWidthsX[k], 3.0);
+					}
+
+					++elementTag;
+				}
+			}
+		}
+	}
+
+	buildingInfo["beam"]["totalBeamIndexX"] = totalBeamIndex;
+
+	std::vector<int> sectionTagsY((numOfBaysY + 1) / 2, 0);
+	sectionTag = 251;
+	for (int i = 0; i < ns; ++i) {
+
+		int elementTag = 25100 + 100 * i + 1;
+		for (int j = 0; j < numOfBaysY; ++j) {
+
+			double depth = getDepth(bayWidthsX[j]);
+
+			if (j > (numOfBaysY - 1) / 2) {
+
+				currentSectionTag = sectionTagsY[numOfBaysY - 1 - j];
+			}
+			else {
+
+				if (sectionTagsY[j] == 0) {
+
+					api::addElasticSection1D(sectionTag, 1, new physicalModel::Rectangle(width, depth));
+					sectionTagsY[j] = sectionTag;
+					currentSectionTag = sectionTag++;
+				}
+				else {
+					currentSectionTag = sectionTagsY[j];
+				}
+			}
+
+			for (int k = 0; k <= numOfBaysX; ++k) {
+
+				int jointITag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
+				int jointJTag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * (j + 1) + k;
+
+				api::addBeam(elementTag, { jointITag, jointJTag }, currentSectionTag, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+				api::setSectionModifiers(elementTag, 0, 1.0, crackedMod, 1.0, 1.0);
+
+				if (m_parameters.meshInfo.meshSlabBeam) {
+
+					int numOfSegments = bayWidthsY[j] / m_parameters.meshInfo.meshSensitivity;
+					numOfSegments = numOfSegments % 2 == 0 ? numOfSegments : numOfSegments + 1;
+					std::vector<double> segmentRatios(numOfSegments, bayWidthsY[j] / (double)numOfSegments);
+					api::setSegmentRatios(elementTag, segmentRatios);
+				}
+
+				if (0 == i) {
+
+					totalBeamIndex += api::getMomentOfInertiaYY(elementTag) / std::pow(bayWidthsY[j], 3.0);
+				}
+
+				++elementTag;
+			}
+		}
+	}
+
+	buildingInfo["beam"]["totalBeamIndex"] = totalBeamIndex;
 }
 
 std::vector<std::vector<int>> RegularPlanBuildingGenerator::getShearWallArrangementInLongitudinalDir(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatio)
