@@ -605,6 +605,15 @@ void BuildingModelerAPI::disableSlabElements(bool disableSlabElements)
     physicalModel::Building::getInstance().m_disableSlabElements = disableSlabElements;
 }
 
+const std::vector<int>& BuildingModelerAPI::getJointTags(int elementTag)
+{
+    if (!areaElementExists(elementTag)) {
+        throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    return physicalModel::Building::getInstance().getAreaElement(elementTag)->getJointTags();
+}
+
 const std::vector<std::vector<utility::Vector3>>& BuildingModelerAPI::getNodeCoordinatesOfAreaElement(int elementTag)
 {
     if (!areaElementExists(elementTag)) {

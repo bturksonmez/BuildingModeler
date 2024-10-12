@@ -62,6 +62,24 @@ namespace buildingGenerator
 		bool meshColumn = false;
 	};
 
+	struct ModelingPreferences {
+		bool includeMassFromMembers = false;
+		bool includePDeltaEffects = false;
+		bool disableSlabElements = false;
+		bool gravityThroughLineElements = true;
+		bool makeFloorsRigid = true;
+	};
+
+	struct GravityLoading {
+		bool includeDeadLoadFromMembers = true;
+		double minDeadLoadFactor;
+		double maxDeadLoadFactor;
+		double minLiveLoadPerArea;
+		double maxLiveLoadPerArea;
+		double minLiveLoadFactor;
+		double maxLiveLoadFactor;
+	};
+
 	struct Parameters {
 		GeometricParameters geometricParameters;
 		ColumnParameters columnParameters;
@@ -71,6 +89,8 @@ namespace buildingGenerator
 		double minConcreteYoungsModulus;
 		double maxConcreteYoungsModulus;
 		MeshInfo meshInfo;
+		ModelingPreferences modelingPreferences;
+		GravityLoading gravityLoading;
 	};
 
 	typedef nlohmann::json json;

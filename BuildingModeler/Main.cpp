@@ -12,7 +12,7 @@ int main()
 	Parameters params;
 	params.geometricParameters.minNumberOfBays = 3;
 	params.geometricParameters.maxNumberOfBays = 6;
-	params.geometricParameters.minBayWidth = 2.5;
+	params.geometricParameters.minBayWidth = 3.0;
 	params.geometricParameters.maxBayWidth = 6.0;
 	params.geometricParameters.minNumberOfStoreys = 3;
 	params.geometricParameters.maxNumberOfStoreys = 10;
@@ -30,8 +30,8 @@ int main()
 	params.beamParameters.maxBeamWidth = 0.35;
 	params.beamParameters.minBeamDepth = 0.45;
 	params.beamParameters.maxBeamDepth = 0.7;
-	params.beamParameters.minBeamCrackedSectionModifier = 0.5;
-	params.beamParameters.maxBeamCrackedSectionModifier = 0.7;
+	params.beamParameters.minBeamCrackedSectionModifier = 0.25;
+	params.beamParameters.maxBeamCrackedSectionModifier = 0.4;
 	params.shearWallParameters.includeShearWallInXDir = true;
 	params.shearWallParameters.includeShearWallInYDir = false;
 	params.shearWallParameters.maxShearWallRatio = 0.03;
@@ -43,14 +43,26 @@ int main()
 	params.slabParameters.maxSlabThickness = 0.20;
 	params.minConcreteYoungsModulus = 30000000;
 	params.maxConcreteYoungsModulus = 40000000;
-	params.meshInfo.meshSensitivity = 0.5;
+	params.meshInfo.meshSensitivity = 0.9;
 	params.meshInfo.meshColumn = false;
-	params.meshInfo.meshSlabBeam = false;
+	params.meshInfo.meshSlabBeam = true;
+	params.modelingPreferences.includeMassFromMembers = true;
+	params.modelingPreferences.gravityThroughLineElements = false;
+	params.gravityLoading.minDeadLoadFactor = 0.9;
+	params.gravityLoading.maxDeadLoadFactor = 1.4;
+	params.gravityLoading.minLiveLoadPerArea = 2.0;
+	params.gravityLoading.maxLiveLoadPerArea = 3.0;
+	params.gravityLoading.minLiveLoadFactor = 0.3;
+	params.gravityLoading.maxLiveLoadFactor = 1.6;
 
 	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params);
 	json buildingInfo = generator->generate();
 	buildingModeler::BuildingModelerAPI::createAnalyticalModel();
 	buildingModeler::BuildingModelerAPI::createModelAndLoadingFiles();
+
+	std::ofstream file("building_info.json");
+	file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
+	file.close();
 	
 
 

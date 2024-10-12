@@ -29,6 +29,9 @@ json RegularPlanBuildingGenerator::generate()
 	generateShearWalls(buildingInfo);
 	generateSlabs(buildingInfo);
 	generateColumns(buildingInfo);
+	generateBeams(buildingInfo);
+	meshAreaElements();
+	applyModelingPreferences(buildingInfo);
 
 	return buildingInfo;
 }
@@ -368,7 +371,7 @@ void RegularPlanBuildingGenerator::generateColumns(json& buildingInfo)
 						if (m_parameters.meshInfo.meshColumn) {
 
 							int numOfSegments = api::getLength(elementTag) / m_parameters.meshInfo.meshSensitivity + 1;
-							std::vector<double> segmentRatios(numOfSegments, api::getLength(elementTag) / (double)numOfSegments);
+							std::vector<double> segmentRatios(numOfSegments, 1.0 / (double)numOfSegments);
 							api::setSegmentRatios(elementTag, segmentRatios);
 						}
 
@@ -488,8 +491,8 @@ void RegularPlanBuildingGenerator::generateBeams(json& buildingInfo)
 
 			for (int k = 0; k < numOfBaysX; ++k) {
 
-				int jointITag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
-				int jointJTag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k + 1;
+				int jointITag = (i + 1) * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
+				int jointJTag = (i + 1) * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k + 1;
 
 				double depth = getDepth(bayWidthsX[k]);
 				
@@ -519,7 +522,7 @@ void RegularPlanBuildingGenerator::generateBeams(json& buildingInfo)
 
 						int numOfSegments = bayWidthsX[k] / m_parameters.meshInfo.meshSensitivity;
 						numOfSegments = numOfSegments % 2 == 0 ? numOfSegments : numOfSegments + 1;
-						std::vector<double> segmentRatios(numOfSegments, bayWidthsX[k] / (double)numOfSegments);
+						std::vector<double> segmentRatios(numOfSegments, 1.0 / (double)numOfSegments);
 						api::setSegmentRatios(elementTag, segmentRatios);
 					}
 
@@ -564,8 +567,8 @@ void RegularPlanBuildingGenerator::generateBeams(json& buildingInfo)
 
 			for (int k = 0; k <= numOfBaysX; ++k) {
 
-				int jointITag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
-				int jointJTag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * (j + 1) + k;
+				int jointITag = (i + 1) * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
+				int jointJTag = (i + 1) * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * (j + 1) + k;
 
 				api::addBeam(elementTag, { jointITag, jointJTag }, currentSectionTag, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
 				api::setSectionModifiers(elementTag, 0, 1.0, crackedMod, 1.0, 1.0);
@@ -574,7 +577,7 @@ void RegularPlanBuildingGenerator::generateBeams(json& buildingInfo)
 
 					int numOfSegments = bayWidthsY[j] / m_parameters.meshInfo.meshSensitivity;
 					numOfSegments = numOfSegments % 2 == 0 ? numOfSegments : numOfSegments + 1;
-					std::vector<double> segmentRatios(numOfSegments, bayWidthsY[j] / (double)numOfSegments);
+					std::vector<double> segmentRatios(numOfSegments, 1.0 / (double)numOfSegments);
 					api::setSegmentRatios(elementTag, segmentRatios);
 				}
 
@@ -589,6 +592,70 @@ void RegularPlanBuildingGenerator::generateBeams(json& buildingInfo)
 	}
 
 	buildingInfo["beam"]["totalBeamIndex"] = totalBeamIndex;
+}
+
+void RegularPlanBuildingGenerator::meshAreaElements()
+{
+	api::updateAreaElementProperties();
+
+	auto shearWallTags = api::getShearWallElementTags();
+	for (int i = 0; i < shearWallTags.size(); ++i) {
+
+		auto jointTags = api::getJointTags(shearWallTags[i]);
+		auto coordI = api::getCoordinates(jointTags[0]);
+		auto coordJ = api::getCoordinates(jointTags[1]);
+		auto coordK = api::getCoordinates(jointTags[2]);
+
+		int n1 = (coordJ - coordI).norm2() / m_parameters.meshInfo.meshSensitivity;
+		n1 = n1 % 2 == 0 ? n1 : n1 + 1;
+		int n2 = (coordK - coordJ).norm2() / m_parameters.meshInfo.meshSensitivity;
+		n2 = n2 % 2 == 0 ? n2 : n2 + 1;
+
+		api::meshAreaElement(shearWallTags[i], n1, n2);
+	}
+
+	if (m_parameters.meshInfo.meshSlabBeam) {
+		auto slabTags = api::getSlabElementTags();
+		for (int i = 0; i < slabTags.size(); ++i) {
+
+			api::meshAreaElement(slabTags[i]);
+		}
+	}
+}
+
+void RegularPlanBuildingGenerator::applyModelingPreferences(json& buildingInfo)
+{
+	api::includeMassFromMembers(m_parameters.modelingPreferences.includeMassFromMembers);
+	api::updateMassSourceFromMembers();
+
+	if (m_parameters.modelingPreferences.makeFloorsRigid) {
+
+		int ns = buildingInfo["numberOfStoreys"];
+		int masterNodeTag = 10010;
+		for (int i = 1; i <= ns; ++i) {
+
+			api::makeRigid(i, masterNodeTag);
+
+			if (m_parameters.modelingPreferences.includeMassFromMembers) {
+
+				api::confineFloorMassOnDiaphragmNode(i, true);
+			}
+			
+			masterNodeTag += 10;
+		}
+	}
+
+	api::disableSlabElements(m_parameters.modelingPreferences.disableSlabElements);
+	api::includePDeltaEffects(m_parameters.modelingPreferences.includePDeltaEffects);
+
+	if (m_parameters.modelingPreferences.disableSlabElements) {
+
+		api::applyGravityLoadThroughLineElements(true);
+	}
+	else {
+
+		api::applyGravityLoadThroughLineElements(m_parameters.modelingPreferences.gravityThroughLineElements);
+	}
 }
 
 std::vector<std::vector<int>> RegularPlanBuildingGenerator::getShearWallArrangementInLongitudinalDir(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatio)

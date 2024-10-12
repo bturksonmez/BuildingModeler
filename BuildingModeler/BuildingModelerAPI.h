@@ -77,6 +77,7 @@ namespace buildingModeler
         static void meshAreaElement(int elementTag, std::optional<int> n1 = std::nullopt, std::optional<int> n2 = std::nullopt);
         static void disableMeshForAreaElement(int elementTag);
         static void disableSlabElements(bool disableSlabElements);
+        static const std::vector<int>& getJointTags(int elementTag);
         static const std::vector<std::vector<utility::Vector3>>& getNodeCoordinatesOfAreaElement(int elementTag);
         static double getSurfaceArea(int elementTag);
         static std::vector<int> getShearWallElementTags();
