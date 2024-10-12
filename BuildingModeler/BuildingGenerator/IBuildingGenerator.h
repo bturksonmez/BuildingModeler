@@ -68,6 +68,8 @@ namespace buildingGenerator
 		bool disableSlabElements = false;
 		bool gravityThroughLineElements = true;
 		bool makeFloorsRigid = true;
+		double minLiveLoadMassContribution;
+		double maxLiveLoadMassContribution;
 	};
 
 	struct GravityLoading {

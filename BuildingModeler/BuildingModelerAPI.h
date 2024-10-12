@@ -100,6 +100,7 @@ namespace buildingModeler
         static void includeDeadLoadFromMembers(bool includeDeadLoadFromMembers);
         static void applyGravityLoadThroughLineElements(bool gravityThroughLineElements);
         static void setLiveLoadForFloor(int floorNumber, double liveLoadPerArea);
+        static void setLiveLoadMassContributionForFloor(int floorNumber, double liveLoadMassContributionFactor);
         static void addStaticLoadCase(std::string loadCaseTag, physicalModel::StaticLoadCaseType loadCaseType);
         static void addModalLoadCase(std::string loadCaseTag, size_t numberOfModes);
         static void addPointLoad(std::string loadCaseTag, int jointTag, double fx, double fy, double fz, double mx, double my, double mz);

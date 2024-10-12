@@ -207,7 +207,21 @@ void Building::addMemberMasses()
         auto jointJ = it->second->getJJointTag();
         auto jointK = it->second->getKJointTag();
         auto jointL = it->second->getLJointTag();
-        auto mass = it->second->getMass() / 4.0;
+
+        double liveLoadMass = 0.0;
+        auto floor = getFloor(getJoint(jointI)->getFloorNo());
+        if (nullptr != floor) {
+
+            auto area = it->second->getArea();
+            auto liveLoad = floor->getLiveLoadPerArea();
+
+            if (std::nullopt != liveLoad) {
+
+                liveLoadMass = floor->getLiveLoadMassContributionFactor() * liveLoad.value() * it->second->getArea() / 9.81;
+            }
+        }
+
+        auto mass = (it->second->getMass() + liveLoadMass) / 4.0;
 
         utility::Vector3 translationalMass(mass, mass, 0.0);
 

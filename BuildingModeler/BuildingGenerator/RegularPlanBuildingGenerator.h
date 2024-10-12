@@ -27,6 +27,7 @@ namespace buildingGenerator
 		void generateBeams(json& buildingInfo);
 		void meshAreaElements();
 		void applyModelingPreferences(json& buildingInfo);
+		void applyGravityLoads(json& buildingInfo);
 
 		std::vector<std::vector<int>> getShearWallArrangementInLongitudinalDir(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatio);
 		std::vector<std::vector<int>> findSubsetsOfVector(const std::vector<int>& vec);

@@ -10,11 +10,11 @@ using namespace buildingGenerator;
 int main()
 {
 	Parameters params;
-	params.geometricParameters.minNumberOfBays = 3;
+	params.geometricParameters.minNumberOfBays = 6;
 	params.geometricParameters.maxNumberOfBays = 6;
-	params.geometricParameters.minBayWidth = 3.0;
+	params.geometricParameters.minBayWidth = 5.0;
 	params.geometricParameters.maxBayWidth = 6.0;
-	params.geometricParameters.minNumberOfStoreys = 3;
+	params.geometricParameters.minNumberOfStoreys = 10;
 	params.geometricParameters.maxNumberOfStoreys = 10;
 	params.geometricParameters.minFirstStoreyHeight = 2.8;
 	params.geometricParameters.maxFirstStoreyHeight = 4.5;
@@ -43,11 +43,13 @@ int main()
 	params.slabParameters.maxSlabThickness = 0.20;
 	params.minConcreteYoungsModulus = 30000000;
 	params.maxConcreteYoungsModulus = 40000000;
-	params.meshInfo.meshSensitivity = 0.9;
+	params.meshInfo.meshSensitivity = 1.5;
 	params.meshInfo.meshColumn = false;
 	params.meshInfo.meshSlabBeam = true;
 	params.modelingPreferences.includeMassFromMembers = true;
 	params.modelingPreferences.gravityThroughLineElements = false;
+	params.modelingPreferences.minLiveLoadMassContribution = 0.3;
+	params.modelingPreferences.maxLiveLoadMassContribution = 1.0;
 	params.gravityLoading.minDeadLoadFactor = 0.9;
 	params.gravityLoading.maxDeadLoadFactor = 1.4;
 	params.gravityLoading.minLiveLoadPerArea = 2.0;
@@ -57,12 +59,14 @@ int main()
 
 	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params);
 	json buildingInfo = generator->generate();
-	buildingModeler::BuildingModelerAPI::createAnalyticalModel();
-	buildingModeler::BuildingModelerAPI::createModelAndLoadingFiles();
-
 	std::ofstream file("building_info.json");
 	file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
 	file.close();
+
+	buildingModeler::BuildingModelerAPI::createAnalyticalModel();
+	buildingModeler::BuildingModelerAPI::createModelAndLoadingFiles();
+	buildingModeler::BuildingModelerAPI::analyze();
+
 	
 
 

@@ -20,6 +20,7 @@ namespace physicalModel
 		std::optional<utility::Vector3> m_diaphragmMass;
 		std::optional<utility::Vector2> m_massCenter;
 		std::optional<utility::Vector2> m_stiffnessCenter;
+		double m_liveLoadMassContributionFactor;
 		std::optional<double> m_liveLoadPerArea;
 
 	public:
@@ -35,6 +36,7 @@ namespace physicalModel
 		bool updateMassCenter();
 		void updateStiffnessCenter();
 		void confineFloorMassOnDiaphragmNode(bool confineFloorMassOnDiaphragmNode);
+		void setLiveLoadMassContributionFactor(double liveLoadMassContributionFactor);
 		void setLiveLoadPerArea(double liveLoadPerArea);
 
 		int getFloorNumber() const;
@@ -47,6 +49,7 @@ namespace physicalModel
 		std::optional<utility::Vector2> getMassCenter() const;
 		std::optional<utility::Vector2> getStiffnessCenter() const;
 		bool floorMassConfinedOnDiaphragmNode() const;
+		double getLiveLoadMassContributionFactor() const;
 		const std::optional<double> getLiveLoadPerArea() const;
 	};
 }

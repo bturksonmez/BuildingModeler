@@ -838,6 +838,17 @@ void BuildingModelerAPI::setLiveLoadForFloor(int floorNumber, double liveLoadPer
     floor->setLiveLoadPerArea(liveLoadPerArea);
 }
 
+void BuildingModelerAPI::setLiveLoadMassContributionForFloor(int floorNumber, double liveLoadMassContributionFactor)
+{
+    if (!floorExists(floorNumber)) {
+        throw EntityNotFoundException("Floor number " + std::to_string(floorNumber) + " does not exist.");
+    }
+
+    auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
+
+    floor->setLiveLoadMassContributionFactor(liveLoadMassContributionFactor);
+}
+
 void BuildingModelerAPI::addStaticLoadCase(std::string loadCaseTag, physicalModel::StaticLoadCaseType loadCaseType)
 {
     if (loadCaseExists(loadCaseTag)) {

@@ -93,6 +93,11 @@ void Floor::confineFloorMassOnDiaphragmNode(bool confineFloorMassOnDiaphragmNode
 	m_confineFloorMassOnDiaphragmNode = confineFloorMassOnDiaphragmNode;
 }
 
+void Floor::setLiveLoadMassContributionFactor(double liveLoadMassContributionFactor)
+{
+	m_liveLoadMassContributionFactor = liveLoadMassContributionFactor;
+}
+
 void Floor::setLiveLoadPerArea(double liveLoadPerArea)
 {
 	m_liveLoadPerArea = liveLoadPerArea;
@@ -146,6 +151,11 @@ std::optional<utility::Vector2> Floor::getStiffnessCenter() const
 bool Floor::floorMassConfinedOnDiaphragmNode() const
 {
 	return m_confineFloorMassOnDiaphragmNode;
+}
+
+double Floor::getLiveLoadMassContributionFactor() const
+{
+	return m_liveLoadMassContributionFactor;
 }
 
 const std::optional<double> Floor::getLiveLoadPerArea() const
