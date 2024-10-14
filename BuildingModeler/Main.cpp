@@ -1,20 +1,22 @@
 ﻿#include <iostream>
 #include <fstream>
 #include "BuildingGenerator/RegularPlanBuildingGenerator.h"
+#include "LoadingGenerator/GravityLoadingGenerator.h"
 #include "Utilities/VectorUtilities.h"
 #include "BuildingModelerAPI.h"
 
 using namespace std;
 using namespace buildingGenerator;
+using namespace loadingGenerator;
 
 int main()
 {
 	Parameters params;
-	params.geometricParameters.minNumberOfBays = 6;
+	params.geometricParameters.minNumberOfBays = 3;
 	params.geometricParameters.maxNumberOfBays = 6;
-	params.geometricParameters.minBayWidth = 5.0;
+	params.geometricParameters.minBayWidth = 3.0;
 	params.geometricParameters.maxBayWidth = 6.0;
-	params.geometricParameters.minNumberOfStoreys = 10;
+	params.geometricParameters.minNumberOfStoreys = 3;
 	params.geometricParameters.maxNumberOfStoreys = 10;
 	params.geometricParameters.minFirstStoreyHeight = 2.8;
 	params.geometricParameters.maxFirstStoreyHeight = 4.5;
@@ -43,32 +45,28 @@ int main()
 	params.slabParameters.maxSlabThickness = 0.20;
 	params.minConcreteYoungsModulus = 30000000;
 	params.maxConcreteYoungsModulus = 40000000;
-	params.meshInfo.meshSensitivity = 1.5;
+	params.meshInfo.meshSensitivity = 0.9;
 	params.meshInfo.meshColumn = false;
 	params.meshInfo.meshSlabBeam = true;
-	params.modelingPreferences.includeMassFromMembers = true;
 	params.modelingPreferences.gravityThroughLineElements = false;
+	params.modelingPreferences.makeFloorsRigid = false;
+	params.modelingPreferences.minLiveLoadPerArea = 2.0;
+	params.modelingPreferences.maxLiveLoadPerArea = 3.0;
 	params.modelingPreferences.minLiveLoadMassContribution = 0.3;
 	params.modelingPreferences.maxLiveLoadMassContribution = 1.0;
-	params.gravityLoading.minDeadLoadFactor = 0.9;
-	params.gravityLoading.maxDeadLoadFactor = 1.4;
-	params.gravityLoading.minLiveLoadPerArea = 2.0;
-	params.gravityLoading.maxLiveLoadPerArea = 3.0;
-	params.gravityLoading.minLiveLoadFactor = 0.3;
-	params.gravityLoading.maxLiveLoadFactor = 1.6;
 
-	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params);
-	json buildingInfo = generator->generate();
+	double minDeadLoadFactor = 0.9;
+	double maxDeadLoadFactor = 1.4;
+	double minLiveLoadFactor = 1.0;
+	double maxLiveLoadFactor = 1.6;
+
+	auto loading = ILoadingGenerator::create<GravityLoadingGenerator>(minDeadLoadFactor, maxDeadLoadFactor, minLiveLoadFactor, maxLiveLoadFactor);
+	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params, std::move(loading));
+	json buildingInfo = generator->generateAndAnalyze();
+
 	std::ofstream file("building_info.json");
 	file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
 	file.close();
-
-	buildingModeler::BuildingModelerAPI::createAnalyticalModel();
-	buildingModeler::BuildingModelerAPI::createModelAndLoadingFiles();
-	buildingModeler::BuildingModelerAPI::analyze();
-
-	
-
 
 	//for (int i = 0; i < 1000; ++i) {
 	//

@@ -76,6 +76,7 @@ namespace physicalModel
 
         static Building& getInstance();
         void clear();
+        double getTotalWeight() const;
         Joint* getJoint(int jointTag) const;
         LineElement* getLineElement(int elementTag) const;
         AreaElement* getAreaElement(int elementTag) const;

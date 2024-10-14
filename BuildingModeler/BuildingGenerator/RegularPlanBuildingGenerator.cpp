@@ -1,5 +1,6 @@
 #include "RegularPlanBuildingGenerator.h"
 #include "../BuildingModelerAPI.h"
+#include "../LoadingGenerator/GravityLoadingGenerator.h"
 
 #include <chrono>
 #include <cmath>
@@ -7,12 +8,13 @@
 
 using namespace buildingGenerator;
 
-RegularPlanBuildingGenerator::RegularPlanBuildingGenerator(const Parameters& parameters) : m_parameters(parameters)
+RegularPlanBuildingGenerator::RegularPlanBuildingGenerator(const Parameters& parameters, std::unique_ptr<loadingGenerator::ILoadingGenerator> loading) :
+	m_parameters(parameters), m_loading(std::move(loading))
 {
 	void validateInput();
 }
 
-json RegularPlanBuildingGenerator::generate()
+json RegularPlanBuildingGenerator::generateAndAnalyze()
 {
 	static long long counter = 0;
 	m_seed = std::chrono::system_clock::now().time_since_epoch().count() + counter++;
@@ -31,7 +33,7 @@ json RegularPlanBuildingGenerator::generate()
 	generateBeams(buildingInfo);
 	meshAreaElements();
 	applyModelingPreferences(buildingInfo);
-	applyGravityLoads(buildingInfo);
+	analyze(buildingInfo);
 
 	return buildingInfo;
 }
@@ -309,6 +311,10 @@ void RegularPlanBuildingGenerator::generateColumns(json& buildingInfo)
 		}
 	}
 	modifiedShearWallArrangementX.push_back(shearWallArrangementX[numOfBaysX - 1] ? 1 : 0);
+	for (int i = modifiedShearWallArrangementX.size(); i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		modifiedShearWallArrangementX.push_back(-1);
+	}
+	buildingInfo["shearWall"]["modifiedArrangementX"] = modifiedShearWallArrangementX;
 
 	std::uniform_int_distribution<int> columnOrientationDist(0, 1);
 	std::uniform_real_distribution<double> maxAspectRatioDist(1.0, m_parameters.columnParameters.maxAspectRatioForColumns);
@@ -627,7 +633,7 @@ void RegularPlanBuildingGenerator::applyModelingPreferences(json& buildingInfo)
 {
 	int ns = buildingInfo["numberOfStoreys"];
 
-	std::uniform_real_distribution<double> liveLoadDist(m_parameters.gravityLoading.minLiveLoadPerArea, m_parameters.gravityLoading.maxLiveLoadPerArea);
+	std::uniform_real_distribution<double> liveLoadDist(m_parameters.modelingPreferences.minLiveLoadPerArea, m_parameters.modelingPreferences.maxLiveLoadPerArea);
 	std::uniform_real_distribution<double> liveLoadMassContributionDist(m_parameters.modelingPreferences.minLiveLoadMassContribution, m_parameters.modelingPreferences.maxLiveLoadMassContribution);
 
 	double liveLoad = liveLoadDist(m_generator);
@@ -672,28 +678,36 @@ void RegularPlanBuildingGenerator::applyModelingPreferences(json& buildingInfo)
 
 		api::applyGravityLoadThroughLineElements(m_parameters.modelingPreferences.gravityThroughLineElements);
 	}
+
+	api::includeDeadLoadFromMembers(m_parameters.modelingPreferences.includeDeadLoadFromMembers);
 }
 
-void RegularPlanBuildingGenerator::applyGravityLoads(json& buildingInfo)
+void RegularPlanBuildingGenerator::analyze(json& buildingInfo)
+{
+	if (dynamic_cast<loadingGenerator::GravityLoadingGenerator*>(m_loading.get())) {
+		analyzeGravity(buildingInfo);
+	}
+}
+
+void RegularPlanBuildingGenerator::analyzeGravity(json& buildingInfo)
 {
 	int ns = buildingInfo["numberOfStoreys"];
+	double planArea = buildingInfo["planArea"];
+	double liveLoadPerArea = buildingInfo["loading"]["liveLoad"]["liveLoadPerArea"];
 
-	std::uniform_real_distribution<double> deadLoadFactorDist(m_parameters.gravityLoading.minDeadLoadFactor, m_parameters.gravityLoading.maxDeadLoadFactor);
-	std::uniform_real_distribution<double> liveLoadFactorDist(m_parameters.gravityLoading.minLiveLoadFactor, m_parameters.gravityLoading.maxLiveLoadFactor);
+	auto totalLiveLoad = (double)ns * liveLoadPerArea * planArea;
+	buildingInfo["loading"]["totalLiveLoad"] = totalLiveLoad;
+	buildingInfo["loading"]["totalDeadLoad"] = api::getBuildingWeight();
 
-	double deadLoadFactor = deadLoadFactorDist(m_generator);
-	double liveLoadFactor = liveLoadFactorDist(m_generator);
-	
-	buildingInfo["loading"]["deadLoad"]["deadLoadFactor"] = deadLoadFactor;
-	buildingInfo["loading"]["liveLoad"]["liveLoadFactor"] = liveLoadFactor;
+	m_loading->load(buildingInfo);
+	buildingModeler::BuildingModelerAPI::createAnalyticalModel();
+	buildingModeler::BuildingModelerAPI::createModelAndLoadingFiles();
+	buildingModeler::BuildingModelerAPI::analyze();
+}
 
-	api::includeDeadLoadFromMembers(m_parameters.gravityLoading.includeDeadLoadFromMembers);
-	api::updateDeadAndLiveLoads();
+void RegularPlanBuildingGenerator::fetchResultsForGravityAnalysis(json& buildingInfo)
+{
 
-	api::addStaticLoadCombination("gravity");
-	api::addLoadCaseToStaticLoadCombination("gravity", "dead", deadLoadFactor);
-	api::addLoadCaseToStaticLoadCombination("gravity", "live", liveLoadFactor);
-	api::setStaticLoadCombinationActive("gravity", true);
 }
 
 std::vector<std::vector<int>> RegularPlanBuildingGenerator::getShearWallArrangementInLongitudinalDir(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatio)

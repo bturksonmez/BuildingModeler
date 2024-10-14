@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../LoadingGenerator/ILoadingGenerator.h"
 #include <memory>
 #include <nlohmann/json.hpp>
 
@@ -68,18 +69,11 @@ namespace buildingGenerator
 		bool disableSlabElements = false;
 		bool gravityThroughLineElements = true;
 		bool makeFloorsRigid = true;
-		double minLiveLoadMassContribution;
-		double maxLiveLoadMassContribution;
-	};
-
-	struct GravityLoading {
 		bool includeDeadLoadFromMembers = true;
-		double minDeadLoadFactor;
-		double maxDeadLoadFactor;
 		double minLiveLoadPerArea;
 		double maxLiveLoadPerArea;
-		double minLiveLoadFactor;
-		double maxLiveLoadFactor;
+		double minLiveLoadMassContribution;
+		double maxLiveLoadMassContribution;
 	};
 
 	struct Parameters {
@@ -92,7 +86,6 @@ namespace buildingGenerator
 		double maxConcreteYoungsModulus;
 		MeshInfo meshInfo;
 		ModelingPreferences modelingPreferences;
-		GravityLoading gravityLoading;
 	};
 
 	typedef nlohmann::json json;
@@ -103,12 +96,12 @@ namespace buildingGenerator
 		typedef buildingModeler::BuildingModelerAPI api;
 
 	public:
-		virtual json generate() = 0;
+		virtual json generateAndAnalyze() = 0;
 		virtual ~IBuildingGenerator() = default;
 
 		template<typename T, typename... Args>
-		static std::unique_ptr<IBuildingGenerator> create(const Parameters& params, Args&&... args) {
-			return std::make_unique<T>(params, std::forward<Args>(args)...);
+		static std::unique_ptr<IBuildingGenerator> create(const Parameters& params, std::unique_ptr<loadingGenerator::ILoadingGenerator> loading, Args&&... args) {
+			return std::make_unique<T>(params, std::move(loading), std::forward<Args>(args)...);
 		}
 	};
 }

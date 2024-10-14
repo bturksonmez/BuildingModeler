@@ -48,6 +48,23 @@ void Building::clear()
     physicalModel::Load::resetCounter();
 }
 
+double Building::getTotalWeight() const
+{
+    double weight = 0.0;
+
+    for (auto it = m_lineElements.begin(); it != m_lineElements.end(); it++) {
+
+        weight += it->second->getWeight();
+    }
+
+    for (auto it = m_areaElements.begin(); it != m_areaElements.end(); it++) {
+
+        weight += it->second->getWeight();
+    }
+    
+    return weight;
+}
+
 Joint* Building::getJoint(int jointTag) const
 {
     auto it = m_joints.find(jointTag);

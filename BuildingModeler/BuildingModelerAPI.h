@@ -93,6 +93,7 @@ namespace buildingModeler
 
         // Building API
         static void includePDeltaEffects(bool includePDeltEffects);
+        static double getBuildingWeight();
         static void clear();
         static void clearAnalyticalModel();
 

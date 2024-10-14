@@ -13,6 +13,7 @@ namespace buildingGenerator
 	{
 	private:
 		Parameters m_parameters;
+		std::unique_ptr<loadingGenerator::ILoadingGenerator> m_loading;
 		long long m_seed;
 		std::default_random_engine m_generator;
 
@@ -27,16 +28,18 @@ namespace buildingGenerator
 		void generateBeams(json& buildingInfo);
 		void meshAreaElements();
 		void applyModelingPreferences(json& buildingInfo);
-		void applyGravityLoads(json& buildingInfo);
+		void analyze(json& buildingInfo);
+		void analyzeGravity(json& buildingInfo);
+		void fetchResultsForGravityAnalysis(json& buildingInfo);
 
 		std::vector<std::vector<int>> getShearWallArrangementInLongitudinalDir(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatio);
 		std::vector<std::vector<int>> findSubsetsOfVector(const std::vector<int>& vec);
 
 	public:
-		RegularPlanBuildingGenerator(const Parameters& parameters);
+		RegularPlanBuildingGenerator(const Parameters& parameters, std::unique_ptr<loadingGenerator::ILoadingGenerator> loading);
 		RegularPlanBuildingGenerator() = delete;
 		~RegularPlanBuildingGenerator() = default;
 
-		json generate() override;
+		json generateAndAnalyze() override;
 	};
 }

@@ -798,6 +798,11 @@ void BuildingModelerAPI::includePDeltaEffects(bool includePDeltaEffects)
     physicalModel::Building::getInstance().m_includePDeltaEffects = includePDeltaEffects;
 }
 
+double BuildingModelerAPI::getBuildingWeight()
+{
+    return physicalModel::Building::getInstance().getTotalWeight();
+}
+
 void BuildingModelerAPI::clear()
 {
     opensees::OpenseesModel::getInstance().clear();
