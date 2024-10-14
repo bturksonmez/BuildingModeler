@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cmath>
 #include <map>
+#include <fstream>
 
 using namespace buildingGenerator;
 
@@ -33,6 +34,10 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	generateBeams(buildingInfo);
 	meshAreaElements();
 	applyModelingPreferences(buildingInfo);
+	std::ofstream file("building_info.json");
+	file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
+	file.close();
+
 	analyze(buildingInfo);
 	fetchResultsForGravityAnalysis(buildingInfo);
 

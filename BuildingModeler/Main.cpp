@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include <fstream>
+
 #include "BuildingGenerator/RegularPlanBuildingGenerator.h"
 #include "LoadingGenerator/GravityLoadingGenerator.h"
 #include "Utilities/VectorUtilities.h"
@@ -63,10 +63,6 @@ int main()
 	auto loading = ILoadingGenerator::create<GravityLoadingGenerator>(minDeadLoadFactor, maxDeadLoadFactor, minLiveLoadFactor, maxLiveLoadFactor);
 	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params, std::move(loading));
 	json buildingInfo = generator->generateAndAnalyze();
-
-	std::ofstream file("building_info.json");
-	file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
-	file.close();
 
 	//for (int i = 0; i < 1000; ++i) {
 	//
