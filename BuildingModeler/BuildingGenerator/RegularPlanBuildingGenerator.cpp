@@ -708,11 +708,19 @@ void RegularPlanBuildingGenerator::analyzeGravity(json& buildingInfo)
 
 void RegularPlanBuildingGenerator::fetchResultsForGravityAnalysis(json& buildingInfo)
 {
+	int ns = buildingInfo["numberOfStoreys"];
+
+	fetchAxialLoadDistribution("gravity", buildingInfo);
+	fetchBeamDisplacementDistribution("gravity", ns, buildingInfo);
+}
+
+void RegularPlanBuildingGenerator::fetchAxialLoadDistribution(std::string analysisName, json& buildingInfo)
+{
 	std::vector<int> shearWallArrangementX = buildingInfo["shearWall"]["modifiedArrangementX"];
 	std::vector<int> shearWallArrangementY = buildingInfo["shearWall"]["arrangementY"];
 
 	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
-		buildingInfo["output"]["axialLoadDistribution"][std::to_string(i)] = std::vector<double>(m_parameters.geometricParameters.maxNumberOfBays + 1, 0);
+		buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(i)] = std::vector<double>(m_parameters.geometricParameters.maxNumberOfBays + 1, 0);
 	}
 
 	double totalAxialLoad = 0.0;
@@ -731,21 +739,49 @@ void RegularPlanBuildingGenerator::fetchResultsForGravityAnalysis(json& building
 			double axialLoad;
 			if (1 == shearWallArrangementX[j] && 1 == shearWallArrangementY[i]) {
 
-				axialLoad = api::getShearWallForceZ(elementTag, "gravity");
-				buildingInfo["output"]["axialLoadDistribution"][std::to_string(i)][j] = axialLoad / 2.0;
-				buildingInfo["output"]["axialLoadDistribution"][std::to_string(i)][j+1] = axialLoad / 2.0;
+				axialLoad = api::getShearWallForceZ(elementTag, analysisName);
+				buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(i)][j] = axialLoad / 2.0;
+				buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(i)][j + 1] = axialLoad / 2.0;
 				++j;
 			}
 			else {
-				axialLoad = api::getLineElementForceZ(elementTag, "gravity");
-				buildingInfo["output"]["axialLoadDistribution"][std::to_string(i)][j] = axialLoad / 2.0;
+				axialLoad = api::getLineElementForceZ(elementTag, analysisName);
+				buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(i)][j] = axialLoad / 2.0;
 			}
 
 			totalAxialLoad += axialLoad;
 		}
 	}
 
-	buildingInfo["output"]["totalAxialLoad"] = totalAxialLoad;
+	buildingInfo["output"][analysisName]["totalAxialLoad"] = totalAxialLoad;
+}
+
+void RegularPlanBuildingGenerator::fetchBeamDisplacementDistribution(std::string analysisName, int floorNumber, json& buildingInfo)
+{
+	auto beamTags = api::getBeamTags(floorNumber);
+
+	double minDelta = std::numeric_limits<double>::max();
+	double maxDelta = std::numeric_limits<double>::min();
+	double totalDelta = 0;
+
+	for (auto it = beamTags.begin(); it != beamTags.end(); it++) {
+
+		auto length = api::getLength(*it);
+		int numOfSegments = length / m_parameters.meshInfo.meshSensitivity;
+		numOfSegments = numOfSegments % 2 == 0 ? numOfSegments : numOfSegments + 1;
+		double disp = api::getLineElementDisplacement(*it, numOfSegments / 2, analysisName, 3);
+		double delta = std::abs(disp / length);
+
+		minDelta = std::min(delta, minDelta);
+		maxDelta = std::max(delta, maxDelta);
+		totalDelta += delta;
+	}
+
+	auto aveDelta = totalDelta / (double)beamTags.size();
+
+	buildingInfo["output"][analysisName]["minBeamDelta"][std::to_string(floorNumber)] = minDelta;
+	buildingInfo["output"][analysisName]["maxBeamDelta"][std::to_string(floorNumber)] = maxDelta;
+	buildingInfo["output"][analysisName]["averageBeamDelta"][std::to_string(floorNumber)] = aveDelta;
 }
 
 std::vector<std::vector<int>> RegularPlanBuildingGenerator::getShearWallArrangementInLongitudinalDir(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatio)

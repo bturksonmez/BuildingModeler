@@ -793,6 +793,29 @@ std::optional<utility::Vector2> BuildingModelerAPI::getMassCenter(int floorNumbe
     return floor->getMassCenter();
 }
 
+std::set<int> BuildingModelerAPI::getBeamTags(int floorNumber)
+{
+    if (!floorExists(floorNumber)) {
+        throw EntityNotFoundException("Floor number " + std::to_string(floorNumber) + " does not exist.");
+    }
+
+    std::set<int> beamTags;
+
+    auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
+    auto joints = floor->getJoints();
+    for (int i = 0; i < joints.size(); ++i) {
+
+        auto joint = physicalModel::Building::getInstance().getJoint(joints[i]);
+        auto tags = joint->getConnectedBeamTags();
+
+        for (auto beamTag : tags) {
+            beamTags.insert(beamTag);
+        }
+    }
+
+    return beamTags;
+}
+
 void BuildingModelerAPI::includePDeltaEffects(bool includePDeltaEffects)
 {
     physicalModel::Building::getInstance().m_includePDeltaEffects = includePDeltaEffects;

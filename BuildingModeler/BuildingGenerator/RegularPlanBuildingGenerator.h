@@ -31,6 +31,8 @@ namespace buildingGenerator
 		void analyze(json& buildingInfo);
 		void analyzeGravity(json& buildingInfo);
 		void fetchResultsForGravityAnalysis(json& buildingInfo);
+		void fetchAxialLoadDistribution(std::string analysisName, json& buildingInfo);
+		void fetchBeamDisplacementDistribution(std::string analysisName, int floorNumber, json& buildingInfo);
 
 		std::vector<std::vector<int>> getShearWallArrangementInLongitudinalDir(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatio);
 		std::vector<std::vector<int>> findSubsetsOfVector(const std::vector<int>& vec);

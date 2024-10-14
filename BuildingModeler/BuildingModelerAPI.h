@@ -5,6 +5,8 @@
 #include "BuildingModelerExceptions.h"
 #include "PhysicalModel/Load/LoadCase.h"
 
+#include <set>
+
 // To do export class is to be written for dll
 
 namespace buildingModeler
@@ -90,6 +92,7 @@ namespace buildingModeler
         static void confineFloorMassOnDiaphragmNode(int floorNumber, bool confineFloorMassOnDiaphragmNode);
         static std::optional<utility::Vector3> getDiaphragmMass(int floorNumber);
         static std::optional<utility::Vector2> getMassCenter(int floorNumber);
+        static std::set<int> getBeamTags(int floorNumber);
 
         // Building API
         static void includePDeltaEffects(bool includePDeltEffects);

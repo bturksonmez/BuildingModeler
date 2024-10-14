@@ -16,7 +16,7 @@ int main()
 	params.geometricParameters.maxNumberOfBays = 6;
 	params.geometricParameters.minBayWidth = 3.0;
 	params.geometricParameters.maxBayWidth = 6.0;
-	params.geometricParameters.minNumberOfStoreys = 3;
+	params.geometricParameters.minNumberOfStoreys = 7;
 	params.geometricParameters.maxNumberOfStoreys = 10;
 	params.geometricParameters.minFirstStoreyHeight = 2.8;
 	params.geometricParameters.maxFirstStoreyHeight = 4.5;
