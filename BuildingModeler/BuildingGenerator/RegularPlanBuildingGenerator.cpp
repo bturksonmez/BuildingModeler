@@ -34,6 +34,7 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	meshAreaElements();
 	applyModelingPreferences(buildingInfo);
 	analyze(buildingInfo);
+	fetchResultsForGravityAnalysis(buildingInfo);
 
 	return buildingInfo;
 }
@@ -707,7 +708,44 @@ void RegularPlanBuildingGenerator::analyzeGravity(json& buildingInfo)
 
 void RegularPlanBuildingGenerator::fetchResultsForGravityAnalysis(json& buildingInfo)
 {
+	std::vector<int> shearWallArrangementX = buildingInfo["shearWall"]["modifiedArrangementX"];
+	std::vector<int> shearWallArrangementY = buildingInfo["shearWall"]["arrangementY"];
 
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["output"]["axialLoadDistribution"][std::to_string(i)] = std::vector<double>(m_parameters.geometricParameters.maxNumberOfBays + 1, 0);
+	}
+
+	double totalAxialLoad = 0.0;
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+
+		std::vector<int> verticalMembersOnBay = buildingInfo["verticalMemberPlan"][std::to_string(i)];
+
+		for (int j = 0; j <= m_parameters.geometricParameters.maxNumberOfBays; ++j) {
+
+			int elementTag = verticalMembersOnBay[j];
+
+			if (0 == elementTag) {
+				continue;
+			}
+
+			double axialLoad;
+			if (1 == shearWallArrangementX[j] && 1 == shearWallArrangementY[i]) {
+
+				axialLoad = api::getShearWallForceZ(elementTag, "gravity");
+				buildingInfo["output"]["axialLoadDistribution"][std::to_string(i)][j] = axialLoad / 2.0;
+				buildingInfo["output"]["axialLoadDistribution"][std::to_string(i)][j+1] = axialLoad / 2.0;
+				++j;
+			}
+			else {
+				axialLoad = api::getLineElementForceZ(elementTag, "gravity");
+				buildingInfo["output"]["axialLoadDistribution"][std::to_string(i)][j] = axialLoad / 2.0;
+			}
+
+			totalAxialLoad += axialLoad;
+		}
+	}
+
+	buildingInfo["output"]["totalAxialLoad"] = totalAxialLoad;
 }
 
 std::vector<std::vector<int>> RegularPlanBuildingGenerator::getShearWallArrangementInLongitudinalDir(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatio)
