@@ -41,7 +41,6 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	generateFloors(ns, H1, H2);
 
 	// Retrieve geometric properties
-	int ns = buildingInfo["numberOfStoreys"];
 	int numOfBaysX = buildingInfo["numberOfBaysX"];
 	int numOfBaysY = buildingInfo["numberOfBaysY"];
 	std::vector<double> bayWidthsX = buildingInfo["bayWidthsX"];
@@ -55,31 +54,31 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	std::uniform_real_distribution<double> youngsModulusDist(m_parameters.minConcreteYoungsModulus, m_parameters.maxConcreteYoungsModulus);
 	std::uniform_real_distribution<double> shearWallCrackedSectionModifierDist(m_parameters.shearWallParameters.minShearWallCrackedSectionModifier, m_parameters.shearWallParameters.maxShearWallCrackedSectionModifier);
 	double E = youngsModulusDist(m_generator);
-	double crackedMod = shearWallCrackedSectionModifierDist(m_generator);
+	double crackedModShearWall = shearWallCrackedSectionModifierDist(m_generator);
 	buildingInfo["youngsModulus"] = E;
-	buildingInfo["shearWall"]["crackedSectionModifier"] = crackedMod;
-	generateMaterials(E, crackedMod);
+	buildingInfo["shearWall"]["crackedSectionModifier"] = crackedModShearWall;
+	generateMaterials(E, crackedModShearWall);
 
 	//Generate shear walls
 	std::uniform_real_distribution<double> shearWallThicknessDist(m_parameters.shearWallParameters.minShearWallThickness, m_parameters.shearWallParameters.maxShearWallThickness);
-	double t = shearWallThicknessDist(m_generator);
-	buildingInfo["shearWall"]["thickness"] = t;
+	double tShearWall = shearWallThicknessDist(m_generator);
+	buildingInfo["shearWall"]["thickness"] = tShearWall;
 	double shearWallRatioX;
 	std::vector<std::vector<int>> shearWallArrangementXDir;
 	if (m_parameters.shearWallParameters.includeShearWallInXDir) {
-		shearWallArrangementXDir = getShearWallArrangementInLongitudinalDir(numOfBaysX, numOfBaysY, bayWidthsX, bayWidthsY, t, shearWallRatioX);
+		shearWallArrangementXDir = getShearWallArrangementInLongitudinalDir(numOfBaysX, numOfBaysY, bayWidthsX, bayWidthsY, tShearWall, shearWallRatioX);
 		buildingInfo["shearWall"]["shearWallXDir"]["ratio"] = shearWallRatioX;
 		buildingInfo["shearWall"]["shearWallXDir"]["area"] = shearWallRatioX * planArea;
 		buildingInfo["shearWall"]["arrangementX"] = shearWallArrangementXDir[0];
 		buildingInfo["shearWall"]["arrangementY"] = shearWallArrangementXDir[1];
 	}
-	generateShearWalls(shearWallArrangementXDir, t, buildingInfo);
+	generateShearWalls(shearWallArrangementXDir, tShearWall, buildingInfo);
 
 	// Generate slabs
 	std::uniform_real_distribution<double> slabThicknessDist(m_parameters.slabParameters.minSlabThickness, m_parameters.slabParameters.maxSlabThickness);
-	double t = slabThicknessDist(m_generator);
-	buildingInfo["slab"]["thickness"] = t;
-	generateSlabs(t, buildingInfo);
+	double tSlab = slabThicknessDist(m_generator);
+	buildingInfo["slab"]["thickness"] = tSlab;
+	generateSlabs(tSlab, buildingInfo);
 
 	// Generate columns
 	std::vector<int> modifiedShearWallArrangementX;
@@ -105,7 +104,7 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	double aspectRatio = maxAspectRatioDist(m_generator);
 	double areaRatioInnerToOuter = maxAreaRatioInnerToOuterDist(m_generator);
 	double squareWidth = equivalentSquareColumnWidthDist(m_generator);
-	double crackedMod = columnCrackedSectionModifierDist(m_generator);
+	double crackedModColumn = columnCrackedSectionModifierDist(m_generator);
 	double widthOuterS = squareWidth / std::sqrt(aspectRatio);
 	double widthOuterL = squareWidth * std::sqrt(aspectRatio);
 	double widthInnerS = widthOuterS * std::sqrt(areaRatioInnerToOuter);
@@ -114,9 +113,8 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	buildingInfo["column"]["outerColumns"]["depth"] = widthOuterL;
 	buildingInfo["column"]["innerColumns"]["width"] = widthInnerS;
 	buildingInfo["column"]["innerColumns"]["depth"] = widthInnerL;
-	buildingInfo["column"]["crackedMod"] = crackedMod;
-	std::vector<std::vector<int>> newShearWallArrangement = { modifiedShearWallArrangementX, shearWallArrangementXDir[1] };
-	generateColumns(newShearWallArrangement, widthOuterS, widthOuterL, widthInnerS, widthInnerL, crackedMod, buildingInfo);
+	buildingInfo["column"]["crackedMod"] = crackedModColumn;
+	generateColumns(modifiedShearWallArrangementX, widthOuterS, widthOuterL, widthInnerS, widthInnerL, crackedModColumn, buildingInfo);
 
 	// Generate beams
 	std::uniform_real_distribution<double> beamWidthDist(m_parameters.beamParameters.minBeamWidth, m_parameters.beamParameters.maxBeamWidth);
@@ -124,7 +122,7 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	std::uniform_real_distribution<double> beamCrackedSectionModifierDist(m_parameters.beamParameters.minBeamCrackedSectionModifier, m_parameters.beamParameters.maxBeamCrackedSectionModifier);
 	double width = beamWidthDist(m_generator);
 	double equivalentDepth = equivalentBeamDepthDist(m_generator);
-	double crackedMod = beamCrackedSectionModifierDist(m_generator);
+	double crackedModBeam = beamCrackedSectionModifierDist(m_generator);
 	double difDepth = m_parameters.beamParameters.maxBeamDepth - m_parameters.beamParameters.minBeamDepth;
 	double minLength = std::numeric_limits<double>::max();
 	double maxLength = std::numeric_limits<double>::min();
@@ -156,8 +154,8 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	buildingInfo["beam"]["maxDepth"] = maxDepth;
 	buildingInfo["beam"]["minLength"] = minLength;
 	buildingInfo["beam"]["maxLength"] = maxLength;
-	buildingInfo["beam"]["crackedMod"] = crackedMod;
-	generateBeams(width, equivalentDepth, minDepth, maxDepth, minLength, maxLength, crackedMod, buildingInfo);
+	buildingInfo["beam"]["crackedMod"] = crackedModBeam;
+	generateBeams(width, equivalentDepth, minDepth, maxDepth, minLength, maxLength, crackedModBeam, buildingInfo);
 
 	// Mesh area elements
 	meshAreaElements();
@@ -408,12 +406,11 @@ void RegularPlanBuildingGenerator::generateSlabs(double thickness, json& buildin
 	}
 }
 
-void RegularPlanBuildingGenerator::generateColumns(const std::vector<std::vector<int>>& shearWallArrangementX, double outerColumnWidth, double outerColumnDepth, double innerColumnWidth, double innerColumnDepth, double columnCrackedSectionModifier, json& buildingInfo)
+void RegularPlanBuildingGenerator::generateColumns(const std::vector<int>& modifiedShearWallArrangementX, double outerColumnWidth, double outerColumnDepth, double innerColumnWidth, double innerColumnDepth, double columnCrackedSectionModifier, json& buildingInfo)
 {
 	int ns = buildingInfo["numberOfStoreys"];
 	int numOfBaysX = buildingInfo["numberOfBaysX"];
 	int numOfBaysY = buildingInfo["numberOfBaysY"];
-	std::vector<int> shearWallArrangementX = buildingInfo["shearWall"]["arrangementX"];
 	std::vector<int> shearWallArrangementY = buildingInfo["shearWall"]["arrangementY"];
 
 	std::uniform_int_distribution<int> columnOrientationDist(0, 1);
@@ -435,7 +432,7 @@ void RegularPlanBuildingGenerator::generateColumns(const std::vector<std::vector
 
 			for (int k = 0; k <= numOfBaysX; ++k) {
 
-				if (1 != shearWallArrangementX[1][j] || 1 != shearWallArrangementX[0][k]) {
+				if (1 != shearWallArrangementY[j] || 1 != modifiedShearWallArrangementX[k]) {
 
 					int sectionTag;
 

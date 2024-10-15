@@ -24,7 +24,7 @@ namespace buildingGenerator
 		void generateMaterials(double E, double shearWallCrackedSectionModifier);
 		void generateShearWalls(const std::vector<std::vector<int>>& shearWallArrangementX, double thickness, json& buildingInfo);
 		void generateSlabs(double thickness, json& buildingInfo);
-		void generateColumns(const std::vector<std::vector<int>>& shearWallArrangementX, double outerColumnWidth, double outerColumnDepth, double innerColumnWidth, double innerColumnDepth, double columnCrackedSectionModifier, json& buildingInfo);
+		void generateColumns(const std::vector<int>& modifiedShearWallArrangementX, double outerColumnWidth, double outerColumnDepth, double innerColumnWidth, double innerColumnDepth, double columnCrackedSectionModifier, json& buildingInfo);
 		void generateBeams(double width, double equivalentDepth, double minDepth, double maxDepth, double minLength, double maxLength, double beamCrackedSectionModifier, json& buildingInfo);
 		void meshAreaElements();
 		void applyModelingPreferences(double liveLoad, double liveLoadMassContributionFactor, json& buildingInfo);
