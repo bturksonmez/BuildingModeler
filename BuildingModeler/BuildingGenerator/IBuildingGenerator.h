@@ -97,6 +97,7 @@ namespace buildingGenerator
 
 	public:
 		virtual json generateAndAnalyze() = 0;
+		virtual void createModelFromJsonAndAnalyze(json& buildingInfo) = 0;
 		virtual ~IBuildingGenerator() = default;
 
 		template<typename T, typename... Args>

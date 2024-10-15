@@ -19,9 +19,9 @@ namespace buildingGenerator
 
 		void validateInput();
 		void generateBuildingPlan(json& buildingInfo);
-		void generateFloors(json& buildingInfo);
+		void generateFloors(int numberOfStories, double firstStoreyHeight, double storeyHeight);
 		void generateJoints(json& buildingInfo);
-		void generateMaterials(json& buildingInfo);
+		void generateMaterials(double E, double shearWallCrackedSectionModifier);
 		void generateShearWalls(json& buildingInfo);
 		void generateSlabs(json& buildingInfo);
 		void generateColumns(json& buildingInfo);
@@ -43,5 +43,6 @@ namespace buildingGenerator
 		~RegularPlanBuildingGenerator() = default;
 
 		json generateAndAnalyze() override;
+		void createModelFromJsonAndAnalyze(json& buildingInfo) override;
 	};
 }

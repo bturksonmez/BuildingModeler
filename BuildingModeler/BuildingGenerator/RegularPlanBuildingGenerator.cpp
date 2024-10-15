@@ -24,10 +24,35 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	api::clear();
 
 	json buildingInfo;
+
+	//Generate building plan
 	generateBuildingPlan(buildingInfo);
-	generateFloors(buildingInfo);
+
+	//Generate floors
+	std::uniform_int_distribution<int> numberOfStoreysDist(m_parameters.geometricParameters.minNumberOfStoreys, m_parameters.geometricParameters.maxNumberOfStoreys);
+	std::uniform_real_distribution<double> storeyHeightDist(m_parameters.geometricParameters.minStoreyHeight, m_parameters.geometricParameters.maxStoreyHeight);
+	int ns = numberOfStoreysDist(m_generator);
+	double H2 = storeyHeightDist(m_generator);
+	std::uniform_real_distribution<double> firstStoreyHeightDist(H2, m_parameters.geometricParameters.maxFirstStoreyHeight);
+	double H1 = firstStoreyHeightDist(m_generator);
+	buildingInfo["numberOfStoreys"] = ns;
+	buildingInfo["firstStoreyHeight"] = H1;
+	buildingInfo["storeyHeight"] = H2;
+	generateFloors(ns, H1, H2);
+
+	// Generate joints
 	generateJoints(buildingInfo);
-	generateMaterials(buildingInfo);
+
+	// Generate materials
+	std::uniform_real_distribution<double> youngsModulusDist(m_parameters.minConcreteYoungsModulus, m_parameters.maxConcreteYoungsModulus);
+	std::uniform_real_distribution<double> shearWallCrackedSectionModifierDist(m_parameters.shearWallParameters.minShearWallCrackedSectionModifier, m_parameters.shearWallParameters.maxShearWallCrackedSectionModifier);
+	double E = youngsModulusDist(m_generator);
+	double crackedMod = shearWallCrackedSectionModifierDist(m_generator);
+	buildingInfo["youngsModulus"] = E;
+	buildingInfo["shearWall"]["crackedSectionModifier"] = crackedMod;
+	generateMaterials(E, crackedMod);
+
+
 	generateShearWalls(buildingInfo);
 	generateSlabs(buildingInfo);
 	generateColumns(buildingInfo);
@@ -42,6 +67,11 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	fetchResultsForGravityAnalysis(buildingInfo);
 
 	return buildingInfo;
+}
+
+void RegularPlanBuildingGenerator::createModelFromJsonAndAnalyze(json& buildingInfo)
+{
+
 }
 
 void RegularPlanBuildingGenerator::validateInput()
@@ -107,27 +137,14 @@ void RegularPlanBuildingGenerator::generateBuildingPlan(json& buildingInfo)
 	}
 }
 
-void RegularPlanBuildingGenerator::generateFloors(json& buildingInfo)
+void RegularPlanBuildingGenerator::generateFloors(int numberOfStories, double firstStoreyHeight, double storeyHeight)
 {
-	std::uniform_int_distribution<int> numberOfStoreysDist(m_parameters.geometricParameters.minNumberOfStoreys, m_parameters.geometricParameters.maxNumberOfStoreys);
-	std::uniform_real_distribution<double> storeyHeightDist(m_parameters.geometricParameters.minStoreyHeight, m_parameters.geometricParameters.maxStoreyHeight);
-
-	int ns = numberOfStoreysDist(m_generator);
-	double H2 = storeyHeightDist(m_generator);
-
-	std::uniform_real_distribution<double> firstStoreyHeightDist(H2, m_parameters.geometricParameters.maxFirstStoreyHeight);
-	double H1 = firstStoreyHeightDist(m_generator);
-	
-	buildingInfo["numberOfStoreys"] = ns;
-	buildingInfo["firstStoreyHeight"] = H1;
-	buildingInfo["storeyHeight"] = H2;
-
 	api::addFloor(0, 0.0);
-	auto currentHeight = H1;
+	auto currentHeight = firstStoreyHeight;
 
-	for (int i = 1; i <= ns; ++i) {
+	for (int i = 1; i <= numberOfStories; ++i) {
 		api::addFloor(i, currentHeight);
-		currentHeight += H2;
+		currentHeight += storeyHeight;
 	}
 }
 
@@ -179,23 +196,15 @@ void RegularPlanBuildingGenerator::generateJoints(json& buildingInfo)
 	}
 }
 
-void RegularPlanBuildingGenerator::generateMaterials(json& buildingInfo)
+void RegularPlanBuildingGenerator::generateMaterials(double E, double shearWallCrackedSectionModifier)
 {
-	std::uniform_real_distribution<double> youngsModulusDist(m_parameters.minConcreteYoungsModulus, m_parameters.maxConcreteYoungsModulus);
-	std::uniform_real_distribution<double> shearWallCrackedSectionModifierDist(m_parameters.shearWallParameters.minShearWallCrackedSectionModifier, m_parameters.shearWallParameters.maxShearWallCrackedSectionModifier);
-
-	double E = youngsModulusDist(m_generator);
-	double crackedMod = shearWallCrackedSectionModifierDist(m_generator);
-	double Ecracked = crackedMod * E;
+	double Ecracked = shearWallCrackedSectionModifier * E;
 
 	double G = E / (1.0 + 0.2) / 2.0;
 	double Gcracked = Ecracked / (1.0 + 0.2) / 2.0;
 
 	api::addElasticMaterial(1, E, G, 2.4);
 	api::addElasticMaterial(2, Ecracked, Gcracked, 2.4); // for shear walls only
-
-	buildingInfo["youngsModulus"] = E;
-	buildingInfo["shearWall"]["crackedSectionModifier"] = crackedMod;
 }
 
 void RegularPlanBuildingGenerator::generateShearWalls(json& buildingInfo)
