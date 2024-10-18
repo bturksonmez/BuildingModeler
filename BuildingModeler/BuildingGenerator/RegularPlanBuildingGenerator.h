@@ -16,6 +16,7 @@ namespace buildingGenerator
 		std::unique_ptr<loadingGenerator::ILoadingGenerator> m_loading;
 		long long m_seed;
 		std::default_random_engine m_generator;
+		static long long counter;
 
 		void validateInput();
 		void generateBuildingPlan(json& buildingInfo);

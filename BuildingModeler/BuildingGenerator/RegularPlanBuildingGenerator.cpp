@@ -9,6 +9,8 @@
 
 using namespace buildingGenerator;
 
+long long RegularPlanBuildingGenerator::counter = 0;
+
 RegularPlanBuildingGenerator::RegularPlanBuildingGenerator(const Parameters& parameters, std::unique_ptr<loadingGenerator::ILoadingGenerator> loading) :
 	m_parameters(parameters), m_loading(std::move(loading))
 {
@@ -17,7 +19,6 @@ RegularPlanBuildingGenerator::RegularPlanBuildingGenerator(const Parameters& par
 
 json RegularPlanBuildingGenerator::generateAndAnalyze()
 {
-	static long long counter = 0;
 	m_seed = std::chrono::system_clock::now().time_since_epoch().count() + counter++;
 	m_generator.seed(m_seed);
 
@@ -193,7 +194,96 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 
 void RegularPlanBuildingGenerator::createModelFromJsonAndAnalyze(json& buildingInfo)
 {
+	m_seed = std::chrono::system_clock::now().time_since_epoch().count() + counter++;
+	m_generator.seed(m_seed);
 
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["verticalMemberPlan"][std::to_string(i)] = std::vector<int>(m_parameters.geometricParameters.maxNumberOfBays + 1, 0);
+	}
+
+	// Generate floors
+	int ns = buildingInfo["numberOfStoreys"];
+	double H1 = buildingInfo["firstStoreyHeight"];
+	double H2 = buildingInfo["storeyHeight"];
+	generateFloors(ns, H1, H2);
+
+	// Retrieve geometric properties
+	int numOfBaysX = buildingInfo["numberOfBaysX"];
+	int numOfBaysY = buildingInfo["numberOfBaysY"];
+	std::vector<double> bayWidthsX = buildingInfo["bayWidthsX"];
+	std::vector<double> bayWidthsY = buildingInfo["bayWidthsY"];
+	double planArea = buildingInfo["planArea"];
+
+	// Generate joints
+	generateJoints(buildingInfo);
+
+	// Generate materials
+	double E = buildingInfo["youngsModulus"];
+	double crackedModShearWall = buildingInfo["shearWall"]["crackedSectionModifier"];
+	generateMaterials(E, crackedModShearWall);
+
+	//Generate shear walls
+	double tShearWall = buildingInfo["shearWall"]["thickness"];
+	std::vector<int> shearWallArrangementX = buildingInfo["shearWall"]["arrangementX"];
+	std::vector<int> shearWallArrangementY = buildingInfo["shearWall"]["arrangementY"];
+	std::vector<std::vector<int>> shearWallArrangementXDir { shearWallArrangementX , shearWallArrangementY};
+	generateShearWalls(shearWallArrangementXDir, tShearWall, buildingInfo);
+
+	// Generate slabs
+	double tSlab = buildingInfo["slab"]["thickness"];
+	generateSlabs(tSlab, buildingInfo);
+
+	// Generate columns
+	std::vector<int> modifiedShearWallArrangementX = buildingInfo["shearWall"]["modifiedArrangementX"];
+	double widthOuterS = buildingInfo["column"]["outerColumns"]["width"];
+	double widthOuterL = buildingInfo["column"]["outerColumns"]["depth"];
+	double widthInnerS = buildingInfo["column"]["innerColumns"]["width"];
+	double widthInnerL = buildingInfo["column"]["innerColumns"]["depth"];
+	double crackedModColumn = buildingInfo["column"]["crackedMod"];
+	generateColumns(modifiedShearWallArrangementX, widthOuterS, widthOuterL, widthInnerS, widthInnerL, crackedModColumn, buildingInfo);
+
+	// Generate beams
+	double width = buildingInfo["beam"]["width"];
+	double equivalentDepth = buildingInfo["beam"]["equivalentDepth"];
+	double minDepth = buildingInfo["beam"]["minDepth"];
+	double maxDepth = buildingInfo["beam"]["maxDepth"];
+	double minLength = buildingInfo["beam"]["minLength"];
+	double maxLength = buildingInfo["beam"]["maxLength"];
+	double crackedModBeam = buildingInfo["beam"]["crackedMod"];
+	generateBeams(width, equivalentDepth, minDepth, maxDepth, minLength, maxLength, crackedModBeam, buildingInfo);
+
+	// Mesh area elements
+	meshAreaElements();
+
+	// Apply model preferences
+	double liveLoad = buildingInfo["loading"]["liveLoad"]["liveLoadPerArea"];
+	double liveLoadMassContributionFactor = buildingInfo["loading"]["liveLoad"]["liveLoadMassParticipationFactor"];
+	applyModelingPreferences(liveLoad, liveLoadMassContributionFactor, buildingInfo);
+
+	// Load the building
+	if (dynamic_cast<loadingGenerator::GravityLoadingGenerator*>(m_loading.get())) {
+		auto totalLiveLoad = (double)ns * liveLoad * planArea;
+		buildingInfo["loading"]["totalLiveLoad"] = totalLiveLoad;
+		buildingInfo["loading"]["totalDeadLoad"] = api::getBuildingWeight();
+		double deadLoadFactor = buildingInfo["loading"]["deadLoad"]["deadLoadFactor"];
+		double liveLoadFactor = buildingInfo["loading"]["liveLoad"]["liveLoadFactor"];
+		api::updateDeadAndLiveLoads();
+		api::addStaticLoadCombination("gravity");
+		api::addLoadCaseToStaticLoadCombination("gravity", "dead", deadLoadFactor);
+		api::addLoadCaseToStaticLoadCombination("gravity", "live", liveLoadFactor);
+		api::setStaticLoadCombinationActive("gravity", true);
+	}
+
+	// Write model to json file
+	std::ofstream file("building_infoR.json");
+	file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
+	file.close();
+
+	// Analyze the building
+	analyze();
+
+	// Fetch the results
+	fetchResultsForGravityAnalysis(buildingInfo);
 }
 
 void RegularPlanBuildingGenerator::validateInput()
