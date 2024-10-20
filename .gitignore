@@ -38,3 +38,7 @@ external/
 
 # Json files
 *.json
+
+# Mac files
+build/
+.DS_Store

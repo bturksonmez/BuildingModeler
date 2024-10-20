@@ -28,9 +28,9 @@ target_include_directories(BuildingModeler PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/Utilities
 )
 
-if (WIN32)
+if (WIN32 OR APPLE)
     target_link_libraries(BuildingModelerLib PUBLIC BuildingGenerator)
     target_link_libraries(BuildingModelerLib PUBLIC LoadingGenerator)
-endif (WIN32)
+endif ()
 
 target_link_libraries(BuildingModeler PUBLIC BuildingModelerLib)

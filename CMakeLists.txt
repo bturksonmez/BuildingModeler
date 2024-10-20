@@ -14,9 +14,9 @@ enable_testing()
 # Add this to force Google Test to match the current project's settings.
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-if (WIN32)
+if (WIN32 OR APPLE)
 	add_subdirectory(external/googletest)
-endif (WIN32)
+endif ()
 
 add_executable(Tests
 	"Tests/TestMain.cpp"

@@ -6,7 +6,7 @@ add_library(BuildingGenerator STATIC ${BUILDING_GENERATOR_SRC})
 
 target_include_directories(BuildingGenerator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-if (WIN32)
+if (WIN32 OR APPLE)
 	target_include_directories(BuildingGenerator PUBLIC ${PROJECT_ROOT}/external/json/single_include)
-endif (WIN32)
+endif ()
 
