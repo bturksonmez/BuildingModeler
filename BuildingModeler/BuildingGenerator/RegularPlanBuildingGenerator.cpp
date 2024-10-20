@@ -184,15 +184,18 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	file.close();
 
 	// Analyze the building
-	analyze();
+	auto analysisSuccess = analyze();
 	
 	// Fetch the results
+	if (analysisSuccess["gravity"]) {
+		return json{};
+	}
 	fetchResultsForGravityAnalysis(buildingInfo);
 
 	return buildingInfo;
 }
 
-void RegularPlanBuildingGenerator::createModelFromJsonAndAnalyze(json& buildingInfo)
+bool RegularPlanBuildingGenerator::createModelFromJsonAndAnalyze(json& buildingInfo)
 {
 	m_seed = std::chrono::system_clock::now().time_since_epoch().count() + counter++;
 	m_generator.seed(m_seed);
@@ -265,8 +268,8 @@ void RegularPlanBuildingGenerator::createModelFromJsonAndAnalyze(json& buildingI
 		auto totalLiveLoad = (double)ns * liveLoad * planArea;
 		buildingInfo["loading"]["totalLiveLoad"] = totalLiveLoad;
 		buildingInfo["loading"]["totalDeadLoad"] = api::getBuildingWeight();
-		double deadLoadFactor = buildingInfo["loading"]["deadLoad"]["deadLoadFactor"];
-		double liveLoadFactor = buildingInfo["loading"]["liveLoad"]["liveLoadFactor"];
+		double deadLoadFactor = 1.0; //buildingInfo["loading"]["deadLoad"]["deadLoadFactor"];
+		double liveLoadFactor = 1.0; //buildingInfo["loading"]["liveLoad"]["liveLoadFactor"];
 		api::updateDeadAndLiveLoads();
 		api::addStaticLoadCombination("gravity");
 		api::addLoadCaseToStaticLoadCombination("gravity", "dead", deadLoadFactor);
@@ -280,10 +283,15 @@ void RegularPlanBuildingGenerator::createModelFromJsonAndAnalyze(json& buildingI
 	file.close();
 
 	// Analyze the building
-	analyze();
+	auto analysisSuccess = analyze();
 
 	// Fetch the results
+	if (!analysisSuccess["gravity"]) {
+		return false;
+	}
 	fetchResultsForGravityAnalysis(buildingInfo);
+
+	return true;
 }
 
 void RegularPlanBuildingGenerator::validateInput()
@@ -738,7 +746,8 @@ void RegularPlanBuildingGenerator::meshAreaElements()
 
 		int n1 = (coordJ - coordI).norm2() / m_parameters.meshInfo.meshSensitivity;
 		n1 = n1 % 2 == 0 ? n1 : n1 + 1;
-		int n2 = (coordK - coordJ).norm2() / m_parameters.meshInfo.meshSensitivity;
+		int n2 = (coordK - coordJ).norm2() / m_parameters.meshInfo.meshSensitivity; 
+
 		n2 = n2 % 2 == 0 ? n2 : n2 + 1;
 
 		api::meshAreaElement(shearWallTags[i], n1, n2);
@@ -797,11 +806,12 @@ void RegularPlanBuildingGenerator::applyModelingPreferences(double liveLoad, dou
 	api::includeDeadLoadFromMembers(m_parameters.modelingPreferences.includeDeadLoadFromMembers);
 }
 
-void RegularPlanBuildingGenerator::analyze()
+std::unordered_map<std::string, bool> RegularPlanBuildingGenerator::analyze()
+
 {
 	buildingModeler::BuildingModelerAPI::createAnalyticalModel();
 	buildingModeler::BuildingModelerAPI::createModelAndLoadingFiles();
-	buildingModeler::BuildingModelerAPI::analyze();
+	return buildingModeler::BuildingModelerAPI::analyze();
 }
 
 void RegularPlanBuildingGenerator::fetchResultsForGravityAnalysis(json& buildingInfo)

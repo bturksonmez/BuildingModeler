@@ -43,23 +43,37 @@ double ModalOutput::getFundamentalPeriod(size_t dof)
 	return -1.0;
 }
 
-void ModalOutput::retrieveOutput()
+bool ModalOutput::retrieveOutput()
 {
-	retrievePeriods();
+	bool periodsRetrieved = retrievePeriods();
+
+	if (!periodsRetrieved) {
+
+		return false;
+	}
 	retrieveModeShapes();
 	retrieveModeShapesAsDisplacements();
+
+	return true;
 }
 
-void ModalOutput::retrievePeriods()
+bool ModalOutput::retrievePeriods()
 {
 	std::string outputFile = "lambda.out";
 	auto lambdas = utilities::DataReader::readContinuosLine<double>(outputFile);
+
+	if (lambdas.empty()) {
+
+		return false;
+	}
 
 	for (auto lambda : lambdas) {
 		// To do: add PI global
 		auto period = 2.0 * 3.141593 / std::pow(lambda, 0.5);
 		m_periods.push_back(period);
 	}
+
+	return true;
 }
 
 void ModalOutput::retrieveModeShapes()

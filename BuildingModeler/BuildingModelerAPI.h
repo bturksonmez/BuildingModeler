@@ -164,6 +164,6 @@ namespace buildingModeler
         // Input File Generation
         static void createAnalyticalModel();
         static void createModelAndLoadingFiles();
-        static void analyze();
+        static std::unordered_map<std::string, bool> analyze();
     };
 }

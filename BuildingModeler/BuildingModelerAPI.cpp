@@ -344,8 +344,8 @@ double BuildingModelerAPI::getArea(int elementTag, int segmentNo)
         throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
     }
 
-    return physicalModel::Building::getInstance().m_lineElements[elementTag]->getSectionModifiers(segmentNo)->m_modifierA * 
-        physicalModel::Building::getInstance().m_lineElements[elementTag]->getSection(segmentNo)->getA().value();
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->getSection(segmentNo)->getA().value();
+        
 }
 
 double BuildingModelerAPI::getMomentOfInertiaYY(int elementTag, int segmentNo)
@@ -354,8 +354,7 @@ double BuildingModelerAPI::getMomentOfInertiaYY(int elementTag, int segmentNo)
         throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
     }
 
-    return physicalModel::Building::getInstance().m_lineElements[elementTag]->getSectionModifiers(segmentNo)->m_modifierIyy *
-        physicalModel::Building::getInstance().m_lineElements[elementTag]->getSection(segmentNo)->getIyy().value();
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->getSection(segmentNo)->getIyy().value();  
 }
 
 double BuildingModelerAPI::getMomentOfInertiaZZ(int elementTag, int segmentNo)
@@ -364,8 +363,7 @@ double BuildingModelerAPI::getMomentOfInertiaZZ(int elementTag, int segmentNo)
         throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
     }
 
-    return physicalModel::Building::getInstance().m_lineElements[elementTag]->getSectionModifiers(segmentNo)->m_modifierIzz * 
-        physicalModel::Building::getInstance().m_lineElements[elementTag]->getSection(segmentNo)->getIzz().value();
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->getSection(segmentNo)->getIzz().value();
 }
 
 double BuildingModelerAPI::getTorsionalConstant(int elementTag, int segmentNo)
@@ -374,8 +372,7 @@ double BuildingModelerAPI::getTorsionalConstant(int elementTag, int segmentNo)
         throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
     }
 
-    return physicalModel::Building::getInstance().m_lineElements[elementTag]->getSectionModifiers(segmentNo)->m_modifierJ *
-        physicalModel::Building::getInstance().m_lineElements[elementTag]->getSection(segmentNo)->getJ().value();
+    return physicalModel::Building::getInstance().m_lineElements[elementTag]->getSection(segmentNo)->getJ().value();
 }
 
 void BuildingModelerAPI::addShearWall(int elementTag, std::vector<int> jointTags, int sectionTag,
@@ -1937,7 +1934,7 @@ void BuildingModelerAPI::createModelAndLoadingFiles()
     opensees::OpenseesModel::getInstance().toTclFile();
 }
 
-void BuildingModelerAPI::analyze()
+std::unordered_map<std::string, bool> BuildingModelerAPI::analyze()
 {
-    opensees::OpenseesModel::getInstance().analyze();
+    return opensees::OpenseesModel::getInstance().analyze();
 }

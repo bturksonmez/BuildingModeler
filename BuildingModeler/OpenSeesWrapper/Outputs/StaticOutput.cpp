@@ -13,17 +13,24 @@ const std::unordered_map<int, std::vector<std::vector<double>>>& StaticOutput::g
 	return m_eleForceOutput;
 }
 
-void StaticOutput::retrieveOutput()
+bool StaticOutput::retrieveOutput()
 {
 	// To do: these methods will be updated based on multiple stage analysis not just for analyze 1 command in OpenSees
-	retrieveNodeDisplacements();
-	retrieveElementForces();
+	bool dispRetrieved = retrieveNodeDisplacements();
+	bool forceRetrieved = retrieveElementForces();
+
+	return dispRetrieved && forceRetrieved;
 }
 
-void StaticOutput::retrieveNodeDisplacements()
+bool StaticOutput::retrieveNodeDisplacements()
 {
 	std::string outputFile = "nodeDisp.out";
 	auto displacements = utilities::DataReader::readContinuosLine<double>(outputFile);
+
+	if (displacements.empty()) {
+		
+		return false;
+	}
 
 	auto nodeTags = OpenseesModel::getInstance().getOutputNodes();
 	for (const auto tag : nodeTags) {
@@ -35,12 +42,19 @@ void StaticOutput::retrieveNodeDisplacements()
 		int nodeInd = (i - 1) / 6;
 		m_nodeDispOutput[nodeTags[nodeInd]][0].push_back(displacements[i]);
 	}
+
+	return true;
 }
 
-void StaticOutput::retrieveElementForces()
+bool StaticOutput::retrieveElementForces()
 {
 	std::string outputFile = "eleForce.out";
 	auto forces = utilities::DataReader::readContinuosLine<double>(outputFile);
+
+	if (forces.empty()) {
+
+		return false;
+	}
 
 	auto eleTags = OpenseesModel::getInstance().getOutputElements();
 	for (const auto tag : eleTags) {
@@ -64,4 +78,6 @@ void StaticOutput::retrieveElementForces()
 			forceInd++;
 		}
 	}
+
+	return true;
 }

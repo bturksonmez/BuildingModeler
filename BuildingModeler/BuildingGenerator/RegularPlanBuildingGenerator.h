@@ -29,7 +29,7 @@ namespace buildingGenerator
 		void generateBeams(double width, double equivalentDepth, double minDepth, double maxDepth, double minLength, double maxLength, double beamCrackedSectionModifier, json& buildingInfo);
 		void meshAreaElements();
 		void applyModelingPreferences(double liveLoad, double liveLoadMassContributionFactor, json& buildingInfo);
-		void analyze();
+		std::unordered_map<std::string, bool> analyze();
 		void fetchResultsForGravityAnalysis(json& buildingInfo);
 		void fetchAxialLoadDistribution(std::string analysisName, json& buildingInfo);
 		void fetchBeamDisplacementDistribution(std::string analysisName, int floorNumber, json& buildingInfo);
@@ -43,6 +43,6 @@ namespace buildingGenerator
 		~RegularPlanBuildingGenerator() = default;
 
 		json generateAndAnalyze() override;
-		void createModelFromJsonAndAnalyze(json& buildingInfo) override;
+		bool createModelFromJsonAndAnalyze(json& buildingInfo) override;
 	};
 }

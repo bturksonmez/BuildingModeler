@@ -9,8 +9,8 @@ namespace opensees
 	private:
 		std::unordered_map<int, std::vector<std::vector<double>>> m_eleForceOutput;
 
-		void retrieveNodeDisplacements();
-		void retrieveElementForces();
+		bool retrieveNodeDisplacements();
+		bool retrieveElementForces();
 
 	public:
 		StaticOutput(std::string loadTag);
@@ -19,6 +19,6 @@ namespace opensees
 
 		const std::unordered_map<int, std::vector<std::vector<double>>>& getElementForce() const;
 
-		void retrieveOutput() override;
+		bool retrieveOutput() override;
 	};
 }

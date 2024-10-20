@@ -14,7 +14,7 @@ namespace opensees
 		std::vector<std::vector<double>> m_modeShapeXY;
 
 
-		void retrievePeriods();
+		bool retrievePeriods();
 		void retrieveModeShapes();
 		void retrieveModeShapesAsDisplacements();
 		bool isMonotonicallyIncreasingEigenVector(const std::vector<double>& eigenVector);
@@ -29,6 +29,6 @@ namespace opensees
 		const std::vector<double>& getPeriods() const;
 		double getFundamentalPeriod(size_t dof);
 
-		void retrieveOutput() override;
+		bool retrieveOutput() override;
 	};
 }

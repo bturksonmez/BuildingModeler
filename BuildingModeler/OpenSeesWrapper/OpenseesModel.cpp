@@ -222,9 +222,13 @@ void OpenseesModel::createLoadingTclFiles()
     }
 }
 
-void OpenseesModel::analyze()
+std::unordered_map<std::string, bool> OpenseesModel::analyze()
 {
+    std::unordered_map<std::string, bool> analysisSuccess;
+
     for (const auto analysis : m_analyses) {
-        analysis.second->perform();
+        analysisSuccess[analysis.first] = analysis.second->perform();
     }
+
+    return analysisSuccess;
 }

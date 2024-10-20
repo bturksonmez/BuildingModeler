@@ -34,6 +34,6 @@ namespace opensees
 		std::shared_ptr<Output> getOutput() const;
 		static void resetCounter();
 		
-		void perform();
+		bool perform();
 	};
 }

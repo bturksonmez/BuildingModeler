@@ -62,7 +62,15 @@ int main()
 
 	auto loading = ILoadingGenerator::create<GravityLoadingGenerator>(minDeadLoadFactor, maxDeadLoadFactor, minLiveLoadFactor, maxLiveLoadFactor);
 	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params, std::move(loading));
-	json buildingInfo = generator->generateAndAnalyze();
+	std::ifstream file("building_infof15.json");
+
+	if (!file.is_open()) {
+		std::cerr << "Failed to open file" << std::endl;
+		return 1;
+	}
+
+	json buildingInfo = json::parse(file);
+	auto answer = generator->createModelFromJsonAndAnalyze(buildingInfo);
 
 	//for (int i = 0; i < 1000; ++i) {
 	//

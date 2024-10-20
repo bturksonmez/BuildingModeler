@@ -36,6 +36,6 @@ namespace opensees
 		const std::unordered_map<int, std::vector<std::vector<double>>>& getNodeDisplacement() const;
 		static void resetCounter();
 
-		virtual void retrieveOutput() = 0;
+		virtual bool retrieveOutput() = 0;
 	};
 }
