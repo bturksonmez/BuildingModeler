@@ -45,7 +45,7 @@ void Analysis::resetCounter()
 
 bool Analysis::perform()
 {
-#ifdef _WIN64
+#if defined(_WIN64) || (__APPLE__)
 	utilities::Process::runOpensees("source " + m_analysisName + ".tcl");
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	return m_output->retrieveOutput();

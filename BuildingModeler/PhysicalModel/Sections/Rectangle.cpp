@@ -1,6 +1,6 @@
 #include "Rectangle.h"
 
-#include <cmath>
+#include <algorithm>
 
 using namespace physicalModel;
 
