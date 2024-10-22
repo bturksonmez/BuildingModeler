@@ -27,7 +27,7 @@ bool Process::runOpensees(const std::string& inputFile)
     if (pid == -1) {
         return false;
     } else if (pid == 0) {
-        execl("/Users/yourusername/Desktop/Codes/OpenSees/OpenSees", "OpenSees", inputFile.c_str(), (char *)NULL);
+        execl("/Users/bturksonmez/Desktop/Codes/OpenSees/OpenSees3.7.0/bin/OpenSees", "OpenSees", inputFile.c_str(), (char *)NULL);
         exit(1);
     } else {
         int status;
