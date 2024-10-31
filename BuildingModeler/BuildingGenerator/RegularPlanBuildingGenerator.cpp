@@ -65,39 +65,68 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	double tShearWall = shearWallThicknessDist(m_generator);
 	buildingInfo["shearWall"]["thickness"] = tShearWall;
 	double shearWallRatioX;
-	std::vector<std::vector<int>> shearWallArrangementXDir;
-	if (m_parameters.shearWallParameters.includeShearWallInXDir) {
-		shearWallArrangementXDir = getShearWallArrangementInLongitudinalDir(numOfBaysX, numOfBaysY, bayWidthsX, bayWidthsY, tShearWall, shearWallRatioX);
+	double shearWallRatioY;
+	std::vector<std::vector<std::vector<int>>> shearWallArrangement;
+	if (m_parameters.shearWallParameters.includeShearWalls) {
+		std::pair<int, int> coreLocation {-1, -1};
+		shearWallArrangement = getShearWallArrangement(numOfBaysX, numOfBaysY, bayWidthsX, bayWidthsY, tShearWall, shearWallRatioX, shearWallRatioY, coreLocation);
 		buildingInfo["shearWall"]["shearWallXDir"]["ratio"] = shearWallRatioX;
 		buildingInfo["shearWall"]["shearWallXDir"]["area"] = shearWallRatioX * planArea;
-		buildingInfo["shearWall"]["arrangementX"] = shearWallArrangementXDir[0];
-		buildingInfo["shearWall"]["arrangementY"] = shearWallArrangementXDir[1];
-	}
-	generateShearWalls(shearWallArrangementXDir, tShearWall, buildingInfo);
+		for (int i = 0; i <= numOfBaysY; ++i) {
+			buildingInfo["shearWall"]["shearWallXDir"][std::to_string(i)] = shearWallArrangement[0][i];
+		}
 
+		buildingInfo["shearWall"]["shearWallYDir"]["ratio"] = shearWallRatioY;
+		buildingInfo["shearWall"]["shearWallYDir"]["area"] = shearWallRatioY * planArea;
+		for (int i = 0; i <= numOfBaysY; ++i) {
+			buildingInfo["shearWall"]["shearWallYDir"][std::to_string(i)] = shearWallArrangement[1][i];
+		}
+
+		buildingInfo["shearWall"]["coreLocationX"] = coreLocation.first;
+		buildingInfo["shearWall"]["coreLocationY"] = coreLocation.second;
+	}
+	generateShearWalls(shearWallArrangement, tShearWall, buildingInfo);
+	
 	// Generate slabs
 	std::uniform_real_distribution<double> slabThicknessDist(m_parameters.slabParameters.minSlabThickness, m_parameters.slabParameters.maxSlabThickness);
 	double tSlab = slabThicknessDist(m_generator);
 	buildingInfo["slab"]["thickness"] = tSlab;
 	generateSlabs(tSlab, buildingInfo);
-
+	/*
 	// Generate columns
-	std::vector<int> modifiedShearWallArrangementX;
-	modifiedShearWallArrangementX.push_back(shearWallArrangementXDir[0][0] ? 1 : 0);
-	for (int i = 1; i < numOfBaysX; ++i) {
+	std::vector<std::vector<int>> modifiedShearWallArrangement(m_parameters.geometricParameters.maxNumberOfBays, std::vector<int>(m_parameters.geometricParameters.maxNumberOfBays, -1));
+	for (int i = 0; i <= numOfBaysY; ++i) {
 
-		if (shearWallArrangementXDir[0][i] || shearWallArrangementXDir[0][i - 1]) {
-			modifiedShearWallArrangementX.push_back(1);
-		}
-		else {
-			modifiedShearWallArrangementX.push_back(0);
+		for (int j = 0; j < numOfBaysX; ++j) {
+
+			modifiedShearWallArrangement[i][j] = 0;
 		}
 	}
-	modifiedShearWallArrangementX.push_back(shearWallArrangementXDir[0][numOfBaysX - 1] ? 1 : 0);
-	for (int i = modifiedShearWallArrangementX.size(); i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
-		modifiedShearWallArrangementX.push_back(-1);
+	for (int i = 0; i < shearWallArrangement[0].size(); ++i) {
+
+		for (int j = 0; j < shearWallArrangement[0][i].size(); ++j) {
+
+			if (1 == shearWallArrangement[0][i][j]) {
+
+				modifiedShearWallArrangement[i][j]++;
+				modifiedShearWallArrangement[i][j + 1]++;
+			}
+		}
 	}
-	buildingInfo["shearWall"]["modifiedArrangementX"] = modifiedShearWallArrangementX;
+	for (int i = 0; i < shearWallArrangement[1].size(); ++i) {
+
+		for (int j = 0; j < shearWallArrangement[1][i].size(); ++j) {
+
+			if (1 == shearWallArrangement[1][i][j]) {
+
+				modifiedShearWallArrangement[i][j]++;
+				modifiedShearWallArrangement[i + 1][j]++;
+			}
+		}
+	}
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["shearWall"]["modifiedArrangement"][std::to_string(i)] = modifiedShearWallArrangement[i];
+	}
 	std::uniform_real_distribution<double> maxAspectRatioDist(1.0, m_parameters.columnParameters.maxAspectRatioForColumns);
 	std::uniform_real_distribution<double> maxAreaRatioInnerToOuterDist(1.0, m_parameters.columnParameters.maxAreaRatioInnerToOuterColumns);
 	std::uniform_real_distribution<double> equivalentSquareColumnWidthDist(m_parameters.columnParameters.minEquivalentSquareColumnWidth, m_parameters.columnParameters.maxEquivalentSquareColumnWidth);
@@ -115,7 +144,7 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	buildingInfo["column"]["innerColumns"]["width"] = widthInnerS;
 	buildingInfo["column"]["innerColumns"]["depth"] = widthInnerL;
 	buildingInfo["column"]["crackedMod"] = crackedModColumn;
-	generateColumns(modifiedShearWallArrangementX, widthOuterS, widthOuterL, widthInnerS, widthInnerL, crackedModColumn, buildingInfo);
+	generateColumns(modifiedShearWallArrangement, widthOuterS, widthOuterL, widthInnerS, widthInnerL, crackedModColumn, buildingInfo);
 
 	// Generate beams
 	std::uniform_real_distribution<double> beamWidthDist(m_parameters.beamParameters.minBeamWidth, m_parameters.beamParameters.maxBeamWidth);
@@ -184,14 +213,14 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	file.close();
 
 	// Analyze the building
-	auto analysisSuccess = analyze();
+	//auto analysisSuccess = analyze();
 	
 	// Fetch the results
-	if (analysisSuccess["gravity"]) {
-		return json{};
-	}
-	fetchResultsForGravityAnalysis(buildingInfo);
-
+	//if (analysisSuccess["gravity"]) {
+	//	return json{};
+	//}
+	//fetchResultsForGravityAnalysis(buildingInfo);
+	*/
 	return buildingInfo;
 }
 
@@ -230,7 +259,7 @@ bool RegularPlanBuildingGenerator::createModelFromJsonAndAnalyze(json& buildingI
 	std::vector<int> shearWallArrangementX = buildingInfo["shearWall"]["arrangementX"];
 	std::vector<int> shearWallArrangementY = buildingInfo["shearWall"]["arrangementY"];
 	std::vector<std::vector<int>> shearWallArrangementXDir { shearWallArrangementX , shearWallArrangementY};
-	generateShearWalls(shearWallArrangementXDir, tShearWall, buildingInfo);
+	//generateShearWalls(shearWallArrangementXDir, tShearWall, buildingInfo);
 
 	// Generate slabs
 	double tSlab = buildingInfo["slab"]["thickness"];
@@ -243,7 +272,7 @@ bool RegularPlanBuildingGenerator::createModelFromJsonAndAnalyze(json& buildingI
 	double widthInnerS = buildingInfo["column"]["innerColumns"]["width"];
 	double widthInnerL = buildingInfo["column"]["innerColumns"]["depth"];
 	double crackedModColumn = buildingInfo["column"]["crackedMod"];
-	generateColumns(modifiedShearWallArrangementX, widthOuterS, widthOuterL, widthInnerS, widthInnerL, crackedModColumn, buildingInfo);
+	//generateColumns(modifiedShearWallArrangementX, widthOuterS, widthOuterL, widthInnerS, widthInnerL, crackedModColumn, buildingInfo);
 
 	// Generate beams
 	double width = buildingInfo["beam"]["width"];
@@ -355,6 +384,10 @@ void RegularPlanBuildingGenerator::generateBuildingPlan(json& buildingInfo)
 	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
 		buildingInfo["verticalMemberPlan"][std::to_string(i)] = std::vector<int>(m_parameters.geometricParameters.maxNumberOfBays + 1, 0);
 	}
+
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["verticalMemberPlanSecondary"][std::to_string(i)] = std::vector<int>(m_parameters.geometricParameters.maxNumberOfBays + 1, 0);
+	}
 }
 
 void RegularPlanBuildingGenerator::generateFloors(int numberOfStories, double firstStoreyHeight, double storeyHeight)
@@ -427,7 +460,7 @@ void RegularPlanBuildingGenerator::generateMaterials(double E, double shearWallC
 	api::addElasticMaterial(2, Ecracked, Gcracked, 2.4); // for shear walls only
 }
 
-void RegularPlanBuildingGenerator::generateShearWalls(const std::vector<std::vector<int>>& shearWallArrangementX, double thickness, json& buildingInfo)
+void RegularPlanBuildingGenerator::generateShearWalls(const std::vector<std::vector<std::vector<int>>>& shearWallArrangement, double thickness, json& buildingInfo)
 {
 	int ns = buildingInfo["numberOfStoreys"];
 	int numOfBaysX = buildingInfo["numberOfBaysX"];
@@ -440,11 +473,11 @@ void RegularPlanBuildingGenerator::generateShearWalls(const std::vector<std::vec
 	for (int i = 0; i < ns; ++i) {
 
 		int elementTag = 30100 + 100 * i + 1;
-		for (int j = 0; j < shearWallArrangementX[1].size(); ++j) {
+		for (int j = 0; j < shearWallArrangement[0].size(); ++j) {
 
-			for (int k = 0; k < shearWallArrangementX[0].size(); ++k) {
+			for (int k = 0; k < shearWallArrangement[0][j].size(); ++k) {
 
-				if (1 == shearWallArrangementX[0][k] && 1 == shearWallArrangementX[1][j]) {
+				if (1 == shearWallArrangement[0][j][k]) {
 
 					int initJointTag = i * numOfJointsPerFloor + 1;
 					int jointITag = initJointTag + (numOfBaysX + 1) * j + k;
@@ -469,6 +502,30 @@ void RegularPlanBuildingGenerator::generateShearWalls(const std::vector<std::vec
 				}
 			}
 		}
+
+		for (int j = 0; j < shearWallArrangement[1].size(); ++j) {
+
+			for (int k = 0; k < shearWallArrangement[1][j].size(); ++k) {
+
+				if (1 == shearWallArrangement[1][j][k]) {
+
+					int initJointTag = i * numOfJointsPerFloor + 1;
+					int jointITag = initJointTag + (numOfBaysX + 1) * (k + 1) + j;
+					int jointJTag = initJointTag + (numOfBaysX + 1) * k + j;
+					int jointKTag = initJointTag + (numOfBaysX + 1) * k + j + numOfJointsPerFloor;
+					int jointLTag = initJointTag + (numOfBaysX + 1) * (k + 1) + j + numOfJointsPerFloor;
+
+					api::addShearWall(elementTag, { jointITag, jointJTag, jointKTag, jointLTag }, 301, physicalModel::AreaElementFormulation::LINEAR);
+
+					if (0 == i) {
+						buildingInfo["verticalMemberPlan"][std::to_string(k)][j] = elementTag;
+						buildingInfo["verticalMemberPlan"][std::to_string(k + 1)][j] = elementTag;
+					}
+
+					++elementTag;
+				}
+			}
+		}
 	}
 
 	buildingInfo["shearWall"]["shearWallXDir"]["momentOfInertia"] = totalIx;
@@ -479,6 +536,8 @@ void RegularPlanBuildingGenerator::generateSlabs(double thickness, json& buildin
 	int ns = buildingInfo["numberOfStoreys"];
 	int numOfBaysX = buildingInfo["numberOfBaysX"];
 	int numOfBaysY = buildingInfo["numberOfBaysY"];
+	int coreLocationX = buildingInfo["shearWall"]["coreLocationX"];
+	int coreLocationY = buildingInfo["shearWall"]["coreLocationY"];
 
 	api::addElasticSection2D(401, 1, thickness);
 
@@ -489,6 +548,10 @@ void RegularPlanBuildingGenerator::generateSlabs(double thickness, json& buildin
 		for (int j = 0; j < numOfBaysY; ++j) {
 
 			for (int k = 0; k < numOfBaysX; ++k) {
+
+				if (k == coreLocationX && j == coreLocationY) {
+					continue;
+				}
 
 				int initJointTag = (i + 1) * numOfJointsPerFloor + 1;
 				int jointITag = initJointTag + (numOfBaysX + 1) * j + k;
@@ -504,12 +567,11 @@ void RegularPlanBuildingGenerator::generateSlabs(double thickness, json& buildin
 	}
 }
 
-void RegularPlanBuildingGenerator::generateColumns(const std::vector<int>& modifiedShearWallArrangementX, double outerColumnWidth, double outerColumnDepth, double innerColumnWidth, double innerColumnDepth, double columnCrackedSectionModifier, json& buildingInfo)
+void RegularPlanBuildingGenerator::generateColumns(const std::vector<std::vector<int>>& modifiedShearWallArrangement, double outerColumnWidth, double outerColumnDepth, double innerColumnWidth, double innerColumnDepth, double columnCrackedSectionModifier, json& buildingInfo)
 {
 	int ns = buildingInfo["numberOfStoreys"];
 	int numOfBaysX = buildingInfo["numberOfBaysX"];
 	int numOfBaysY = buildingInfo["numberOfBaysY"];
-	std::vector<int> shearWallArrangementY = buildingInfo["shearWall"]["arrangementY"];
 
 	std::uniform_int_distribution<int> columnOrientationDist(0, 1);
 	
@@ -526,11 +588,11 @@ void RegularPlanBuildingGenerator::generateColumns(const std::vector<int>& modif
 	for (int i = 0; i < ns; ++i) {
 
 		int elementTag = 10100 + 100 * i + 1;
-		for (int j = 0; j <= numOfBaysY / 2; ++j) {
+		for (int j = 0; j <= numOfBaysY; ++j) {
 
 			for (int k = 0; k <= numOfBaysX; ++k) {
 
-				if (1 != shearWallArrangementY[j] || 1 != modifiedShearWallArrangementX[k]) {
+				if (0 == modifiedShearWallArrangement[j][k]) {
 
 					int sectionTag;
 
@@ -543,54 +605,27 @@ void RegularPlanBuildingGenerator::generateColumns(const std::vector<int>& modif
 						sectionTag = columnOrientationDist(m_generator) ? 111 : 112;
 					}
 
-					if (2 * j == numOfBaysY) {
+					int jointITag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
+					int jointJTag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k + numOfJointsPerFloor;
+					api::addColumn(elementTag, { jointITag, jointJTag }, sectionTag, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+					api::setSectionModifiers(elementTag, 0, 1.0, 1.0, columnCrackedSectionModifier, 1.0);
 
-						int jointITag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
-						int jointJTag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k + numOfJointsPerFloor;
-						api::addColumn(elementTag, { jointITag, jointJTag }, sectionTag, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-						api::setSectionModifiers(elementTag, 0, 1.0, 1.0, columnCrackedSectionModifier, 1.0);
+					if (m_parameters.meshInfo.meshColumn) {
 
-						if (m_parameters.meshInfo.meshColumn) {
-
-							int numOfSegments = api::getLength(elementTag) / m_parameters.meshInfo.meshSensitivity + 1;
-							std::vector<double> segmentRatios(numOfSegments, 1.0 / (double)numOfSegments);
-							api::setSegmentRatios(elementTag, segmentRatios);
-						}
-
-						if (0 == i) {
-
-							buildingInfo["verticalMemberPlan"][std::to_string(j)][k] = elementTag;
-
-							totalA += api::getArea(elementTag);
-							totalIx += api::getMomentOfInertiaZZ(elementTag);
-						}
-
-						++elementTag;
+						int numOfSegments = api::getLength(elementTag) / m_parameters.meshInfo.meshSensitivity + 1;
+						std::vector<double> segmentRatios(numOfSegments, 1.0 / (double)numOfSegments);
+						api::setSegmentRatios(elementTag, segmentRatios);
 					}
-					else {
 
-						int jointITag1 = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
-						int jointJTag1 = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k + numOfJointsPerFloor;
-						int elementTag1 = elementTag++;
-						api::addColumn(elementTag1, { jointITag1, jointJTag1 }, sectionTag, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-						
-						int jointITag2 = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * (numOfBaysY - j) + k;
-						int jointJTag2 = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * (numOfBaysY - j) + k + numOfJointsPerFloor;
-						int elementTag2 = elementTag++;
-						api::addColumn(elementTag2, { jointITag2, jointJTag2 }, sectionTag, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+					if (0 == i) {
 
-						if (0 == i) {
+						buildingInfo["verticalMemberPlan"][std::to_string(j)][k] = elementTag;
 
-							buildingInfo["verticalMemberPlan"][std::to_string(j)][k] = elementTag1;
-							buildingInfo["verticalMemberPlan"][std::to_string(numOfBaysY - j)][k] = elementTag2;
+						totalA += api::getArea(elementTag);
+						totalIx += api::getMomentOfInertiaZZ(elementTag);
+					}
 
-							totalA += api::getArea(elementTag1);
-							totalA += api::getArea(elementTag2);
-
-							totalIx += api::getMomentOfInertiaZZ(elementTag1);
-							totalIx += api::getMomentOfInertiaZZ(elementTag2);
-						}
-					}	
+					++elementTag;
 				}
 			}
 		}
@@ -627,6 +662,8 @@ void RegularPlanBuildingGenerator::generateBeams(double width, double equivalent
 		int elementTag = 20100 + 100 * i + 1;
 		for (int j = 0; j <= numOfBaysY; ++j) {
 
+			std::vector<int> shearWallArrangmentX = buildingInfo["shearWall"]["shearWallXDir"][std::to_string(j)];
+
 			for (int k = 0; k < numOfBaysX; ++k) {
 
 				int jointITag = (i + 1) * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
@@ -651,7 +688,7 @@ void RegularPlanBuildingGenerator::generateBeams(double width, double equivalent
 					}
 				}
 
-				if (1 != shearWallArrangementX[k] || 1 != shearWallArrangementY[j]) {
+				if (0 == shearWallArrangementX[k]) {
 
 					api::addBeam(elementTag, { jointITag, jointJTag }, currentSectionTag, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
 					api::setSectionModifiers(elementTag, 0, 1.0, beamCrackedSectionModifier, 1.0, 1.0);
@@ -705,26 +742,31 @@ void RegularPlanBuildingGenerator::generateBeams(double width, double equivalent
 
 			for (int k = 0; k <= numOfBaysX; ++k) {
 
+				std::vector<int> shearWallArrangmentY = buildingInfo["shearWall"]["shearWallYDir"][std::to_string(k)];
+
 				int jointITag = (i + 1) * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
 				int jointJTag = (i + 1) * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * (j + 1) + k;
 
-				api::addBeam(elementTag, { jointITag, jointJTag }, currentSectionTag, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
-				api::setSectionModifiers(elementTag, 0, 1.0, beamCrackedSectionModifier, 1.0, 1.0);
-
-				if (m_parameters.meshInfo.meshSlabBeam) {
-
-					int numOfSegments = bayWidthsY[j] / m_parameters.meshInfo.meshSensitivity;
-					numOfSegments = numOfSegments % 2 == 0 ? numOfSegments : numOfSegments + 1;
-					std::vector<double> segmentRatios(numOfSegments, 1.0 / (double)numOfSegments);
-					api::setSegmentRatios(elementTag, segmentRatios);
+				if (0 == shearWallArrangementY[j])
+				{
+					api::addBeam(elementTag, { jointITag, jointJTag }, currentSectionTag, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
+				    api::setSectionModifiers(elementTag, 0, 1.0, beamCrackedSectionModifier, 1.0, 1.0);
+    
+				    if (m_parameters.meshInfo.meshSlabBeam) {
+				    
+				    	int numOfSegments = bayWidthsY[j] / m_parameters.meshInfo.meshSensitivity;
+				    	numOfSegments = numOfSegments % 2 == 0 ? numOfSegments : numOfSegments + 1;
+				    	std::vector<double> segmentRatios(numOfSegments, 1.0 / (double)numOfSegments);
+				    	api::setSegmentRatios(elementTag, segmentRatios);
+				    }
+    
+				    if (0 == i) {
+				    
+				    	totalBeamIndex += api::getMomentOfInertiaYY(elementTag) / std::pow(bayWidthsY[j], 3.0);
+				    }
+    
+				    ++elementTag;
 				}
-
-				if (0 == i) {
-
-					totalBeamIndex += api::getMomentOfInertiaYY(elementTag) / std::pow(bayWidthsY[j], 3.0);
-				}
-
-				++elementTag;
 			}
 		}
 	}
@@ -892,8 +934,22 @@ void RegularPlanBuildingGenerator::fetchBeamDisplacementDistribution(std::string
 	buildingInfo["output"][analysisName]["averageBeamDelta"][std::to_string(floorNumber)] = aveDelta;
 }
 
-std::vector<std::vector<int>> RegularPlanBuildingGenerator::getShearWallArrangementInLongitudinalDir(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatio)
+std::vector<std::vector<std::vector<int>>> RegularPlanBuildingGenerator::getShearWallArrangement(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatioX, double& shearWallRatioY, std::pair<int, int>& coreLocation)
 {
+	std::vector<std::vector<std::vector<int>>> shearWallArrangement(2);
+	shearWallArrangement[0] = std::vector<std::vector<int>>(bayWidthsPerpDir.size() + 1, std::vector<int>(bayWidthsLongDir.size(), -1));
+	for (int i = 0; i <= numOfBaysPerpDir; ++i) {
+		for (int j = 0; j < numOfBaysLongDir; ++j) {
+			shearWallArrangement[0][i][j] = 0;
+		}
+	}
+	shearWallArrangement[1] = std::vector<std::vector<int>>(bayWidthsLongDir.size() + 1, std::vector<int>(bayWidthsPerpDir.size(), -1));
+	for (int i = 0; i <= numOfBaysLongDir; ++i) {
+		for (int j = 0; j < numOfBaysPerpDir; ++j) {
+			shearWallArrangement[1][i][j] = 0;
+		}
+	}
+
 	double lengthLong = 0.0;
 	for (int i = 0; i < numOfBaysLongDir; ++i) {
 		lengthLong += bayWidthsLongDir[i];
@@ -905,83 +961,258 @@ std::vector<std::vector<int>> RegularPlanBuildingGenerator::getShearWallArrangem
 	}
 
 	double buildingArea = lengthLong * lengthPerp;
-	std::map<int, std::vector<std::vector<int>>> arrangements;
-	arrangements[0] = {};
-	int numOfLocationAlongPerpDir = (numOfBaysPerpDir + 1) / 2;
-	std::vector<int> locationVector;
-	for (int i = 0; i < numOfLocationAlongPerpDir; ++i) {
-		locationVector.push_back(i);
+	
+	// Core shear wall arrangement for both directions
+	auto coreShearWallArrangement = getCoreShearWallArrangement(numOfBaysLongDir, numOfBaysPerpDir, coreLocation);
+	double coreShearWallRatioX = 0.0;
+	for (auto wallArangement : coreShearWallArrangement[0]) {
+		coreShearWallRatioX += thickness * bayWidthsLongDir[wallArangement.first] / buildingArea;
 	}
-	auto possibleLocations = findSubsetsOfVector(locationVector);
+	double coreShearWallRatioY = 0.0;
+	for (auto wallArangement : coreShearWallArrangement[1]) {
+		coreShearWallRatioY += thickness * bayWidthsPerpDir[wallArangement.first] / buildingArea;
+	}
 
-	int count = 1;
-	std::vector<double> shearWallRatioVec;
-	shearWallRatioVec.push_back(0);
-	// Symmetric one bay shear walls
-	double sectionArea = bayWidthsLongDir[numOfBaysLongDir / 2] * thickness;
-	for (int i = 1; i < possibleLocations.size(); ++i) {
+	// Additional shear wall arrangement
+	int chosenConfigurationXDir;
+	int chosenConfigurationYDir;
+	auto additionalArrangementsX = getAdditionalShearWallLocations(numOfBaysLongDir, bayWidthsLongDir, thickness, coreShearWallRatioX, buildingArea);
+	auto additionalArrangementsY = getAdditionalShearWallLocations(numOfBaysPerpDir, bayWidthsPerpDir, thickness, coreShearWallRatioY, buildingArea);
+	std::uniform_int_distribution<int> coreShearWallFirstConfigDist(0, additionalArrangementsX.size() + 1);
+	chosenConfigurationXDir = coreShearWallFirstConfigDist(m_generator);
+	if (additionalArrangementsY.empty()) {
+		chosenConfigurationYDir = -1;
+	}
+	else {
+		std::uniform_int_distribution<int> coreShearWallSecondConfigDist(0, additionalArrangementsY.size() - 1);
+		chosenConfigurationYDir = coreShearWallSecondConfigDist(m_generator);
+	}
 
-		auto shearWallRatio = (2 * sectionArea * (double)possibleLocations[i].size()) / buildingArea;
+	// Final shear wall arrangement
+	if (0 == chosenConfigurationXDir) {
+		return shearWallArrangement;
+	}
+	else {
 
-		if (shearWallRatio <= m_parameters.shearWallParameters.maxShearWallRatio) {
-			arrangements[count].push_back({ numOfBaysLongDir / 2 });
-			arrangements[count].push_back(possibleLocations[i]);
-			shearWallRatioVec.push_back(shearWallRatio);
-			count++;
+		for (const auto coreX : coreShearWallArrangement[0]) {
+			shearWallArrangement[0][coreX.second][coreX.first] = 1;
+		}
+
+		for (const auto coreY : coreShearWallArrangement[1]) {
+			shearWallArrangement[1][coreY.second][coreY.first] = 1;
 		}
 	}
 	
-	// Symmetric two bay shear walls
-	int firstBay = numOfBaysLongDir % 2 == 0 ? numOfBaysLongDir / 2 - 2 : numOfBaysLongDir / 2 - 1;
-	int secondBay = numOfBaysLongDir / 2 + 1;
-	sectionArea = 2 * bayWidthsLongDir[firstBay] * thickness;
-	for (int i = 1; i < possibleLocations.size(); ++i) {
+	double additionalShearWallRatioX = 0;
+	double additionalShearWallRatioY = 0;
+	if (chosenConfigurationXDir > 1) {
 
-		auto shearWallRatio = (2 * sectionArea * (double)possibleLocations[i].size()) / buildingArea;
+		auto additionalArrangementX = additionalArrangementsX[chosenConfigurationXDir - 2];
+		
+		for (const auto additionalX : additionalArrangementX) {
+			shearWallArrangement[0].front()[additionalX] = 1;
+			shearWallArrangement[0].back()[additionalX] = 1;
+			additionalShearWallRatioX += 2 * thickness * bayWidthsLongDir[additionalX] / buildingArea;
+		}
 
-		if (shearWallRatio <= m_parameters.shearWallParameters.maxShearWallRatio) {
-			arrangements[count].push_back({ firstBay, secondBay });
-			arrangements[count].push_back(possibleLocations[i]);
-			shearWallRatioVec.push_back(shearWallRatio);
-			count++;
+		if (chosenConfigurationYDir > -1) {
+
+			auto additionalArrangementY = additionalArrangementsY[chosenConfigurationYDir];
+			for (const auto additionalY : additionalArrangementY) {
+				shearWallArrangement[1].front()[additionalY] = 1;
+				shearWallArrangement[1].back()[additionalY] = 1;
+				additionalShearWallRatioY += 2 * thickness * bayWidthsPerpDir[additionalY] / buildingArea;
+			}
 		}
 	}
 
-	std::uniform_int_distribution<int> numberOfStoreysDist(0, count - 1);
-	int chosenIndex = numberOfStoreysDist(m_generator);
+	shearWallRatioX = coreShearWallRatioX + additionalShearWallRatioX;
+	shearWallRatioY = coreShearWallRatioY + additionalShearWallRatioY;
 
-	auto chosenArrangement = arrangements[chosenIndex];
-	shearWallRatio = shearWallRatioVec[chosenIndex];
+	return shearWallArrangement;
+}
 
-	std::vector<int> arrangementLong(bayWidthsLongDir.size(), -1);
-	for (int i = 0; i < numOfBaysLongDir; ++i) {
+std::vector<std::vector<std::pair<int, int>>> RegularPlanBuildingGenerator::getCoreShearWallArrangement(int numOfBaysLongDir, int numOfBaysPerpDir, std::pair<int, int>& coreLocation)
+{
+	std::vector<std::vector<std::pair<int, int>>> coreShearWallArrangement(2);
+	std::uniform_int_distribution<int> coreShearWallConfigDist(1, 8);
+	auto chosenConfig = coreShearWallConfigDist(m_generator);
 
-		arrangementLong[i] = 0;
+	// Core shear walls
+	if (0 == numOfBaysLongDir % 2) {
+
+		if (0 == numOfBaysPerpDir % 2) {
+
+			if (1 == chosenConfig) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2 - 1, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2 - 1, numOfBaysLongDir / 2 - 1));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2 - 1, numOfBaysLongDir / 2));
+				coreLocation.first = numOfBaysLongDir / 2 - 1;
+				coreLocation.second = numOfBaysPerpDir / 2 - 1;
+			}
+			else if (2 == chosenConfig) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2 - 1, numOfBaysPerpDir / 2 - 1));
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2 - 1, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2 - 1, numOfBaysLongDir / 2));
+				coreLocation.first = numOfBaysLongDir / 2 - 1;
+				coreLocation.second = numOfBaysPerpDir / 2 - 1;
+			}
+			else if (3 == chosenConfig) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2 - 1, numOfBaysLongDir / 2));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2 - 1, numOfBaysLongDir / 2 + 1));
+				coreLocation.first = numOfBaysLongDir / 2;
+				coreLocation.second = numOfBaysPerpDir / 2 - 1;
+			}
+			else if (4 == chosenConfig) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2 - 1));
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2 - 1, numOfBaysLongDir / 2));
+				coreLocation.first = numOfBaysLongDir / 2;
+				coreLocation.second = numOfBaysPerpDir / 2 - 1;
+			}
+			else if (5 == chosenConfig) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2 - 1, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2 - 1));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2));
+				coreLocation.first = numOfBaysLongDir / 2 - 1;
+				coreLocation.second = numOfBaysPerpDir / 2;
+			}
+			else if (6 == chosenConfig) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2 - 1, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2 - 1, numOfBaysPerpDir / 2 + 1));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2));
+				coreLocation.first = numOfBaysLongDir / 2 - 1;
+				coreLocation.second = numOfBaysPerpDir / 2;
+			}
+			else if (7 == chosenConfig) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2 + 1));
+				coreLocation.first = numOfBaysLongDir / 2;
+				coreLocation.second = numOfBaysPerpDir / 2;
+			}
+			else if (8 == chosenConfig) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2 + 1));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2));
+				coreLocation.first = numOfBaysLongDir / 2;
+				coreLocation.second = numOfBaysPerpDir / 2;
+			}
+			else {
+				// To do: do some exceptions here
+			}
+		}
+		else {
+			if (chosenConfig > 0 && chosenConfig < 5) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2 - 1, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2 - 1, numOfBaysPerpDir / 2 + 1));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2));
+				coreLocation.first = numOfBaysLongDir / 2 - 1;
+				coreLocation.second = numOfBaysPerpDir / 2;
+			}
+			else if (chosenConfig > 4 && chosenConfig < 9) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2 + 1));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2));
+				coreLocation.first = numOfBaysLongDir / 2;
+				coreLocation.second = numOfBaysPerpDir / 2;
+			}
+			else {
+				// To do: do some exceptions here
+			}
+		}
+	}
+	else {
+		if (0 == numOfBaysPerpDir % 2) {
+			if (chosenConfig > 0 && chosenConfig < 5) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2 - 1, numOfBaysLongDir / 2 - 1));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2 - 1, numOfBaysLongDir / 2));
+				coreLocation.first = numOfBaysLongDir / 2;
+				coreLocation.second = numOfBaysPerpDir / 2 - 1;
+			}
+			else if (chosenConfig > 4 && chosenConfig < 9) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2 - 1));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2));
+				coreLocation.first = numOfBaysLongDir / 2;
+				coreLocation.second = numOfBaysPerpDir / 2;
+			}
+			else {
+				// To do: do some exceptions here
+			}
+		}
+		else {
+			coreLocation.first = numOfBaysLongDir / 2;
+			coreLocation.second = numOfBaysPerpDir / 2;
+
+			if (chosenConfig > 0 && chosenConfig < 3) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2 + 1));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2 + 1));
+			}
+			else if (chosenConfig > 2 && chosenConfig < 5) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2 + 1));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2 + 1));
+			}
+			else if (chosenConfig > 4 && chosenConfig < 7) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2 + 1));
+			}
+			else if (chosenConfig > 6 && chosenConfig < 9) {
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2));
+				coreShearWallArrangement[0].push_back(std::make_pair(numOfBaysLongDir / 2, numOfBaysPerpDir / 2 + 1));
+				coreShearWallArrangement[1].push_back(std::make_pair(numOfBaysPerpDir / 2, numOfBaysLongDir / 2));
+			}
+			else {
+				// To do: do some exceptions here
+			}
+		}
 	}
 
-	std::vector<int> arrangementPerp(bayWidthsPerpDir.size() + 1, -1);
-	for (int i = 0; i < numOfBaysPerpDir + 1; ++i) {
+	return coreShearWallArrangement;
+}
 
-		arrangementPerp[i] = 0;
+std::vector<std::vector<int>> RegularPlanBuildingGenerator::getAdditionalShearWallLocations(int numOfBays, std::vector<double> bayWidths, double thickness, double shearWallRatio, double buildingArea)
+{
+	std::vector<std::vector<int>> additionalLocations;
+	std::vector<std::vector<int>> possibleLocations;
+
+	if (3 == numOfBays) {
+		possibleLocations.push_back({1});
+	}
+	else if (4 == numOfBays) {
+		possibleLocations.push_back({1});
+		possibleLocations.push_back({2});
+	}
+	else if (5 == numOfBays) {
+		possibleLocations.push_back({2});
+		possibleLocations.push_back({1, 3});
+	}
+	else if (6 == numOfBays) {
+		possibleLocations.push_back({2});
+		possibleLocations.push_back({3});
+		possibleLocations.push_back({1, 4});
 	}
 
-	if (chosenArrangement.empty()) {
-		return { arrangementLong , arrangementPerp };
+	for (auto it = possibleLocations.begin(); it != possibleLocations.end(); it++) {
+
+		auto totalShearWallRatio = shearWallRatio;
+
+		for (const auto bayNumber : *it) {
+
+			totalShearWallRatio += thickness * bayWidths[bayNumber] / buildingArea;
+		}
+
+		if (totalShearWallRatio < m_parameters.shearWallParameters.maxShearWallRatio + 1e-10) {
+			additionalLocations.push_back(*it);
+		}
 	}
 
-	for (int i = 0; i < chosenArrangement[0].size(); ++i) {
-
-		arrangementLong[chosenArrangement[0][i]] = 1;
-	}
-
-
-	for (int i = 0; i < chosenArrangement[1].size(); ++i) {
-
-		arrangementPerp[chosenArrangement[1][i]] = 1;
-		arrangementPerp[numOfBaysPerpDir - chosenArrangement[1][i]] = 1;
-	}
-
-	return { arrangementLong , arrangementPerp };
+	return additionalLocations;
 }
 
 std::vector<std::vector<int>> RegularPlanBuildingGenerator::findSubsetsOfVector(const std::vector<int>& vec) {

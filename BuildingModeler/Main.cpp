@@ -34,8 +34,7 @@ int main()
 	params.beamParameters.maxBeamDepth = 0.7;
 	params.beamParameters.minBeamCrackedSectionModifier = 0.25;
 	params.beamParameters.maxBeamCrackedSectionModifier = 0.4;
-	params.shearWallParameters.includeShearWallInXDir = true;
-	params.shearWallParameters.includeShearWallInYDir = false;
+	params.shearWallParameters.includeShearWalls = true;
 	params.shearWallParameters.maxShearWallRatio = 0.03;
 	params.shearWallParameters.minShearWallThickness = 0.25;
 	params.shearWallParameters.maxShearWallThickness = 0.3;
@@ -62,15 +61,8 @@ int main()
 
 	auto loading = ILoadingGenerator::create<GravityLoadingGenerator>(minDeadLoadFactor, maxDeadLoadFactor, minLiveLoadFactor, maxLiveLoadFactor);
 	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params, std::move(loading));
-	std::ifstream file("building_infof15.json");
 
-	if (!file.is_open()) {
-		std::cerr << "Failed to open file" << std::endl;
-		return 1;
-	}
-
-	json buildingInfo = json::parse(file);
-	auto answer = generator->createModelFromJsonAndAnalyze(buildingInfo);
+	auto answer = generator->generateAndAnalyze();
 
 	//for (int i = 0; i < 1000; ++i) {
 	//

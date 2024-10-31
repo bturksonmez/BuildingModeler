@@ -43,8 +43,7 @@ namespace buildingGenerator
 	};
 
 	struct ShearWallParameters {
-		bool includeShearWallInXDir;
-		bool includeShearWallInYDir;
+		bool includeShearWalls;
 		double maxShearWallRatio;
 		double minShearWallThickness;
 		double maxShearWallThickness;

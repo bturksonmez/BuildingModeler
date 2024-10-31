@@ -23,9 +23,9 @@ namespace buildingGenerator
 		void generateFloors(int numberOfStories, double firstStoreyHeight, double storeyHeight);
 		void generateJoints(json& buildingInfo);
 		void generateMaterials(double E, double shearWallCrackedSectionModifier);
-		void generateShearWalls(const std::vector<std::vector<int>>& shearWallArrangementX, double thickness, json& buildingInfo);
+		void generateShearWalls(const std::vector<std::vector<std::vector<int>>>& shearWallArrangement, double thickness, json& buildingInfo);
 		void generateSlabs(double thickness, json& buildingInfo);
-		void generateColumns(const std::vector<int>& modifiedShearWallArrangementX, double outerColumnWidth, double outerColumnDepth, double innerColumnWidth, double innerColumnDepth, double columnCrackedSectionModifier, json& buildingInfo);
+		void generateColumns(const std::vector<std::vector<int>>& modifiedShearWallArrangement, double outerColumnWidth, double outerColumnDepth, double innerColumnWidth, double innerColumnDepth, double columnCrackedSectionModifier, json& buildingInfo);
 		void generateBeams(double width, double equivalentDepth, double minDepth, double maxDepth, double minLength, double maxLength, double beamCrackedSectionModifier, json& buildingInfo);
 		void meshAreaElements();
 		void applyModelingPreferences(double liveLoad, double liveLoadMassContributionFactor, json& buildingInfo);
@@ -34,7 +34,9 @@ namespace buildingGenerator
 		void fetchAxialLoadDistribution(std::string analysisName, json& buildingInfo);
 		void fetchBeamDisplacementDistribution(std::string analysisName, int floorNumber, json& buildingInfo);
 
-		std::vector<std::vector<int>> getShearWallArrangementInLongitudinalDir(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatio);
+		std::vector<std::vector<std::vector<int>>> getShearWallArrangement(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatioX, double& shearWallRatioY, std::pair<int, int>& coreLocation);
+		std::vector<std::vector<std::pair<int, int>>> getCoreShearWallArrangement(int numOfBaysLongDir, int numOfBaysPerpDir, std::pair<int, int>& coreLocation);
+		std::vector<std::vector<int>> getAdditionalShearWallLocations(int numOfBays, std::vector<double> bayWidths, double thickness, double shearWallRatio, double buildingArea);
 		std::vector<std::vector<int>> findSubsetsOfVector(const std::vector<int>& vec);
 
 	public:
