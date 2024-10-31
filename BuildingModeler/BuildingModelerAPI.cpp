@@ -386,7 +386,7 @@ void BuildingModelerAPI::addShearWall(int elementTag, std::vector<int> jointTags
         throw InvalidInputException("Number of joints must be four to create an area element with tag " + std::to_string(elementTag) + ".");
     }
 
-    if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2])) {
+    if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2]) || !jointExists(jointTags[3])) {
         throw InvalidInputException("Joints do not exists to create area element with tag " + std::to_string(elementTag) + " .");
     }
 
@@ -435,7 +435,7 @@ void BuildingModelerAPI::addSlab(int elementTag, std::vector<int> jointTags, int
         throw InvalidInputException("Number of joints must be four to create an area element with tag " + std::to_string(elementTag) + ".");
     }
 
-    if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2])) {
+    if (!jointExists(jointTags[0]) || !jointExists(jointTags[1]) || !jointExists(jointTags[2]) || !jointExists(jointTags[3])) {
         throw InvalidInputException("Joints do not exists to create area element with tag " + std::to_string(elementTag) + " .");
     }
 

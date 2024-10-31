@@ -63,6 +63,7 @@ int main()
 	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params, std::move(loading));
 
 	auto answer = generator->generateAndAnalyze();
+	
 
 	//for (int i = 0; i < 1000; ++i) {
 	//
