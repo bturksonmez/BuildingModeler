@@ -16,7 +16,7 @@ int main()
 	params.geometricParameters.maxNumberOfBays = 6;
 	params.geometricParameters.minBayWidth = 3.0;
 	params.geometricParameters.maxBayWidth = 6.0;
-	params.geometricParameters.minNumberOfStoreys = 7;
+	params.geometricParameters.minNumberOfStoreys = 3;
 	params.geometricParameters.maxNumberOfStoreys = 10;
 	params.geometricParameters.minFirstStoreyHeight = 2.8;
 	params.geometricParameters.maxFirstStoreyHeight = 4.5;
@@ -62,20 +62,20 @@ int main()
 	auto loading = ILoadingGenerator::create<GravityLoadingGenerator>(minDeadLoadFactor, maxDeadLoadFactor, minLiveLoadFactor, maxLiveLoadFactor);
 	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params, std::move(loading));
 
-	auto answer = generator->generateAndAnalyze();
+	for (int i = 1; i <= 50000; ++i) {
 	
+		auto answer = generator->generateAndAnalyze();
 
-	//for (int i = 0; i < 1000; ++i) {
-	//
-	//	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params);
-	//	json buildingInfo = generator->generate();
-	//	buildingModeler::BuildingModelerAPI::createAnalyticalModel();
-	//	buildingModeler::BuildingModelerAPI::createModelAndLoadingFiles();
-	//
-	//	//std::ofstream file("building_info" + std::to_string(i) + ".json");
-	//	//file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
-	//	//file.close();
-	//}
+		if (!answer.empty()) {
+			std::ofstream file("data/building_info" + std::to_string(i) + ".json");
+			file << answer.dump(4);  // The argument 4 specifies indentation for pretty-printing
+			file.close();
+		}
+	
+		//std::ofstream file("building_info" + std::to_string(i) + ".json");
+		//file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
+		//file.close();
+	}
 
 	return 0;
 }

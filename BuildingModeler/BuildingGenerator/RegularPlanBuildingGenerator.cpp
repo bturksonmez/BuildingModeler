@@ -172,7 +172,7 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 
 	double minDepth = m_parameters.beamParameters.minBeamDepth;
 	double maxDepth = m_parameters.beamParameters.maxBeamDepth;
-	if ((equivalentDepth - m_parameters.beamParameters.minBeamDepth) / thresholdVal) {
+	if ((equivalentDepth - m_parameters.beamParameters.minBeamDepth) / difDepth > thresholdVal) {
 		minDepth = (equivalentDepth - thresholdVal * maxDepth) / (1 - thresholdVal);
 	}
 	else {
@@ -185,7 +185,7 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	buildingInfo["beam"]["minLength"] = minLength;
 	buildingInfo["beam"]["maxLength"] = maxLength;
 	buildingInfo["beam"]["crackedMod"] = crackedModBeam;
-	generateBeams(width, equivalentDepth, minDepth, maxDepth, minLength, maxLength, crackedModBeam, buildingInfo);
+	generateBeams(width, minDepth, maxDepth, minLength, maxLength, crackedModBeam, buildingInfo);
 	
 	// Mesh area elements
 	meshAreaElements();
@@ -201,26 +201,23 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	
 	// Load the building
 	if (dynamic_cast<loadingGenerator::GravityLoadingGenerator*>(m_loading.get())) {
-		auto totalLiveLoad = (double)ns * liveLoad * planArea;
+		int coreX = buildingInfo["shearWall"]["coreLocationX"];
+		int coreY = buildingInfo["shearWall"]["coreLocationY"];
+		auto totalLiveLoad = (double)ns * liveLoad * (planArea - bayWidthsX[coreX] * bayWidthsY[coreY]);
 		buildingInfo["loading"]["totalLiveLoad"] = totalLiveLoad;
 		buildingInfo["loading"]["totalDeadLoad"] = api::getBuildingWeight();
 		m_loading->load(buildingInfo);
 	}
-
-	// Write model to json file
-	std::ofstream file("building_info.json");
-	file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
-	file.close();
 	
 	// Analyze the building
 	auto analysisSuccess = analyze();
 	
 	// Fetch the results
-	if (analysisSuccess["gravity"]) {
+	if (!analysisSuccess["gravity"]) {
 		return json{};
 	}
 	fetchResultsForGravityAnalysis(buildingInfo);
-	
+
 	return buildingInfo;
 }
 
@@ -282,7 +279,7 @@ bool RegularPlanBuildingGenerator::createModelFromJsonAndAnalyze(json& buildingI
 	double minLength = buildingInfo["beam"]["minLength"];
 	double maxLength = buildingInfo["beam"]["maxLength"];
 	double crackedModBeam = buildingInfo["beam"]["crackedMod"];
-	generateBeams(width, equivalentDepth, minDepth, maxDepth, minLength, maxLength, crackedModBeam, buildingInfo);
+	generateBeams(width, minDepth, maxDepth, minLength, maxLength, crackedModBeam, buildingInfo);
 
 	// Mesh area elements
 	meshAreaElements();
@@ -518,8 +515,8 @@ void RegularPlanBuildingGenerator::generateShearWalls(const std::vector<std::vec
 					api::addShearWall(elementTag, { jointITag, jointJTag, jointKTag, jointLTag }, 301, physicalModel::AreaElementFormulation::LINEAR);
 
 					if (0 == i) {
-						buildingInfo["verticalMemberPlan"][std::to_string(k)][j] = elementTag;
-						buildingInfo["verticalMemberPlan"][std::to_string(k + 1)][j] = elementTag;
+						buildingInfo["verticalMemberPlanSecondary"][std::to_string(k)][j] = elementTag;
+						buildingInfo["verticalMemberPlanSecondary"][std::to_string(k + 1)][j] = elementTag;
 					}
 
 					++elementTag;
@@ -635,7 +632,7 @@ void RegularPlanBuildingGenerator::generateColumns(const std::vector<std::vector
 	buildingInfo["column"]["momentOfInertia"] = totalIx;
 }
 
-void RegularPlanBuildingGenerator::generateBeams(double width, double equivalentDepth, double minDepth, double maxDepth, double minLength, double maxLength, double beamCrackedSectionModifier, json& buildingInfo)
+void RegularPlanBuildingGenerator::generateBeams(double width, double minDepth, double maxDepth, double minLength, double maxLength, double beamCrackedSectionModifier, json& buildingInfo)
 {
 	int ns = buildingInfo["numberOfStoreys"];
 	int numOfBaysX = buildingInfo["numberOfBaysX"];
@@ -787,7 +784,6 @@ void RegularPlanBuildingGenerator::meshAreaElements()
 		int n1 = (coordJ - coordI).norm2() / m_parameters.meshInfo.meshSensitivity;
 		n1 = n1 % 2 == 0 ? n1 : n1 + 1;
 		int n2 = (coordK - coordJ).norm2() / m_parameters.meshInfo.meshSensitivity; 
-
 		n2 = n2 % 2 == 0 ? n2 : n2 + 1;
 
 		api::meshAreaElement(shearWallTags[i], n1, n2);
@@ -864,28 +860,39 @@ void RegularPlanBuildingGenerator::fetchResultsForGravityAnalysis(json& building
 
 void RegularPlanBuildingGenerator::fetchAxialLoadDistribution(std::string analysisName, json& buildingInfo)
 {
-	std::vector<int> shearWallArrangementX = buildingInfo["shearWall"]["modifiedArrangementX"];
-	std::vector<int> shearWallArrangementY = buildingInfo["shearWall"]["arrangementY"];
+	int numOfBaysX = buildingInfo["numberOfBaysX"];
+	int numOfBaysY = buildingInfo["numberOfBaysY"];
+
+	std::vector<std::vector<int>> shearWallArrangementX(m_parameters.geometricParameters.maxNumberOfBays + 1);
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["shearWall"]["shearWallXDir"][std::to_string(i)].get_to(shearWallArrangementX[i]);
+	}
+
+	std::vector<std::vector<int>> shearWallArrangementY(m_parameters.geometricParameters.maxNumberOfBays + 1);
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["shearWall"]["shearWallYDir"][std::to_string(i)].get_to(shearWallArrangementY[i]);
+	}
 
 	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
 		buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(i)] = std::vector<double>(m_parameters.geometricParameters.maxNumberOfBays + 1, 0);
 	}
 
 	double totalAxialLoad = 0.0;
-	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+	for (int i = 0; i <= numOfBaysY; ++i) {
 
 		std::vector<int> verticalMembersOnBay = buildingInfo["verticalMemberPlan"][std::to_string(i)];
 
-		for (int j = 0; j <= m_parameters.geometricParameters.maxNumberOfBays; ++j) {
+		for (int j = 0; j <= numOfBaysX; ++j) {
 
 			int elementTag = verticalMembersOnBay[j];
+
 
 			if (0 == elementTag) {
 				continue;
 			}
 
 			double axialLoad;
-			if (1 == shearWallArrangementX[j] && 1 == shearWallArrangementY[i]) {
+			if (j != numOfBaysX && 1 == shearWallArrangementX[i][j]) {
 
 				axialLoad = api::getShearWallForceZ(elementTag, analysisName);
 				buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(i)][j] = axialLoad / 2.0;
@@ -894,7 +901,35 @@ void RegularPlanBuildingGenerator::fetchAxialLoadDistribution(std::string analys
 			}
 			else {
 				axialLoad = api::getLineElementForceZ(elementTag, analysisName);
-				buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(i)][j] = axialLoad / 2.0;
+				buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(i)][j] = axialLoad;
+			}
+
+			totalAxialLoad += axialLoad;
+		}
+	}
+
+	std::vector<std::vector<int>> verticalSecondaryMembers(m_parameters.geometricParameters.maxNumberOfBays + 1);
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["verticalMemberPlanSecondary"][std::to_string(i)].get_to(verticalSecondaryMembers[i]);
+	}
+
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+
+		for (int j = 0; j < m_parameters.geometricParameters.maxNumberOfBays; ++j) {
+
+			int elementTag = verticalSecondaryMembers[j][i];
+
+			if (0 == elementTag) {
+				continue;
+			}
+
+			double axialLoad = 0;
+			if (1 == shearWallArrangementY[i][j]) {
+
+				axialLoad = api::getShearWallForceZ(elementTag, analysisName);
+				buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(j)][i] = buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(j)][i] + axialLoad / 2.0;
+				buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(j+1)][i] = buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(j + 1)][i] + axialLoad / 2.0;
+				++j;
 			}
 
 			totalAxialLoad += axialLoad;
@@ -988,6 +1023,8 @@ std::vector<std::vector<std::vector<int>>> RegularPlanBuildingGenerator::getShea
 
 	// Final shear wall arrangement
 	if (0 == chosenConfigurationXDir) {
+		shearWallRatioX = 0;
+		shearWallRatioY = 0;
 		return shearWallArrangement;
 	}
 	else {
