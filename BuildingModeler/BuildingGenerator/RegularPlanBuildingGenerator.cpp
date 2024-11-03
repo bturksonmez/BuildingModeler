@@ -217,7 +217,7 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 		return json{};
 	}
 	fetchResultsForGravityAnalysis(buildingInfo);
-
+	
 	return buildingInfo;
 }
 
@@ -593,7 +593,7 @@ void RegularPlanBuildingGenerator::generateColumns(const std::vector<std::vector
 
 					int sectionTag;
 
-					if (j == 0 || k == 0 || k == numOfBaysX) {
+					if (j == 0 || k == 0 || j == numOfBaysY || k == numOfBaysX) {
 
 						sectionTag = columnOrientationDist(m_generator) ? 101 : 102;
 					}
@@ -716,7 +716,7 @@ void RegularPlanBuildingGenerator::generateBeams(double width, double minDepth, 
 		int elementTag = 25100 + 100 * i + 1;
 		for (int j = 0; j < numOfBaysY; ++j) {
 
-			double depth = getDepth(bayWidthsX[j]);
+			double depth = getDepth(bayWidthsY[j]);
 
 			if (j > (numOfBaysY - 1) / 2) {
 
@@ -821,6 +821,17 @@ void RegularPlanBuildingGenerator::applyModelingPreferences(double liveLoad, dou
 			if (m_parameters.modelingPreferences.includeMassFromMembers) {
 
 				api::confineFloorMassOnDiaphragmNode(i, true);
+
+				if (1 == i) {
+					auto massCenterCoord = api::getMassCenter(i);
+
+					if (std::nullopt != massCenterCoord) {
+
+						buildingInfo["massCenter"]["coordX"] = massCenterCoord.value().x;
+						buildingInfo["massCenter"]["coordY"] = massCenterCoord.value().y;
+					}
+					
+				}
 			}
 			
 			masterNodeTag += 10;
