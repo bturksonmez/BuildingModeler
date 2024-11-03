@@ -927,8 +927,10 @@ void RegularPlanBuildingGenerator::fetchAxialLoadDistribution(std::string analys
 			if (1 == shearWallArrangementY[i][j]) {
 
 				axialLoad = api::getShearWallForceZ(elementTag, analysisName);
-				buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(j)][i] = buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(j)][i] + axialLoad / 2.0;
-				buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(j+1)][i] = buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(j + 1)][i] + axialLoad / 2.0;
+				double tempLoad1 = buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(j)][i];
+				double tempLoad2 = buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(j+1)][i];
+				buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(j)][i] = tempLoad1 + axialLoad / 2.0;
+				buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(j+1)][i] = tempLoad2 + axialLoad / 2.0;
 				++j;
 			}
 
