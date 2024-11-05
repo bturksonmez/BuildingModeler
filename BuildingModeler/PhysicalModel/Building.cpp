@@ -227,7 +227,7 @@ void Building::addMemberMasses()
 
         double liveLoadMass = 0.0;
         auto floor = getFloor(getJoint(jointI)->getFloorNo());
-        if (nullptr != floor) {
+        if (nullptr != floor && physicalModel::AreaElementType::SLAB == it->second->getAreaElementType()) {
 
             auto area = it->second->getArea();
             auto liveLoad = floor->getLiveLoadPerArea();

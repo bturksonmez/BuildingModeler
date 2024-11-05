@@ -92,6 +92,7 @@ namespace buildingModeler
         static void confineFloorMassOnDiaphragmNode(int floorNumber, bool confineFloorMassOnDiaphragmNode);
         static std::optional<utility::Vector3> getDiaphragmMass(int floorNumber);
         static std::optional<utility::Vector2> getMassCenter(int floorNumber);
+        static const std::vector<int>& getFloorJointTags(int floorNumber);
         static std::set<int> getBeamTags(int floorNumber);
 
         // Building API
