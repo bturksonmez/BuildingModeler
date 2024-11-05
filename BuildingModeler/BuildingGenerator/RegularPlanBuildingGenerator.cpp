@@ -1,6 +1,7 @@
 #include "RegularPlanBuildingGenerator.h"
 #include "../BuildingModelerAPI.h"
 #include "../LoadingGenerator/GravityLoadingGenerator.h"
+#include "../LoadingGenerator/ELFLoadingGenerator.h"
 
 #include <chrono>
 #include <cmath>
@@ -206,6 +207,9 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 		auto totalLiveLoad = (double)ns * liveLoad * (planArea - bayWidthsX[coreX] * bayWidthsY[coreY]);
 		buildingInfo["loading"]["totalLiveLoad"] = totalLiveLoad;
 		buildingInfo["loading"]["totalDeadLoad"] = api::getBuildingWeight();
+		m_loading->load(buildingInfo);
+	}
+	else if (dynamic_cast<loadingGenerator::ELFLoadingGenerator*>(m_loading.get())) {
 		m_loading->load(buildingInfo);
 	}
 	

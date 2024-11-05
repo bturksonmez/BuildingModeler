@@ -2,6 +2,7 @@
 
 #include "BuildingGenerator/RegularPlanBuildingGenerator.h"
 #include "LoadingGenerator/GravityLoadingGenerator.h"
+#include "LoadingGenerator/ELFLoadingGenerator.h"
 #include "Utilities/VectorUtilities.h"
 #include "BuildingModelerAPI.h"
 
@@ -46,32 +47,41 @@ int main()
 	params.maxConcreteYoungsModulus = 40000000;
 	params.meshInfo.meshSensitivity = 0.9;
 	params.meshInfo.meshColumn = false;
-	params.meshInfo.meshSlabBeam = true;
-	params.modelingPreferences.gravityThroughLineElements = false;
-	params.modelingPreferences.makeFloorsRigid = false;
+	params.meshInfo.meshSlabBeam = false;
+	params.modelingPreferences.includeMassFromMembers = true;
+	params.modelingPreferences.includePDeltaEffects = false;
+	params.modelingPreferences.disableSlabElements = true;
+	params.modelingPreferences.gravityThroughLineElements = true;
+	params.modelingPreferences.makeFloorsRigid = true;
+	params.modelingPreferences.includeDeadLoadFromMembers = false;
 	params.modelingPreferences.minLiveLoadPerArea = 2.0;
 	params.modelingPreferences.maxLiveLoadPerArea = 3.0;
 	params.modelingPreferences.minLiveLoadMassContribution = 0.3;
 	params.modelingPreferences.maxLiveLoadMassContribution = 1.0;
 
+	// Gravity Loading
 	double minDeadLoadFactor = 0.9;
 	double maxDeadLoadFactor = 1.4;
 	double minLiveLoadFactor = 1.0;
 	double maxLiveLoadFactor = 1.6;
 
-	auto loading = ILoadingGenerator::create<GravityLoadingGenerator>(minDeadLoadFactor, maxDeadLoadFactor, minLiveLoadFactor, maxLiveLoadFactor);
+	// Earthquake Loading
+	double minSpectralAcceleration = 0.1;
+	double maxSpectralAcceleration = 2.0;
+
+	auto loading = ILoadingGenerator::create<ELFLoadingGenerator>(minSpectralAcceleration, maxSpectralAcceleration);
 	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params, std::move(loading));
 
-	for (int i = 1; i <= 50000; ++i) {
+	for (int i = 1; i <= 1; ++i) {
 	
 		auto answer = generator->generateAndAnalyze();
 
-		if (!answer.empty()) {
-			std::ofstream file("data/building_info" + std::to_string(i) + ".json");
+		//if (!answer.empty()) {
+			std::ofstream file("building_info" + std::to_string(i) + ".json");
 			file << answer.dump(4);  // The argument 4 specifies indentation for pretty-printing
 			file.close();
-		}
-	
+		//}
+		
 		//std::ofstream file("building_info" + std::to_string(i) + ".json");
 		//file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
 		//file.close();

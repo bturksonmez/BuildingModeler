@@ -790,6 +790,17 @@ std::optional<utility::Vector2> BuildingModelerAPI::getMassCenter(int floorNumbe
     return floor->getMassCenter();
 }
 
+double BuildingModelerAPI::getFloorHeight(int floorNumber)
+{
+    if (!floorExists(floorNumber)) {
+        throw EntityNotFoundException("Floor number " + std::to_string(floorNumber) + " does not exist.");
+    }
+
+    auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
+
+    return floor->getFloorHeight();
+}
+
 const std::vector<int>& BuildingModelerAPI::getFloorJointTags(int floorNumber)
 {
     if (!floorExists(floorNumber)) {
@@ -799,6 +810,17 @@ const std::vector<int>& BuildingModelerAPI::getFloorJointTags(int floorNumber)
     auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
 
     return floor->getJoints();
+}
+
+int BuildingModelerAPI::getMasterJointTag(int floorNumber)
+{
+    if (!floorExists(floorNumber)) {
+        throw EntityNotFoundException("Floor number " + std::to_string(floorNumber) + " does not exist.");
+    }
+
+    auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
+
+    return floor->getMassCenterJointTag();
 }
 
 std::set<int> BuildingModelerAPI::getBeamTags(int floorNumber)
