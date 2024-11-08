@@ -47,7 +47,7 @@ std::string StaticAnalysis::getOpenseesCommand() const
 	command += "#Analysis\n";
 	command += "constraints Transformation\n";
 	command += "numberer RCM\n";
-	command += "system SparseSYM\n";
+	command += "system BandSPD\n";
 	command += "test NormDispIncr 1.0e-6 6\n";
 	command += "algorithm Newton\n";
 	command += "integrator LoadControl 1\n";

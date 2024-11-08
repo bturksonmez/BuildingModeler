@@ -64,7 +64,7 @@ namespace buildingModeler
         static void setSegmentRatios(int elementTag, std::vector<double> segmentRatios);
         static void setSection(int elementTag, int segmentNo, int sectionTag);
         static void setSectionModifiers(int elementTag, int segmentNo, double modifierA, double modifierIyy, double modifierIzz, double modifierJ);
-        static const std::vector<int>& getLineElementJointTags(int elementTag);
+        static std::vector<int> getLineElementJointTags(int elementTag);
         static const std::vector<utility::Vector3>& getNodeCoordinatesOfLineElement(int elementTag);
         static double getLength(int elementTag);
         static double getArea(int elementTag, int segmentNo = 0);

@@ -66,8 +66,8 @@ int main()
 	double maxLiveLoadFactor = 1.6;
 
 	// Earthquake Loading
-	double minSpectralAcceleration = 0.1;
-	double maxSpectralAcceleration = 2.0;
+	double minSpectralAcceleration = 0.4;
+	double maxSpectralAcceleration = 2.5;
 
 	auto loading = ILoadingGenerator::create<ELFLoadingGenerator>(minSpectralAcceleration, maxSpectralAcceleration);
 	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params, std::move(loading));
@@ -77,7 +77,7 @@ int main()
 		auto answer = generator->generateAndAnalyze();
 
 		//if (!answer.empty()) {
-			std::ofstream file("building_info" + std::to_string(i) + ".json");
+			std::ofstream file("data/building_info" + std::to_string(i) + ".json");
 			file << answer.dump(4);  // The argument 4 specifies indentation for pretty-printing
 			file.close();
 		//}

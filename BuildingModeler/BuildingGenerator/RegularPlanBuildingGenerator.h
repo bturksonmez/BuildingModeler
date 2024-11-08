@@ -33,6 +33,7 @@ namespace buildingGenerator
 		void fetchResultsForGravityAnalysis(json& buildingInfo);
 		void fetchResultsForEarthquakeAnalysis(json& buildingInfo);
 		void fetchAxialLoadDistribution(std::string analysisName, json& buildingInfo);
+		void fetchBaseShearInXDirDistribution(std::string analysisName, json& buildingInfo);
 		void fetchBeamDisplacementDistribution(std::string analysisName, int floorNumber, json& buildingInfo);
 		void fetchDriftRatioDistribution(std::string analysisName, json& buildingInfo);
 

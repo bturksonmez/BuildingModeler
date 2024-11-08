@@ -43,5 +43,5 @@ void ELFLoadingGenerator::applyEarthquakeLoads(json& buildingInfo)
         api::addPointLoad("earthquake", api::getMasterJointTag(i), eqLoad, 0.0, 0.0, 0.0, 0.0, 0.0);
     }
 
-	api::setStaticLoadCombinationActive("earthquake", true);
+	api::setLoadCaseActive("earthquake", true);
 }

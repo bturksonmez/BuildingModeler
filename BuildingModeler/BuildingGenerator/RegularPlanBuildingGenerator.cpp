@@ -886,6 +886,8 @@ void RegularPlanBuildingGenerator::fetchResultsForGravityAnalysis(json& building
 
 void RegularPlanBuildingGenerator::fetchResultsForEarthquakeAnalysis(json& buildingInfo)
 {
+	fetchAxialLoadDistribution("earthquake", buildingInfo);
+	fetchBaseShearInXDirDistribution("earthquake", buildingInfo);
 	fetchDriftRatioDistribution("earthquake", buildingInfo);
 }
 
@@ -972,6 +974,87 @@ void RegularPlanBuildingGenerator::fetchAxialLoadDistribution(std::string analys
 	buildingInfo["output"][analysisName]["totalAxialLoad"] = totalAxialLoad;
 }
 
+void RegularPlanBuildingGenerator::fetchBaseShearInXDirDistribution(std::string analysisName, json& buildingInfo)
+{
+	int numOfBaysX = buildingInfo["numberOfBaysX"];
+	int numOfBaysY = buildingInfo["numberOfBaysY"];
+
+	std::vector<std::vector<int>> shearWallArrangementX(m_parameters.geometricParameters.maxNumberOfBays + 1);
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["shearWall"]["shearWallXDir"][std::to_string(i)].get_to(shearWallArrangementX[i]);
+	}
+
+	std::vector<std::vector<int>> shearWallArrangementY(m_parameters.geometricParameters.maxNumberOfBays + 1);
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["shearWall"]["shearWallYDir"][std::to_string(i)].get_to(shearWallArrangementY[i]);
+	}
+
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(i)] = std::vector<double>(m_parameters.geometricParameters.maxNumberOfBays + 1, 0);
+	}
+
+	double totalBaseShear = 0.0;
+	for (int i = 0; i <= numOfBaysY; ++i) {
+
+		std::vector<int> verticalMembersOnBay = buildingInfo["verticalMemberPlan"][std::to_string(i)];
+
+		for (int j = 0; j <= numOfBaysX; ++j) {
+
+			int elementTag = verticalMembersOnBay[j];
+
+
+			if (0 == elementTag) {
+				continue;
+			}
+
+			double shear;
+			if (j != numOfBaysX && 1 == shearWallArrangementX[i][j]) {
+
+				shear = api::getShearWallForceX(elementTag, analysisName);
+				buildingInfo["output"][analysisName]["baseShearDistribution"][std::to_string(i)][j] = shear / 2.0;
+				buildingInfo["output"][analysisName]["baseShearDistribution"][std::to_string(i)][j + 1] = shear / 2.0;
+				++j;
+			}
+			else {
+				shear = api::getLineElementForceX(elementTag, analysisName);
+				buildingInfo["output"][analysisName]["baseShearDistribution"][std::to_string(i)][j] = shear;
+			}
+
+			totalBaseShear += shear;
+		}
+	}
+
+	double baseShearFromWallsInYDir = 0.0;
+	std::vector<std::vector<int>> verticalSecondaryMembers(m_parameters.geometricParameters.maxNumberOfBays + 1);
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["verticalMemberPlanSecondary"][std::to_string(i)].get_to(verticalSecondaryMembers[i]);
+	}
+
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+
+		for (int j = 0; j < m_parameters.geometricParameters.maxNumberOfBays; ++j) {
+
+			int elementTag = verticalSecondaryMembers[j][i];
+
+			if (0 == elementTag) {
+				continue;
+			}
+
+			double shear = 0;
+			if (1 == shearWallArrangementY[i][j]) {
+
+				shear = api::getShearWallForceX(elementTag, analysisName);
+				++j;
+			}
+
+			baseShearFromWallsInYDir += shear;
+		}
+	}
+
+	buildingInfo["output"][analysisName]["totalBaseShear"] = totalBaseShear;
+	buildingInfo["output"][analysisName]["baseShearFromWallsInYDir"] = baseShearFromWallsInYDir;
+}
+
 void RegularPlanBuildingGenerator::fetchBeamDisplacementDistribution(std::string analysisName, int floorNumber, json& buildingInfo)
 {
 	auto beamTags = api::getBeamTags(floorNumber);
@@ -1034,8 +1117,8 @@ void RegularPlanBuildingGenerator::fetchDriftRatioDistribution(std::string analy
 
 		double aveDriftRatio = api::getFloorDR(i, analysisName, 1);
 
-		buildingInfo["output"][analysisName]["driftRatioDistributionMax"][i] = maxDriftRatio;
-		buildingInfo["output"][analysisName]["driftRatioDistributionAve"][i] = aveDriftRatio;
+		buildingInfo["output"][analysisName]["driftRatioDistributionMax"][i-1] = maxDriftRatio;
+		buildingInfo["output"][analysisName]["driftRatioDistributionAve"][i-1] = aveDriftRatio;
 	}
 
 	buildingInfo["output"][analysisName]["driftRatioBuilding"] = api::getBuildingDR(analysisName, 1);

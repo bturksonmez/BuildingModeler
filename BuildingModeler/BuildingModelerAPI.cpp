@@ -320,7 +320,7 @@ void BuildingModelerAPI::setSectionModifiers(int elementTag, int segmentNo, doub
     physicalModel::Building::getInstance().m_lineElements[elementTag]->setSectionModifiers(segmentNo, std::make_shared<physicalModel::SectionModifiers>(modifierA, modifierIyy, modifierIzz, modifierJ));
 }
 
-const std::vector<int>& BuildingModelerAPI::getLineElementJointTags(int elementTag)
+std::vector<int> BuildingModelerAPI::getLineElementJointTags(int elementTag)
 {
     if (!lineElementExists(elementTag)) {
         throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
