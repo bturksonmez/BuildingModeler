@@ -320,6 +320,16 @@ void BuildingModelerAPI::setSectionModifiers(int elementTag, int segmentNo, doub
     physicalModel::Building::getInstance().m_lineElements[elementTag]->setSectionModifiers(segmentNo, std::make_shared<physicalModel::SectionModifiers>(modifierA, modifierIyy, modifierIzz, modifierJ));
 }
 
+const std::vector<int>& BuildingModelerAPI::getLineElementJointTags(int elementTag)
+{
+    if (!lineElementExists(elementTag)) {
+        throw EntityNotFoundException("Line element with tag " + std::to_string(elementTag) + " does not exist.");
+    }
+
+    return { physicalModel::Building::getInstance().getLineElement(elementTag)->getIJointTag(), 
+             physicalModel::Building::getInstance().getLineElement(elementTag)->getJJointTag() };
+}
+
 const std::vector<utility::Vector3>& BuildingModelerAPI::getNodeCoordinatesOfLineElement(int elementTag)
 {
     if (!lineElementExists(elementTag)) {
@@ -602,7 +612,7 @@ void BuildingModelerAPI::disableSlabElements(bool disableSlabElements)
     physicalModel::Building::getInstance().m_disableSlabElements = disableSlabElements;
 }
 
-const std::vector<int>& BuildingModelerAPI::getJointTags(int elementTag)
+const std::vector<int>& BuildingModelerAPI::getAreaElementJointTags(int elementTag)
 {
     if (!areaElementExists(elementTag)) {
         throw EntityNotFoundException("Area element with tag " + std::to_string(elementTag) + " does not exist.");
@@ -844,6 +854,79 @@ std::set<int> BuildingModelerAPI::getBeamTags(int floorNumber)
     }
 
     return beamTags;
+}
+
+std::vector<int> BuildingModelerAPI::getColumnTags(int floorNumber)
+{
+    if (!floorExists(floorNumber)) {
+        throw EntityNotFoundException("Floor number " + std::to_string(floorNumber) + " does not exist.");
+    }
+
+    std::vector<int> columnTags;
+
+    auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
+    auto joints = floor->getJoints();
+    for (int i = 0; i < joints.size(); ++i) {
+
+        auto joint = physicalModel::Building::getInstance().getJoint(joints[i]);
+        auto tags = joint->getConnectedColumnTags();
+
+        for (auto columnTag : tags) {
+            
+            auto columnJointTags = getLineElementJointTags(columnTag);
+            if (joints[i] == columnJointTags[1]) {
+
+                if (floorNumber - 1 == physicalModel::Building::getInstance().m_joints[columnJointTags[0]]->getFloorNo()) {
+
+                    columnTags.push_back(columnTag);
+                }
+            }
+            else {
+
+                if (floorNumber - 1 == physicalModel::Building::getInstance().m_joints[columnJointTags[1]]->getFloorNo()) {
+
+                    columnTags.push_back(columnTag);
+                }
+            }
+
+        }
+    }
+
+    return columnTags;
+}
+
+std::set<int> BuildingModelerAPI::getShearWallTagsInXDir(int floorNumber)
+{
+    if (!floorExists(floorNumber)) {
+        throw EntityNotFoundException("Floor number " + std::to_string(floorNumber) + " does not exist.");
+    }
+
+    std::set<int> shearWallTags;
+
+    auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
+    auto joints = floor->getJoints();
+    for (int i = 0; i < joints.size(); ++i) {
+
+        auto joint = physicalModel::Building::getInstance().getJoint(joints[i]);
+        auto tags = joint->getConnectedWallTags();
+
+        for (auto wallTag : tags) {
+            
+            auto wallJointTags = getAreaElementJointTags(wallTag);
+            if (joints[i] == wallJointTags[2] || joints[i] == wallJointTags[3]) {
+
+                if (floorNumber - 1 == physicalModel::Building::getInstance().m_joints[wallJointTags[1]]->getFloorNo()) {
+
+                    if (getCoordinates(wallJointTags[1]).x - getCoordinates(wallJointTags[0]).x > 1e-10) {
+
+                        shearWallTags.insert(wallTag);
+                    }
+                }
+            }
+        }
+    }
+
+    return shearWallTags;
 }
 
 void BuildingModelerAPI::includePDeltaEffects(bool includePDeltaEffects)

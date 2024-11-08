@@ -28,6 +28,7 @@ void ELFLoadingGenerator::applyEarthquakeLoads(json& buildingInfo)
 
     auto sA = spectralAccelerationDist(m_generator);
     auto baseShear = sA * api::getBuildingWeight();
+    buildingInfo["loading"]["earthquakeLoad"]["baseShear"] = baseShear;
 
     int ns = buildingInfo["numberOfStoreys"];
 

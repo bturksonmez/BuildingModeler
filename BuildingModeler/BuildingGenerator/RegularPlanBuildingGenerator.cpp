@@ -208,19 +208,30 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 		buildingInfo["loading"]["totalLiveLoad"] = totalLiveLoad;
 		buildingInfo["loading"]["totalDeadLoad"] = api::getBuildingWeight();
 		m_loading->load(buildingInfo);
+
+		// Analyze the building
+		auto analysisSuccess = analyze();
+	
+		// Fetch the results
+		if (!analysisSuccess["gravity"]) {
+			return json{};
+		}
+		fetchResultsForGravityAnalysis(buildingInfo);
 	}
 	else if (dynamic_cast<loadingGenerator::ELFLoadingGenerator*>(m_loading.get())) {
 		m_loading->load(buildingInfo);
+		
+		// Analyze the building
+		auto analysisSuccess = analyze();
+	
+		// Fetch the results
+		if (!analysisSuccess["earthquake"]) {
+			return json{};
+		}
+		fetchResultsForEarthquakeAnalysis(buildingInfo);
 	}
 	
-	// Analyze the building
-	auto analysisSuccess = analyze();
 	
-	// Fetch the results
-	if (!analysisSuccess["gravity"]) {
-		return json{};
-	}
-	fetchResultsForGravityAnalysis(buildingInfo);
 	
 	return buildingInfo;
 }
@@ -780,7 +791,7 @@ void RegularPlanBuildingGenerator::meshAreaElements()
 	auto shearWallTags = api::getShearWallElementTags();
 	for (int i = 0; i < shearWallTags.size(); ++i) {
 
-		auto jointTags = api::getJointTags(shearWallTags[i]);
+		auto jointTags = api::getAreaElementJointTags(shearWallTags[i]);
 		auto coordI = api::getCoordinates(jointTags[0]);
 		auto coordJ = api::getCoordinates(jointTags[1]);
 		auto coordK = api::getCoordinates(jointTags[2]);
@@ -871,6 +882,11 @@ void RegularPlanBuildingGenerator::fetchResultsForGravityAnalysis(json& building
 
 	fetchAxialLoadDistribution("gravity", buildingInfo);
 	fetchBeamDisplacementDistribution("gravity", ns, buildingInfo);
+}
+
+void RegularPlanBuildingGenerator::fetchResultsForEarthquakeAnalysis(json& buildingInfo)
+{
+	fetchDriftRatioDistribution("earthquake", buildingInfo);
 }
 
 void RegularPlanBuildingGenerator::fetchAxialLoadDistribution(std::string analysisName, json& buildingInfo)
@@ -982,6 +998,47 @@ void RegularPlanBuildingGenerator::fetchBeamDisplacementDistribution(std::string
 	buildingInfo["output"][analysisName]["minBeamDelta"][std::to_string(floorNumber)] = minDelta;
 	buildingInfo["output"][analysisName]["maxBeamDelta"][std::to_string(floorNumber)] = maxDelta;
 	buildingInfo["output"][analysisName]["averageBeamDelta"][std::to_string(floorNumber)] = aveDelta;
+}
+
+void RegularPlanBuildingGenerator::fetchDriftRatioDistribution(std::string analysisName, json& buildingInfo)
+{
+	int ns = buildingInfo["numberOfStoreys"];
+	int numOfBaysX = buildingInfo["numberOfBaysX"];
+	int numOfBaysY = buildingInfo["numberOfBaysY"];
+
+	std::vector<std::vector<int>> shearWallArrangementX(m_parameters.geometricParameters.maxNumberOfBays + 1);
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["shearWall"]["shearWallXDir"][std::to_string(i)].get_to(shearWallArrangementX[i]);
+	}
+
+	buildingInfo["output"][analysisName]["driftRatioDistributionMax"] = std::vector<double>(m_parameters.geometricParameters.maxNumberOfStoreys, 0);
+	buildingInfo["output"][analysisName]["driftRatioDistributionAve"] = std::vector<double>(m_parameters.geometricParameters.maxNumberOfStoreys, 0);
+
+	for (int i = 1; i <= ns; ++i) {
+
+		double maxDriftRatio = -1;
+
+		auto columnTags = api::getColumnTags(i);
+		for (const auto columnTag : columnTags) {
+
+			auto driftRatio = api::getLineElementDR(columnTag, analysisName, 1);
+			maxDriftRatio = std::max(driftRatio, maxDriftRatio);
+		}
+
+		auto shearWallTags = api::getShearWallTagsInXDir(i);
+		for (const auto shearWallTag : shearWallTags) {
+
+			auto driftRatio = api::getShearWallDR(shearWallTag, analysisName, 1);
+			maxDriftRatio = std::max(driftRatio, maxDriftRatio);
+		}
+
+		double aveDriftRatio = api::getFloorDR(i, analysisName, 1);
+
+		buildingInfo["output"][analysisName]["driftRatioDistributionMax"][i] = maxDriftRatio;
+		buildingInfo["output"][analysisName]["driftRatioDistributionAve"][i] = aveDriftRatio;
+	}
+
+	buildingInfo["output"][analysisName]["driftRatioBuilding"] = api::getBuildingDR(analysisName, 1);
 }
 
 std::vector<std::vector<std::vector<int>>> RegularPlanBuildingGenerator::getShearWallArrangement(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatioX, double& shearWallRatioY, std::pair<int, int>& coreLocation)

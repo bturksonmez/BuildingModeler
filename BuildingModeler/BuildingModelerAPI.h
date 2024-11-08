@@ -64,6 +64,7 @@ namespace buildingModeler
         static void setSegmentRatios(int elementTag, std::vector<double> segmentRatios);
         static void setSection(int elementTag, int segmentNo, int sectionTag);
         static void setSectionModifiers(int elementTag, int segmentNo, double modifierA, double modifierIyy, double modifierIzz, double modifierJ);
+        static const std::vector<int>& getLineElementJointTags(int elementTag);
         static const std::vector<utility::Vector3>& getNodeCoordinatesOfLineElement(int elementTag);
         static double getLength(int elementTag);
         static double getArea(int elementTag, int segmentNo = 0);
@@ -79,7 +80,7 @@ namespace buildingModeler
         static void meshAreaElement(int elementTag, std::optional<int> n1 = std::nullopt, std::optional<int> n2 = std::nullopt);
         static void disableMeshForAreaElement(int elementTag);
         static void disableSlabElements(bool disableSlabElements);
-        static const std::vector<int>& getJointTags(int elementTag);
+        static const std::vector<int>& getAreaElementJointTags(int elementTag);
         static const std::vector<std::vector<utility::Vector3>>& getNodeCoordinatesOfAreaElement(int elementTag);
         static double getSurfaceArea(int elementTag);
         static std::vector<int> getShearWallElementTags();
@@ -96,6 +97,8 @@ namespace buildingModeler
         static const std::vector<int>& getFloorJointTags(int floorNumber);
         static int getMasterJointTag(int floorNumber);
         static std::set<int> getBeamTags(int floorNumber);
+        static std::vector<int> getColumnTags(int floorNumber);
+        static std::set<int> getShearWallTagsInXDir(int floorNumber);
 
         // Building API
         static void includePDeltaEffects(bool includePDeltEffects);
