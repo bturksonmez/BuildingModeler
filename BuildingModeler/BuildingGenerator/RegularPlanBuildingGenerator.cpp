@@ -173,7 +173,11 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 
 	double minDepth = m_parameters.beamParameters.minBeamDepth;
 	double maxDepth = m_parameters.beamParameters.maxBeamDepth;
-	if ((equivalentDepth - m_parameters.beamParameters.minBeamDepth) / difDepth > thresholdVal) {
+	if (maxLength >= minLength - 1e-10 && maxLength <= minLength + 1e-10) {
+		minDepth = equivalentDepth;
+		maxDepth = equivalentDepth;
+	}
+	else if ((equivalentDepth - m_parameters.beamParameters.minBeamDepth) / difDepth > thresholdVal) {
 		minDepth = (equivalentDepth - thresholdVal * maxDepth) / (1 - thresholdVal);
 	}
 	else {
@@ -657,6 +661,10 @@ void RegularPlanBuildingGenerator::generateBeams(double width, double minDepth, 
 
 	auto getDepth{
 		[=](double length) {
+
+			if (maxLength >= minLength - 1e-10 && maxLength <= minLength + 1e-10) {
+				return minDepth;
+			}
 			return minDepth + (maxDepth - minDepth) * (length - minLength) / (maxLength - minLength);
 		}
 	};
