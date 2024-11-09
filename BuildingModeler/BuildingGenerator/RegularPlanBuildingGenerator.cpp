@@ -127,6 +127,7 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	}
 	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
 		buildingInfo["shearWall"]["modifiedArrangement"][std::to_string(i)] = modifiedShearWallArrangement[i];
+		buildingInfo["column"]["columnArrangement"][std::to_string(i)] = std::vector<int>(m_parameters.geometricParameters.maxNumberOfBays + 1, -1);
 	}
 	std::uniform_real_distribution<double> maxAspectRatioDist(1.0, m_parameters.columnParameters.maxAspectRatioForColumns);
 	std::uniform_real_distribution<double> maxAreaRatioInnerToOuterDist(1.0, m_parameters.columnParameters.maxAreaRatioInnerToOuterColumns);
@@ -589,6 +590,11 @@ void RegularPlanBuildingGenerator::generateColumns(const std::vector<std::vector
 	int numOfBaysX = buildingInfo["numberOfBaysX"];
 	int numOfBaysY = buildingInfo["numberOfBaysY"];
 
+	std::vector<std::vector<int>> columnArrangement(m_parameters.geometricParameters.maxNumberOfBays + 1);
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["column"]["columnArrangement"][std::to_string(i)].get_to(columnArrangement[i]);
+	}
+
 	std::uniform_int_distribution<int> columnOrientationDist(0, 1);
 	
 	// To do: array yap bunlari
@@ -611,14 +617,20 @@ void RegularPlanBuildingGenerator::generateColumns(const std::vector<std::vector
 				if (0 == modifiedShearWallArrangement[j][k]) {
 
 					int sectionTag;
+					bool isStrong;
+
+					if (columnArrangement[j][k] == -1) {
+						columnArrangement[j][k] = columnOrientationDist(m_generator);
+						buildingInfo["column"]["columnArrangement"][std::to_string(j)][k] = columnArrangement[j][k];
+					}
 
 					if (j == 0 || k == 0 || j == numOfBaysY || k == numOfBaysX) {
 
-						sectionTag = columnOrientationDist(m_generator) ? 101 : 102;
+						sectionTag = columnArrangement[j][k] ? 101 : 102;
 					}
 					else {
 
-						sectionTag = columnOrientationDist(m_generator) ? 111 : 112;
+						sectionTag = columnArrangement[j][k] ? 111 : 112;
 					}
 
 					int jointITag = i * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
