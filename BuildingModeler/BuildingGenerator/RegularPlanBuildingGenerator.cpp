@@ -1010,7 +1010,7 @@ void RegularPlanBuildingGenerator::fetchBaseShearInXDirDistribution(std::string 
 	}
 
 	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
-		buildingInfo["output"][analysisName]["axialLoadDistribution"][std::to_string(i)] = std::vector<double>(m_parameters.geometricParameters.maxNumberOfBays + 1, 0);
+		buildingInfo["output"][analysisName]["baseShearDistribution"][std::to_string(i)] = std::vector<double>(m_parameters.geometricParameters.maxNumberOfBays + 1, 0);
 	}
 
 	double totalBaseShear = 0.0;
