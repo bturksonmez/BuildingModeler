@@ -15,7 +15,7 @@ std::string ElasticBeamColumnElement::getOpenseesCommand() const
 	std::shared_ptr<Material> mat = m_section->getMaterial();
 
 	command = "element elasticBeamColumn " + std::to_string(m_elementTag) + " " + std::to_string(m_nodeTags[0]) + " " + std::to_string(m_nodeTags[1])
-		+ " " + std::to_string(m_section->getA() * m_modifiers[0]) + " " + std::to_string(mat->getE()) + " " + std::to_string(mat->getE()) + " " + std::to_string(m_section->getJ() * m_modifiers[3])
+		+ " " + std::to_string(m_section->getA() * m_modifiers[0]) + " " + std::to_string(mat->getE()) + " " + std::to_string(mat->getG()) + " " + std::to_string(m_section->getJ() * m_modifiers[3])
 		+ " " + std::to_string(m_section->getIyy() * m_modifiers[1]) + " " + std::to_string(m_section->getIzz() * m_modifiers[2]) + " " + std::to_string(m_transf->getTransfTag());
 
 	command += ("\n");

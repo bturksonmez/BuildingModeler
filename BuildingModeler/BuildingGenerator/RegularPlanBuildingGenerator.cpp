@@ -2,6 +2,7 @@
 #include "../BuildingModelerAPI.h"
 #include "../LoadingGenerator/GravityLoadingGenerator.h"
 #include "../LoadingGenerator/ELFLoadingGenerator.h"
+#include "../LoadingGenerator/ModalAnalysisGenerator.h"
 
 #include <chrono>
 #include <cmath>
@@ -150,7 +151,7 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	
 	// Generate beams
 	std::uniform_real_distribution<double> beamWidthDist(m_parameters.beamParameters.minBeamWidth, m_parameters.beamParameters.maxBeamWidth);
-	std::uniform_real_distribution<double> equivalentBeamDepthDist(m_parameters.beamParameters.minBeamDepth, m_parameters.beamParameters.maxBeamDepth);
+	std::uniform_real_distribution<double> equivalentBeamDepthDist(std::max(m_parameters.beamParameters.minBeamDepth, squareWidth), m_parameters.beamParameters.maxBeamDepth);
 	std::uniform_real_distribution<double> beamCrackedSectionModifierDist(m_parameters.beamParameters.minBeamCrackedSectionModifier, m_parameters.beamParameters.maxBeamCrackedSectionModifier);
 	double width = beamWidthDist(m_generator);
 	double equivalentDepth = equivalentBeamDepthDist(m_generator);
@@ -235,8 +236,18 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 		}
 		fetchResultsForEarthquakeAnalysis(buildingInfo);
 	}
+	else if (dynamic_cast<loadingGenerator::ModalAnalysisGenerator*>(m_loading.get())) {
+		m_loading->load(buildingInfo);
 	
+		// Analyze the building
+		auto analysisSuccess = analyze();
 	
+		// Fetch the results
+		if (!analysisSuccess["modal"]) {
+			return json{};
+		}
+		fetchResultsForModalAnalysis(buildingInfo);
+	}
 	
 	return buildingInfo;
 }
@@ -248,6 +259,9 @@ bool RegularPlanBuildingGenerator::createModelFromJsonAndAnalyze(json& buildingI
 
 	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
 		buildingInfo["verticalMemberPlan"][std::to_string(i)] = std::vector<int>(m_parameters.geometricParameters.maxNumberOfBays + 1, 0);
+	}
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["verticalMemberPlanSecondary"][std::to_string(i)] = std::vector<int>(m_parameters.geometricParameters.maxNumberOfBays + 1, 0);
 	}
 
 	// Generate floors
@@ -273,23 +287,30 @@ bool RegularPlanBuildingGenerator::createModelFromJsonAndAnalyze(json& buildingI
 
 	//Generate shear walls
 	double tShearWall = buildingInfo["shearWall"]["thickness"];
-	std::vector<int> shearWallArrangementX = buildingInfo["shearWall"]["arrangementX"];
-	std::vector<int> shearWallArrangementY = buildingInfo["shearWall"]["arrangementY"];
-	std::vector<std::vector<int>> shearWallArrangementXDir { shearWallArrangementX , shearWallArrangementY};
-	//generateShearWalls(shearWallArrangementXDir, tShearWall, buildingInfo);
+	std::vector<std::vector<std::vector<int>>> shearWallArrangement(2, std::vector<std::vector<int>>(m_parameters.geometricParameters.maxNumberOfBays + 1));
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["shearWall"]["shearWallXDir"][std::to_string(i)].get_to(shearWallArrangement[0][i]);
+	}
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["shearWall"]["shearWallYDir"][std::to_string(i)].get_to(shearWallArrangement[1][i]);
+	}
+	generateShearWalls(shearWallArrangement, tShearWall, buildingInfo);
 
 	// Generate slabs
 	double tSlab = buildingInfo["slab"]["thickness"];
 	generateSlabs(tSlab, buildingInfo);
 
 	// Generate columns
-	std::vector<int> modifiedShearWallArrangementX = buildingInfo["shearWall"]["modifiedArrangementX"];
+	std::vector<std::vector<int>> modifiedShearWallArrangement(m_parameters.geometricParameters.maxNumberOfBays + 1);
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["shearWall"]["modifiedArrangement"][std::to_string(i)].get_to(modifiedShearWallArrangement[i]);
+	}
 	double widthOuterS = buildingInfo["column"]["outerColumns"]["width"];
 	double widthOuterL = buildingInfo["column"]["outerColumns"]["depth"];
 	double widthInnerS = buildingInfo["column"]["innerColumns"]["width"];
 	double widthInnerL = buildingInfo["column"]["innerColumns"]["depth"];
 	double crackedModColumn = buildingInfo["column"]["crackedMod"];
-	//generateColumns(modifiedShearWallArrangementX, widthOuterS, widthOuterL, widthInnerS, widthInnerL, crackedModColumn, buildingInfo);
+	generateColumns(modifiedShearWallArrangement, widthOuterS, widthOuterL, widthInnerS, widthInnerL, crackedModColumn, buildingInfo);
 
 	// Generate beams
 	double width = buildingInfo["beam"]["width"];
@@ -321,21 +342,56 @@ bool RegularPlanBuildingGenerator::createModelFromJsonAndAnalyze(json& buildingI
 		api::addLoadCaseToStaticLoadCombination("gravity", "dead", deadLoadFactor);
 		api::addLoadCaseToStaticLoadCombination("gravity", "live", liveLoadFactor);
 		api::setStaticLoadCombinationActive("gravity", true);
-	}
 
-	// Write model to json file
-	std::ofstream file("building_infoR.json");
-	file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
-	file.close();
+		// Analyze the building
+		auto analysisSuccess = analyze();
+
+		// Fetch the results
+		if (!analysisSuccess["gravity"]) {
+			return false;
+		}
+
+		fetchResultsForGravityAnalysis(buildingInfo);
+	}
+	else if (dynamic_cast<loadingGenerator::ELFLoadingGenerator*>(m_loading.get())) {
+		int ns = buildingInfo["numberOfStoreys"];
+		double buildingWeight = 0;
+		for (int i = 1; i <= ns; ++i) {
+			buildingWeight += api::getDiaphragmMass(i).value().x * 9.81;
+		}
+
+		double sA = buildingInfo["loading"]["earthquakeLoad"]["spectralAcceleration"];
+		auto baseShear = sA * buildingWeight;
+		buildingInfo["loading"]["earthquakeLoad"]["baseShear"] = baseShear;
+		buildingInfo["loading"]["earthquakeLoad"]["totalMass"] = buildingWeight / 9.81;
+
+		double totalMoment = 0;
+		for (int i = 1; i <= ns; ++i) {
+			totalMoment += api::getDiaphragmMass(i).value().x * api::getFloorHeight(i);
+		}
+
+		api::addStaticLoadCase("earthquake", physicalModel::StaticLoadCaseType::EARTHQUAKE);
+		for (int i = 1; i <= ns; ++i) {
+			auto eqLoad = baseShear * api::getDiaphragmMass(i).value().x * api::getFloorHeight(i) / totalMoment;
+			api::addPointLoad("earthquake", api::getMasterJointTag(i), eqLoad, 0.0, 0.0, 0.0, 0.0, 0.0);
+		}
+
+		api::setLoadCaseActive("earthquake", true);
 
 	// Analyze the building
 	auto analysisSuccess = analyze();
 
 	// Fetch the results
-	if (!analysisSuccess["gravity"]) {
+		if (!analysisSuccess["earthquake"]) {
 		return false;
 	}
-	fetchResultsForGravityAnalysis(buildingInfo);
+		fetchResultsForEarthquakeAnalysis(buildingInfo);
+	}
+
+	// Write model to json file
+	std::ofstream file("data/building_info6R.json");
+	file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing
+	file.close();
 
 	return true;
 }
@@ -908,7 +964,13 @@ void RegularPlanBuildingGenerator::fetchResultsForEarthquakeAnalysis(json& build
 {
 	fetchAxialLoadDistribution("earthquake", buildingInfo);
 	fetchBaseShearInXDirDistribution("earthquake", buildingInfo);
+	fetchMomentInXDirDistribution("earthquake", buildingInfo);
 	fetchDriftRatioDistribution("earthquake", buildingInfo);
+}
+
+void RegularPlanBuildingGenerator::fetchResultsForModalAnalysis(json& buildingInfo)
+{
+	fetchFundamentalPeriodInGivenDirection("modal", buildingInfo);
 }
 
 void RegularPlanBuildingGenerator::fetchAxialLoadDistribution(std::string analysisName, json& buildingInfo)
@@ -1064,15 +1126,109 @@ void RegularPlanBuildingGenerator::fetchBaseShearInXDirDistribution(std::string 
 			if (1 == shearWallArrangementY[i][j]) {
 
 				shear = api::getShearWallForceX(elementTag, analysisName);
+				double temp1 = buildingInfo["output"][analysisName]["baseShearDistribution"][std::to_string(j)][i];
+				double temp2 = buildingInfo["output"][analysisName]["baseShearDistribution"][std::to_string(j + 1)][i];
+				temp1 += shear / 2;
+				temp2 += shear / 2;
+				buildingInfo["output"][analysisName]["baseShearDistribution"][std::to_string(j)][i] = temp1;
+				buildingInfo["output"][analysisName]["baseShearDistribution"][std::to_string(j + 1)][i] = temp2;
 				++j;
 			}
 
+			totalBaseShear += shear;
 			baseShearFromWallsInYDir += shear;
 		}
 	}
 
 	buildingInfo["output"][analysisName]["totalBaseShear"] = totalBaseShear;
 	buildingInfo["output"][analysisName]["baseShearFromWallsInYDir"] = baseShearFromWallsInYDir;
+}
+
+void RegularPlanBuildingGenerator::fetchMomentInXDirDistribution(std::string analysisName, json& buildingInfo)
+{
+	int numOfBaysX = buildingInfo["numberOfBaysX"];
+	int numOfBaysY = buildingInfo["numberOfBaysY"];
+
+	std::vector<std::vector<int>> shearWallArrangementX(m_parameters.geometricParameters.maxNumberOfBays + 1);
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["shearWall"]["shearWallXDir"][std::to_string(i)].get_to(shearWallArrangementX[i]);
+	}
+
+	std::vector<std::vector<int>> shearWallArrangementY(m_parameters.geometricParameters.maxNumberOfBays + 1);
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["shearWall"]["shearWallYDir"][std::to_string(i)].get_to(shearWallArrangementY[i]);
+	}
+
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["output"][analysisName]["momentDistribution"][std::to_string(i)] = std::vector<double>(m_parameters.geometricParameters.maxNumberOfBays + 1, 0);
+	}
+	
+	double totalMoment = 0.0;
+	for (int i = 0; i <= numOfBaysY; ++i) {
+
+		std::vector<int> verticalMembersOnBay = buildingInfo["verticalMemberPlan"][std::to_string(i)];
+
+		for (int j = 0; j <= numOfBaysX; ++j) {
+
+			int elementTag = verticalMembersOnBay[j];
+
+
+			if (0 == elementTag) {
+				continue;
+			}
+
+			double moment;
+			if (j != numOfBaysX && 1 == shearWallArrangementX[i][j]) {
+
+				moment = api::getShearWallMomentYY(elementTag, analysisName);
+				buildingInfo["output"][analysisName]["momentDistribution"][std::to_string(i)][j] = moment / 2.0;
+				buildingInfo["output"][analysisName]["momentDistribution"][std::to_string(i)][j + 1] = moment / 2.0;
+				++j;
+			}
+			else {
+				moment = api::getLineElementMomentYY(elementTag, analysisName);
+				buildingInfo["output"][analysisName]["momentDistribution"][std::to_string(i)][j] = moment;
+			}
+
+			totalMoment += moment;
+		}
+	}
+
+	double momentFromWallsInYDir = 0.0;
+	std::vector<std::vector<int>> verticalSecondaryMembers(m_parameters.geometricParameters.maxNumberOfBays + 1);
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["verticalMemberPlanSecondary"][std::to_string(i)].get_to(verticalSecondaryMembers[i]);
+	}
+
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+
+		for (int j = 0; j < m_parameters.geometricParameters.maxNumberOfBays; ++j) {
+
+			int elementTag = verticalSecondaryMembers[j][i];
+
+			if (0 == elementTag) {
+				continue;
+			}
+
+			double moment = 0;
+			if (1 == shearWallArrangementY[i][j]) {
+
+				moment = api::getShearWallMomentYY(elementTag, analysisName);
+				double temp1 = buildingInfo["output"][analysisName]["momentDistribution"][std::to_string(j)][i];
+				double temp2 = buildingInfo["output"][analysisName]["momentDistribution"][std::to_string(j + 1)][i];
+				temp1 += moment / 2;
+				temp2 += moment / 2;
+				buildingInfo["output"][analysisName]["momentDistribution"][std::to_string(j)][i] = temp1;
+				buildingInfo["output"][analysisName]["momentDistribution"][std::to_string(j + 1)][i] = temp2;
+				++j;
+			}
+
+			momentFromWallsInYDir += moment;
+		}
+	}
+
+	buildingInfo["output"][analysisName]["totalMoment"] = totalMoment;
+	buildingInfo["output"][analysisName]["momentFromWallsInYDir"] = momentFromWallsInYDir;
 }
 
 void RegularPlanBuildingGenerator::fetchBeamDisplacementDistribution(std::string analysisName, int floorNumber, json& buildingInfo)
@@ -1142,6 +1298,25 @@ void RegularPlanBuildingGenerator::fetchDriftRatioDistribution(std::string analy
 	}
 
 	buildingInfo["output"][analysisName]["driftRatioBuilding"] = api::getBuildingDR(analysisName, 1);
+
+	int bottomRightJoint = (numOfBaysX + 1) * (numOfBaysY + 1) + numOfBaysX + 1;
+	int topRightJoint = 2 * (numOfBaysX + 1) * (numOfBaysY + 1);
+	int masterJoint = api::getMasterJointTag(1);
+
+	buildingInfo["output"][analysisName]["bottomRight"]["xDisp"] = api::getDisplacements(bottomRightJoint, analysisName)[0];
+	buildingInfo["output"][analysisName]["bottomRight"]["yDisp"] = api::getDisplacements(bottomRightJoint, analysisName)[1];
+	buildingInfo["output"][analysisName]["bottomRight"]["rot"] = api::getDisplacements(bottomRightJoint, analysisName)[5];
+	buildingInfo["output"][analysisName]["topRight"]["xDisp"] = api::getDisplacements(topRightJoint, analysisName)[0];
+	buildingInfo["output"][analysisName]["topRight"]["yDisp"] = api::getDisplacements(topRightJoint, analysisName)[1];
+	buildingInfo["output"][analysisName]["topRight"]["rot"] = api::getDisplacements(topRightJoint, analysisName)[5];
+	buildingInfo["output"][analysisName]["masterJoint"]["xDisp"] = api::getDisplacements(masterJoint, analysisName)[0];
+	buildingInfo["output"][analysisName]["masterJoint"]["yDisp"] = api::getDisplacements(masterJoint, analysisName)[1];
+	buildingInfo["output"][analysisName]["masterJoint"]["rot"] = api::getDisplacements(masterJoint, analysisName)[5];
+}
+
+void RegularPlanBuildingGenerator::fetchFundamentalPeriodInGivenDirection(std::string analysisName, json& buildingInfo)
+{
+	buildingInfo["output"][analysisName]["fundamentalPeriodX"] = api::getFundamentalPeriod("modal", 1);
 }
 
 std::vector<std::vector<std::vector<int>>> RegularPlanBuildingGenerator::getShearWallArrangement(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatioX, double& shearWallRatioY, std::pair<int, int>& coreLocation)

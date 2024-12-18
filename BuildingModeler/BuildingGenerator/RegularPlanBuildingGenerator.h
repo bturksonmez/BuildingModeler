@@ -32,10 +32,13 @@ namespace buildingGenerator
 		std::unordered_map<std::string, bool> analyze();
 		void fetchResultsForGravityAnalysis(json& buildingInfo);
 		void fetchResultsForEarthquakeAnalysis(json& buildingInfo);
+		void fetchResultsForModalAnalysis(json& buildingInfo);
 		void fetchAxialLoadDistribution(std::string analysisName, json& buildingInfo);
 		void fetchBaseShearInXDirDistribution(std::string analysisName, json& buildingInfo);
+		void fetchMomentInXDirDistribution(std::string analysisName, json& buildingInfo);
 		void fetchBeamDisplacementDistribution(std::string analysisName, int floorNumber, json& buildingInfo);
 		void fetchDriftRatioDistribution(std::string analysisName, json& buildingInfo);
+		void fetchFundamentalPeriodInGivenDirection(std::string analysisName, json& buildingInfo);
 
 		std::vector<std::vector<std::vector<int>>> getShearWallArrangement(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatioX, double& shearWallRatioY, std::pair<int, int>& coreLocation);
 		std::vector<std::vector<std::pair<int, int>>> getCoreShearWallArrangement(int numOfBaysLongDir, int numOfBaysPerpDir, std::pair<int, int>& coreLocation);

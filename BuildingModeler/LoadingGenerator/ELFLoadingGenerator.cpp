@@ -26,11 +26,17 @@ void ELFLoadingGenerator::applyEarthquakeLoads(json& buildingInfo)
 {
 	std::uniform_real_distribution<double> spectralAccelerationDist(m_minSpectralAcceleration, m_maxSpectralAcceleration);
 
-    auto sA = spectralAccelerationDist(m_generator);
-    auto baseShear = sA * api::getBuildingWeight();
-    buildingInfo["loading"]["earthquakeLoad"]["baseShear"] = baseShear;
-
     int ns = buildingInfo["numberOfStoreys"];
+    double buildingWeight = 0;
+    for (int i = 1; i <= ns; ++i) {
+        buildingWeight += api::getDiaphragmMass(i).value().x * 9.81;
+    }
+
+    auto sA = spectralAccelerationDist(m_generator);
+    auto baseShear = sA * buildingWeight;
+    buildingInfo["loading"]["earthquakeLoad"]["spectralAcceleration"] = sA;
+    buildingInfo["loading"]["earthquakeLoad"]["baseShear"] = baseShear;
+    buildingInfo["loading"]["earthquakeLoad"]["totalMass"] = buildingWeight / 9.81;
 
     double totalMoment = 0;
     for (int i = 1; i <= ns; ++i) {
