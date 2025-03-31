@@ -4,6 +4,7 @@
 #include "../LoadingGenerator/ELFLoadingGenerator.h"
 #include "../LoadingGenerator/ModalAnalysisGenerator.h"
 
+#include <cstdlib> 
 #include <chrono>
 #include <cmath>
 #include <map>

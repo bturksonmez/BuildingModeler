@@ -20,7 +20,7 @@ std::string StaticAnalysis::getOpenseesCommand() const
 {
 	std::string command;
 
-	command = "source " + m_sourceModelName + ".tcl\n";
+	command = "source ./" + m_sourceModelName + ".tcl\n";
 	command += "\n";
 
 	command += "remove recorders\n";
@@ -30,14 +30,14 @@ std::string StaticAnalysis::getOpenseesCommand() const
 	auto minNodeTag = *std::min_element(nodeTags.begin(), nodeTags.end());
 	auto maxNodeTag = *std::max_element(nodeTags.begin(), nodeTags.end());
 	command += "#Node displacement recorder\n";
-	command += "recorder Node -file nodeDisp.out -time -nodeRange " + std::to_string(minNodeTag) + " " + std::to_string(maxNodeTag) + " -dof 1 2 3 4 5 6 disp";
+	command += "recorder Node -file ./nodeDisp.out -time -nodeRange " + std::to_string(minNodeTag) + " " + std::to_string(maxNodeTag) + " -dof 1 2 3 4 5 6 disp";
 	command += "\n";
 
 	auto eleTags = OpenseesModel::getInstance().getOutputElements();
 	auto minEleTag = (eleTags.begin())->first;
 	auto maxEleTag = (--eleTags.end())->first;
 	command += "#Element force recorder\n";
-	command += "recorder Element -file eleForce.out -time -eleRange " + std::to_string(minEleTag) + " " + std::to_string(maxEleTag) + " force";
+	command += "recorder Element -file ./eleForce.out -time -eleRange " + std::to_string(minEleTag) + " " + std::to_string(maxEleTag) + " force";
 	command += "\n";
 
 	command += "#Load pattern\n";

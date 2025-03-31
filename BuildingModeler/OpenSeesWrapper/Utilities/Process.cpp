@@ -3,6 +3,7 @@
 #ifdef _WIN64
 #include <windows.h>
 #elif defined(__APPLE__)
+#include <iostream>
 #include <cstdlib>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -27,8 +28,9 @@ bool Process::runOpensees(const std::string& inputFile)
     if (pid == -1) {
         return false;
     } else if (pid == 0) {
-        execl("/Users/bturksonmez/Desktop/Codes/OpenSees/OpenSees3.7.0/bin/OpenSees", "OpenSees", inputFile.c_str(), (char *)NULL);
-        exit(1);
+        std::string command = "cd /Users/bturksonmez/Desktop/Codes/OpenSees/OpenSees3.7.0/bin && ./OpenSees " + inputFile;
+        int result = system(command.c_str());
+        exit(result);
     } else {
         int status;
         waitpid(pid, &status, 0);
