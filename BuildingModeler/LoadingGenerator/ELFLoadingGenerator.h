@@ -12,13 +12,14 @@ namespace loadingGenerator
 	private:
 		double m_minSpectralAcceleration;
 		double m_maxSpectralAcceleration;
+		bool m_hasDiaphragm;
 		long long m_seed;
 		std::default_random_engine m_generator;
 
 		void applyEarthquakeLoads(json& buildingInfo);
 
 	public:
-		ELFLoadingGenerator(double minSpectralAcceleration, double maxSpectralAcceleration);
+		ELFLoadingGenerator(double minSpectralAcceleration, double maxSpectralAcceleration, bool hasDiaphragm = true);
 		ELFLoadingGenerator() = delete;
 		~ELFLoadingGenerator() = default;
 

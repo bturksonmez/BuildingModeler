@@ -778,6 +778,17 @@ void BuildingModelerAPI::confineFloorMassOnDiaphragmNode(int floorNumber, bool c
     floor->confineFloorMassOnDiaphragmNode(confineFloorMassOnDiaphragmNode);
 }
 
+double BuildingModelerAPI::getFloorMass(int floorNumber)
+{
+    if (!floorExists(floorNumber)) {
+        throw EntityNotFoundException("Floor number " + std::to_string(floorNumber) + " does not exist.");
+    }
+
+    auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
+
+    return floor->getFloorMass();
+}
+
 std::optional<utility::Vector3> BuildingModelerAPI::getDiaphragmMass(int floorNumber)
 {
     if (!floorExists(floorNumber)) {
@@ -1629,6 +1640,7 @@ double BuildingModelerAPI::getFloorDR(int floorNumber, std::string analysisTag, 
 
     auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
     if (!floor->isRigid()) {
+        return -1;
         throw InvalidOperationException("Both floors must be rigid for DR recording!");
     }
 
@@ -1643,6 +1655,7 @@ double BuildingModelerAPI::getFloorDR(int floorNumber, std::string analysisTag, 
         it--;
 
         if (!floor->isRigid()) {
+            return -1;
             throw InvalidOperationException("Both floors must be rigid for DR recording!");
         }
 
@@ -1671,6 +1684,7 @@ double BuildingModelerAPI::getBuildingDR(std::string analysisTag, size_t dof, si
     auto floorNumber = (--physicalModel::Building::getInstance().m_floors.end())->first;
     auto floor = physicalModel::Building::getInstance().getFloor(floorNumber);
     if (!floor->isRigid()) {
+        return -1;
         throw InvalidOperationException("Floor must be rigid for DR recording!");
     }
 

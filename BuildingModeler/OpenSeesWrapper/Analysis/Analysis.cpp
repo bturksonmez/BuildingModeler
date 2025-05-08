@@ -46,7 +46,8 @@ void Analysis::resetCounter()
 bool Analysis::perform()
 {
 #if defined(_WIN64) || (__APPLE__)
-	utilities::Process::runOpensees("./" + m_analysisName + ".tcl");
+	std::string workingDir = std::filesystem::current_path().string();
+	utilities::Process::runOpensees(workingDir + "/" + m_analysisName + ".tcl");
 	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	return m_output->retrieveOutput();
 #endif

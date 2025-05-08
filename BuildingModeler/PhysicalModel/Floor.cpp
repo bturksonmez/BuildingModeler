@@ -113,9 +113,21 @@ double Floor::getFloorHeight() const
 	return m_height;
 }
 
+// To do: Think of a better way to handle floor mass when there is no rigid diaphragm
 double Floor::getFloorMass() const
 {
-	return m_mass;
+	double sumMassX = 0.0;
+
+	for (auto jointTag : m_jointTags) {
+		auto joint = Building::getInstance().getJoint(jointTag);
+
+		auto mass = joint->getTranslationalMass();
+		if (mass != std::nullopt) {
+			sumMassX += mass.value().x;
+		}
+	}
+
+	return sumMassX;
 }
 
 bool Floor::isRigid() const

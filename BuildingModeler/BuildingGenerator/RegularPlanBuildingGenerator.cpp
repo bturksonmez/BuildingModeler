@@ -67,28 +67,45 @@ json RegularPlanBuildingGenerator::generateAndAnalyze()
 	std::uniform_real_distribution<double> shearWallThicknessDist(m_parameters.shearWallParameters.minShearWallThickness, m_parameters.shearWallParameters.maxShearWallThickness);
 	double tShearWall = shearWallThicknessDist(m_generator);
 	buildingInfo["shearWall"]["thickness"] = tShearWall;
-	double shearWallRatioX;
-	double shearWallRatioY;
+	double shearWallRatioX = 0.0;
+	double shearWallRatioY = 0.0;
+	std::pair<int, int> coreLocation {-1, -1};
 	std::vector<std::vector<std::vector<int>>> shearWallArrangement;
 	if (m_parameters.shearWallParameters.includeShearWalls) {
-		std::pair<int, int> coreLocation {-1, -1};
 		shearWallArrangement = getShearWallArrangement(numOfBaysX, numOfBaysY, bayWidthsX, bayWidthsY, tShearWall, shearWallRatioX, shearWallRatioY, coreLocation);
-		buildingInfo["shearWall"]["shearWallXDir"]["ratio"] = shearWallRatioX;
-		buildingInfo["shearWall"]["shearWallXDir"]["area"] = shearWallRatioX * planArea;
-		for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
-			buildingInfo["shearWall"]["shearWallXDir"][std::to_string(i)] = shearWallArrangement[0][i];
-		}
-
-		buildingInfo["shearWall"]["shearWallYDir"]["ratio"] = shearWallRatioY;
-		buildingInfo["shearWall"]["shearWallYDir"]["area"] = shearWallRatioY * planArea;
-		for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
-			buildingInfo["shearWall"]["shearWallYDir"][std::to_string(i)] = shearWallArrangement[1][i];
-		}
-
-		buildingInfo["shearWall"]["coreLocationX"] = coreLocation.first;
-		buildingInfo["shearWall"]["coreLocationY"] = coreLocation.second;
 	}
+	else {
+		std::vector<std::vector<std::vector<int>>> shearWallArrangementTemp(2);
+		shearWallArrangementTemp[0] = std::vector<std::vector<int>>(bayWidthsY.size() + 1, std::vector<int>(bayWidthsX.size(), -1));
+		for (int i = 0; i <= numOfBaysY; ++i) {
+			for (int j = 0; j < numOfBaysX; ++j) {
+				shearWallArrangementTemp[0][i][j] = 0;
+			}
+		}
+		shearWallArrangementTemp[1] = std::vector<std::vector<int>>(bayWidthsY.size() + 1, std::vector<int>(bayWidthsX.size(), -1));
+		for (int i = 0; i <= numOfBaysX; ++i) {
+			for (int j = 0; j < numOfBaysY; ++j) {
+				shearWallArrangementTemp[1][i][j] = 0;
+			}
+		}
+
+		shearWallArrangement = shearWallArrangementTemp;
+	}
+
+	buildingInfo["shearWall"]["shearWallXDir"]["ratio"] = shearWallRatioX;
+	buildingInfo["shearWall"]["shearWallXDir"]["area"] = shearWallRatioX * planArea;
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["shearWall"]["shearWallXDir"][std::to_string(i)] = shearWallArrangement[0][i];
+	}
+	buildingInfo["shearWall"]["shearWallYDir"]["ratio"] = shearWallRatioY;
+	buildingInfo["shearWall"]["shearWallYDir"]["area"] = shearWallRatioY * planArea;
+	for (int i = 0; i <= m_parameters.geometricParameters.maxNumberOfBays; ++i) {
+		buildingInfo["shearWall"]["shearWallYDir"][std::to_string(i)] = shearWallArrangement[1][i];
+	}
+	buildingInfo["shearWall"]["coreLocationX"] = coreLocation.first;
+	buildingInfo["shearWall"]["coreLocationY"] = coreLocation.second;
 	generateShearWalls(shearWallArrangement, tShearWall, buildingInfo);
+	
 	
 	// Generate slabs
 	std::uniform_real_distribution<double> slabThicknessDist(m_parameters.slabParameters.minSlabThickness, m_parameters.slabParameters.maxSlabThickness);
@@ -674,10 +691,9 @@ void RegularPlanBuildingGenerator::generateColumns(const std::vector<std::vector
 				if (0 == modifiedShearWallArrangement[j][k]) {
 
 					int sectionTag;
-					bool isStrong;
 
 					if (columnArrangement[j][k] == -1) {
-						columnArrangement[j][k] = columnOrientationDist(m_generator);
+						columnArrangement[j][k] = 1;//columnOrientationDist(m_generator);
 						buildingInfo["column"]["columnArrangement"][std::to_string(j)][k] = columnArrangement[j][k];
 					}
 
@@ -966,7 +982,7 @@ void RegularPlanBuildingGenerator::fetchResultsForEarthquakeAnalysis(json& build
 	fetchAxialLoadDistribution("earthquake", buildingInfo);
 	fetchBaseShearInXDirDistribution("earthquake", buildingInfo);
 	fetchMomentInXDirDistribution("earthquake", buildingInfo);
-	fetchDriftRatioDistribution("earthquake", buildingInfo);
+	//fetchDriftRatioDistribution("earthquake", buildingInfo);
 }
 
 void RegularPlanBuildingGenerator::fetchResultsForModalAnalysis(json& buildingInfo)

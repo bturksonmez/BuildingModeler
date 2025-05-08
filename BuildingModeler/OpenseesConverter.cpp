@@ -300,6 +300,8 @@ void OpenseesConverter::toAnalysisObjectFromLoadCase(physicalModel::LoadCase* lo
 
                 // To do: This part only considers slabs loading in z directions. It should be more general!
                 std::vector<double> loadVec{ 0, 0, 0, 0, 0, 0 };
+                loadVec[0] = subArea * load[2] / 4.0;
+                loadVec[1] = subArea * load[0] / 4.0;
                 loadVec[2] = subArea * load[1] / 4.0;
 
                 for (const auto& nodeTag : analyticalNodeTags[i]) {

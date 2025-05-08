@@ -91,6 +91,7 @@ namespace buildingModeler
         static void makeRigid(int floorNumber, int masterJointTag);
         static void makeFlexible(int floorNumber);
         static void confineFloorMassOnDiaphragmNode(int floorNumber, bool confineFloorMassOnDiaphragmNode);
+        static double getFloorMass(int floorNumber); //To do: Think of a better way to handle floor mass when there is no rigid diaphragm
         static std::optional<utility::Vector3> getDiaphragmMass(int floorNumber);
         static std::optional<utility::Vector2> getMassCenter(int floorNumber);
         static double getFloorHeight(int floorNumber);

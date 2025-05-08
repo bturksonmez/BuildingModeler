@@ -69,18 +69,20 @@ int main()
 	double minSpectralAcceleration = 0.4;
 	double maxSpectralAcceleration = 2.5;
 
-	auto loading = ILoadingGenerator::create<ELFLoadingGenerator>(minSpectralAcceleration, maxSpectralAcceleration);
+	auto loading = ILoadingGenerator::create<ELFLoadingGenerator>(minSpectralAcceleration, maxSpectralAcceleration, true);
 	auto generator = IBuildingGenerator::create<RegularPlanBuildingGenerator>(params, std::move(loading));
 
-	for (int i = 1; i <= 1; ++i) {
+	std::string workingDir = std::filesystem::current_path().string();
+
+	for (int i = 1; i <= 5; ++i) {
 	
 		auto answer = generator->generateAndAnalyze();
 
-		//if (!answer.empty()) {
-			std::ofstream file("data/building_info" + std::to_string(i) + ".json");
+		if (!answer.empty()) {
+			std::ofstream file(workingDir + "/data/building_info" + std::to_string(i) + ".json");
 			file << answer.dump(4);  // The argument 4 specifies indentation for pretty-printing
 			file.close();
-		//}
+		}
 		
 		//std::ofstream file("building_info" + std::to_string(i) + ".json");
 		//file << buildingInfo.dump(4);  // The argument 4 specifies indentation for pretty-printing

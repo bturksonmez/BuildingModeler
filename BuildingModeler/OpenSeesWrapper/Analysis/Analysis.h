@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include "../OpenseesObject.h"
 #include "../Outputs/Output.h"
 
