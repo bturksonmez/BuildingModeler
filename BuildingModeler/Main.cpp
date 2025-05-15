@@ -10,12 +10,22 @@ using namespace std;
 using namespace buildingGenerator;
 using namespace loadingGenerator;
 
-int main()
+int main(int argc, char* argv[])
 {
+	int minModelTag = 0;
+	int maxModelTag = 100000;
+	std::optional<long long> seed;
+	if (argc > 1)
+	{
+		minModelTag = std::atoi(argv[1]);
+		maxModelTag = std::atoi(argv[2]);
+		seed = std::atoll(argv[3]);
+	}
+
 	Parameters params;
 	params.geometricParameters.minNumberOfBays = 2;
 	params.geometricParameters.maxNumberOfBays = 8;
-	params.geometricParameters.minBayWidth = 2.0;
+	params.geometricParameters.minBayWidth = 3.0;
 	params.geometricParameters.maxBayWidth = 6.0;
 	params.geometricParameters.minNumberOfStoreys = 3;
 	params.geometricParameters.maxNumberOfStoreys = 10;
@@ -23,6 +33,7 @@ int main()
 	params.geometricParameters.maxFirstStoreyHeight = 4.5;
 	params.geometricParameters.minStoreyHeight = 2.8;
 	params.geometricParameters.maxStoreyHeight = 3.5;
+	params.geometricParameters.planSensitivity = 0.1;
 	params.columnParameters.maxAspectRatioForColumns = 1.5;
 	params.columnParameters.maxAreaRatioInnerToOuterColumns = 2.0;
 	params.columnParameters.minEquivalentSquareColumnWidth = 0.35;
@@ -74,9 +85,9 @@ int main()
 
 	std::string workingDir = std::filesystem::current_path().string();
 
-	for (int i = 1; i <= 5; ++i) {
+	for (int i = minModelTag; i <= maxModelTag; ++i) {
 	
-		auto answer = generator->generateAndAnalyze();
+		auto answer = generator->generateAndAnalyze(seed);
 
 		if (!answer.empty()) {
 			std::ofstream file(workingDir + "/data/building_info" + std::to_string(i) + ".json");

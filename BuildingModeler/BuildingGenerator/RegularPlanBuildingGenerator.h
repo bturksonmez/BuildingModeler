@@ -2,6 +2,7 @@
 
 #include <random>
 #include <vector>
+#include <optional>
 
 #include "IBuildingGenerator.h"
 
@@ -50,7 +51,7 @@ namespace buildingGenerator
 		RegularPlanBuildingGenerator() = delete;
 		~RegularPlanBuildingGenerator() = default;
 
-		json generateAndAnalyze() override;
+		json generateAndAnalyze(std::optional<long long> seed) override;
 		bool createModelFromJsonAndAnalyze(json& buildingInfo) override;
 	};
 }

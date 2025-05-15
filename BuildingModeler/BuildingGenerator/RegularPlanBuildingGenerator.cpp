@@ -20,10 +20,16 @@ RegularPlanBuildingGenerator::RegularPlanBuildingGenerator(const Parameters& par
 	void validateInput();
 }
 
-json RegularPlanBuildingGenerator::generateAndAnalyze()
+json RegularPlanBuildingGenerator::generateAndAnalyze(std::optional<long long> seed)
 {
-	m_seed = std::chrono::system_clock::now().time_since_epoch().count() + counter++;
-	m_generator.seed(m_seed);
+	if (seed == std::nullopt) {
+		m_seed = std::chrono::system_clock::now().time_since_epoch().count() + counter++;
+		m_generator.seed(m_seed);
+	}
+	else {
+		m_seed = seed.value();
+		m_generator.seed(m_seed);
+	}
 
 	api::clear();
 
@@ -422,7 +428,10 @@ void RegularPlanBuildingGenerator::validateInput()
 void RegularPlanBuildingGenerator::generateBuildingPlan(json& buildingInfo)
 {
 	std::uniform_int_distribution<int> numberOfBayDist(m_parameters.geometricParameters.minNumberOfBays, m_parameters.geometricParameters.maxNumberOfBays);
-	std::uniform_real_distribution<double> bayWidthDist(m_parameters.geometricParameters.minBayWidth, m_parameters.geometricParameters.maxBayWidth);
+
+	int minAddition = 0;
+	int maxAddition = int((m_parameters.geometricParameters.maxBayWidth - m_parameters.geometricParameters.minBayWidth + 0.001) / m_parameters.geometricParameters.planSensitivity);
+	std::uniform_real_distribution<int> bayWidthDist(minAddition, maxAddition);
 
 	std::vector<double> bayWidthsX(m_parameters.geometricParameters.maxNumberOfBays);
 	std::vector<double> bayWidthsY(m_parameters.geometricParameters.maxNumberOfBays);
@@ -432,7 +441,7 @@ void RegularPlanBuildingGenerator::generateBuildingPlan(json& buildingInfo)
 
 	int diff = (numOfBaysX % 2 == 0 ? 1 : 2);
 	for (int i = 0; i < numOfBaysX; ++i) {
-		auto bayWidth = bayWidthDist(m_generator);
+		auto bayWidth = m_parameters.geometricParameters.minBayWidth + (double)bayWidthDist(m_generator) * m_parameters.geometricParameters.planSensitivity;
 
 		if (i >= (numOfBaysX + 1) / 2) {
 			bayWidthsX[i] = bayWidthsX[i - diff];
@@ -445,7 +454,7 @@ void RegularPlanBuildingGenerator::generateBuildingPlan(json& buildingInfo)
 
 	diff = (numOfBaysY % 2 == 0 ? 1 : 2);
 	for (int i = 0; i < numOfBaysY; ++i) {
-		auto bayWidth = bayWidthDist(m_generator);
+		auto bayWidth = m_parameters.geometricParameters.minBayWidth + (double)bayWidthDist(m_generator) * m_parameters.geometricParameters.planSensitivity;
 
 		if (i >= (numOfBaysY + 1) / 2) {
 			bayWidthsY[i] = bayWidthsY[i - diff];
