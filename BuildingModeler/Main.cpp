@@ -12,8 +12,8 @@ using namespace loadingGenerator;
 
 int main(int argc, char* argv[])
 {
-	int minModelTag = 0;
-	int maxModelTag = 100000;
+	int minModelTag = 1;
+	int maxModelTag = 10;
 	std::optional<long long> seed;
 	if (argc > 1)
 	{
