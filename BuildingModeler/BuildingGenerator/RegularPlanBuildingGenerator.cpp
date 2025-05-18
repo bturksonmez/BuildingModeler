@@ -1441,7 +1441,7 @@ std::vector<std::vector<double>> RegularPlanBuildingGenerator::getPerimeterShear
 
 		if (maxLength > 1.5999) {
 			std::vector<double> locations;
-			for (int j = 0; j < bayWidths.size(); ++j) {
+			for (int j = 0; j <= bayWidths.size(); ++j) {
 				
 				if (j <= numOfBays) {
 					locations.push_back(0);
@@ -1468,7 +1468,7 @@ std::vector<std::vector<double>> RegularPlanBuildingGenerator::getPerimeterShear
 				}
 
 				int index = perimeterLocationPool[i][0];
-				double maxLength = std::min(maxLength, std::min(bayWidths[index - 1], bayWidths[index]));
+				maxLength = std::min(maxLength, std::min(bayWidths[index - 1], bayWidths[index]));
 
 				std::uniform_real_distribution<double> edgeShearWallLength(std::min(1.6001, maxLength), std::max(1.6001, maxLength));
 				auto edgeLength = 0.2 * std::round(edgeShearWallLength(m_generator) / 0.2);
