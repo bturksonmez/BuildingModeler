@@ -32,7 +32,7 @@ std::string ModalAnalysis::getOpenseesCommand() const
 	command += "remove recorders\n";
 	command += "\n";
 
-	command += "set processID " + processID;
+	command += "set processID " + processID + "\n";
 
 	command += "#Eigenvector recorder for dof 1\n";	
 	command += "for { set k 1 } { $k <= " + std::to_string(m_numberOfModes) + " } { incr k } {\n";

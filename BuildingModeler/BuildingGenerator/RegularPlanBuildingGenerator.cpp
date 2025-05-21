@@ -1043,6 +1043,7 @@ void RegularPlanBuildingGenerator::fetchResultsForEarthquakeAnalysis(json& build
 
 void RegularPlanBuildingGenerator::fetchResultsForModalAnalysis(json& buildingInfo)
 {
+	fetchPeriods("modal", buildingInfo);
 	fetchFundamentalPeriodInGivenDirection("modal", buildingInfo);
 	fetchMassParticipationRatioInXDir("modal", buildingInfo);
 }
@@ -1317,7 +1318,7 @@ void RegularPlanBuildingGenerator::fetchMassParticipationRatioInXDir(std::string
 	{
 		double vecSumX = 0;
 
-		for (int j = 0; j < ns; j++)
+		for (int j = 0; j < (3 * ns); j++)
 		{
 			vecSumX += modeShapes[i][j] * massVec[j] * lX[j];
 		}

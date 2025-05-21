@@ -2061,7 +2061,7 @@ double BuildingModelerAPI::getFundamentalPeriod(std::string analysisTag, size_t 
         throw EntityNotFoundException("Modal analysis with tag: " + analysisTag + " does not exists.");
     }
 
-    if (dof != 1 || dof != 2) {
+    if (dof != 1 && dof != 2) {
         throw InvalidInputException("Fundamental period could be calculated in either global x or y direction.");
     }
 
