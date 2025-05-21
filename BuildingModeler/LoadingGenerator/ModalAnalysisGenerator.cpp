@@ -10,7 +10,7 @@ ModalAnalysisGenerator::ModalAnalysisGenerator()
 void ModalAnalysisGenerator::load(json& buildingInfo)
 {
 	int ns = buildingInfo["numberOfStoreys"];
-	int numOfModes = ns / 4 + 3;
+	int numOfModes = std::min(2 * ns, 12);
 
 	api::addModalLoadCase("modal", numOfModes);
 	api::setLoadCaseActive("modal", true);

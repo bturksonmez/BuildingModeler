@@ -11,6 +11,21 @@ ModalOutput::ModalOutput(std::string loadTag, std::vector<int> masterNodeTags) :
 	m_masterNodeTags = masterNodeTags;
 }
 
+const std::vector<std::vector<double>>& ModalOutput::getModeShapeX()
+{
+	return m_modeShapeX;
+}
+
+const std::vector<std::vector<double>>& ModalOutput::getModeShapeY()
+{
+	return m_modeShapeY;
+}
+
+const std::vector<std::vector<double>>& ModalOutput::getModeShapeXY()
+{
+	return m_modeShapeXY;
+}
+
 const std::vector<double>& ModalOutput::getPeriods() const
 {
 	return m_periods;

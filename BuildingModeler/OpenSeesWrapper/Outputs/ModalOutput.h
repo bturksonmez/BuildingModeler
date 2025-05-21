@@ -26,6 +26,9 @@ namespace opensees
 		ModalOutput() = delete;
 		~ModalOutput() {}
 
+		const std::vector<std::vector<double>>& getModeShapeX();
+		const std::vector<std::vector<double>>& getModeShapeY();
+		const std::vector<std::vector<double>>& getModeShapeXY();
 		const std::vector<double>& getPeriods() const;
 		double getFundamentalPeriod(size_t dof);
 
