@@ -1060,6 +1060,7 @@ void RegularPlanBuildingGenerator::fetchResultsForEarthquakeAnalysis(json& build
 void RegularPlanBuildingGenerator::fetchResultsForModalAnalysis(json& buildingInfo)
 {
 	fetchFundamentalPeriodInGivenDirection("modal", buildingInfo);
+	fetchMassParticipationRatioInXDir("modal", buildingInfo);
 }
 
 void RegularPlanBuildingGenerator::fetchAxialLoadDistribution(std::string analysisName, json& buildingInfo)
@@ -1260,9 +1261,119 @@ void RegularPlanBuildingGenerator::fetchDriftRatioDistribution(std::string analy
 	buildingInfo["output"][analysisName]["masterJoint"]["rot"] = api::getDisplacements(masterJoint, analysisName)[5];
 }
 
+void RegularPlanBuildingGenerator::fetchPeriods(std::string analysisName, json& buildingInfo)
+{
+	int ns = buildingInfo["numberOfStoreys"];
+	int numOfModes = std::min(2 * ns, 12);
+
+	auto periods = api::getPeriods("modal");
+	
+	for (int i = 1; i <= numOfModes; ++i) {
+		buildingInfo["output"][analysisName]["periods"][std::to_string(i)] = periods[i - 1];
+	}
+}
+
 void RegularPlanBuildingGenerator::fetchFundamentalPeriodInGivenDirection(std::string analysisName, json& buildingInfo)
 {
 	buildingInfo["output"][analysisName]["fundamentalPeriodX"] = api::getFundamentalPeriod("modal", 1);
+}
+
+void RegularPlanBuildingGenerator::fetchMassParticipationRatioInXDir(std::string analysisName, json& buildingInfo)
+{
+	int ns = buildingInfo["numberOfStoreys"];
+	int numOfModes = std::min(2 * ns, 12);
+
+	// Defining l vector
+	std::vector<double> lX(3 * ns, 0.0);
+
+	for (int i = 0; i < (3 * ns); i++)
+	{
+		if ((i + 1) % 3 == 1)
+			lX[i] = 1.0;
+	}
+
+	// Defining mass vector
+	double totalMass = 0.0;
+	std::vector<double> massVec(3 * ns, 0.0);
+	for (int i = 1; i <= ns; ++i) {
+        auto mass = api::getDiaphragmMass(i);
+
+		if (mass == std::nullopt) {
+			return;
+		}
+		else {
+			massVec[(i - 1) * 3] = mass.value().x;
+			massVec[(i - 1) * 3 + 1] = mass.value().y;
+			massVec[(i - 1) * 3 + 2] = mass.value().z;
+
+			totalMass += mass.value().x;
+		}
+	}
+
+	// Calculating L vector
+	std::vector<double> LX(numOfModes, 0.0);
+	std::vector<double> LY(numOfModes, 0.0);
+
+	auto modeShapeX = api::getModeShapeX("modal");
+	auto modeShapeY = api::getModeShapeY("modal");
+	auto modeShapeXY = api::getModeShapeXY("modal");
+
+	std::vector<std::vector<double>> modeShapes (numOfModes, std::vector<double>(3 * ns));
+	for (int i = 0; i < numOfModes; i++)
+	{
+		for (int j = 0; j < ns; j++)
+		{
+			modeShapes[i][3 * j] = modeShapeX[i][j];
+			modeShapes[i][3 * j + 1] = modeShapeY[i][j];
+			modeShapes[i][3 * j + 2] = modeShapeXY[i][j];
+		}
+	}
+
+	for (int i = 0; i < numOfModes; i++)
+	{
+		double vecSumX = 0;
+
+		for (int j = 0; j < ns; j++)
+		{
+			vecSumX += modeShapes[i][j] * massVec[j] * lX[j];
+		}
+
+		LX[i] = vecSumX;
+	}
+
+	// Calculating modal mass vector
+	std::vector<double> modalMassVec(numOfModes, 0.0);
+
+	for (int i = 0; i < numOfModes; i++)
+	{
+		double vecSum = 0;
+
+		for (int j = 0; j < (3 * ns); j++)
+			vecSum += modeShapes[i][j] * massVec[j] * modeShapes[i][j];
+
+
+		modalMassVec[i] = vecSum;
+	}
+
+	// Calculating modal participation factor
+	std::vector<double> modalParticipationX(numOfModes, 0.0);
+
+	for (int i = 0; i < numOfModes; i++)
+	{
+		modalParticipationX[i] = LX[i] / modalMassVec[i];
+	}
+
+	// Calculating mass participation ratios
+	std::vector<double> massParticipationX(numOfModes, 0.0);
+
+	for (int i = 0; i < numOfModes; i++)
+	{
+		massParticipationX[i] = pow(LX[i], 2) / modalMassVec[i] / totalMass;
+	}
+
+	for (int i = 1; i <= numOfModes; ++i) {
+		buildingInfo["output"][analysisName]["massParticipationX"][std::to_string(i)] = massParticipationX[i - 1];
+	}
 }
 
 std::vector<std::vector<std::vector<double>>> RegularPlanBuildingGenerator::getShearWallArrangement(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatioX, double& shearWallRatioY)

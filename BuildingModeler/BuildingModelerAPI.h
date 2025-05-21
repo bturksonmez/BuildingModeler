@@ -166,7 +166,11 @@ namespace buildingModeler
 
         // modal output
         static double getPeriod(std::string analysisTag, int modeNumber);
+        static std::vector<double> getPeriods(std::string analysisTag);
         static double getFundamentalPeriod(std::string analysisTag, size_t dof);
+        static std::vector<std::vector<double>> getModeShapeX(std::string analysisTag);
+        static std::vector<std::vector<double>> getModeShapeY(std::string analysisTag);
+        static std::vector<std::vector<double>> getModeShapeXY(std::string analysisTag);
 
         // Input File Generation
         static void createAnalyticalModel();

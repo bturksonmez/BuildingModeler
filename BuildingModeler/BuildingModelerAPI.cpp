@@ -2023,6 +2023,28 @@ double BuildingModelerAPI::getPeriod(std::string analysisTag, int modeNumber)
     return periods[modeNumber - 1];
 }
 
+std::vector<double> BuildingModelerAPI::getPeriods(std::string analysisTag)
+{
+    if (!loadCaseExists(analysisTag)) {
+        throw EntityNotFoundException("Load case: " + analysisTag + " does not exists.");
+    }
+
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    if (analysis == nullptr) {
+        throw EntityNotFoundException("Analysis with tag: " + analysisTag + " has not been performed yet.");
+    }
+
+    auto modalAnalysis = std::dynamic_pointer_cast<opensees::ModalAnalysis>(analysis);
+    if (modalAnalysis == nullptr) {
+        throw EntityNotFoundException("Modal analysis with tag: " + analysisTag + " does not exists.");
+    }
+
+    auto modalOutput = std::dynamic_pointer_cast<opensees::ModalOutput>(analysis->getOutput());
+    auto periods = modalOutput->getPeriods();
+
+    return periods;
+}
+
 double BuildingModelerAPI::getFundamentalPeriod(std::string analysisTag, size_t dof)
 {
     if (!loadCaseExists(analysisTag)) {
@@ -2051,6 +2073,84 @@ double BuildingModelerAPI::getFundamentalPeriod(std::string analysisTag, size_t 
     }
 
     return fundamentalPeriod;
+}
+
+std::vector<std::vector<double>> BuildingModelerAPI::getModeShapeX(std::string analysisTag)
+{
+    if (!loadCaseExists(analysisTag)) {
+        throw EntityNotFoundException("Load case: " + analysisTag + " does not exists.");
+    }
+
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    if (analysis == nullptr) {
+        throw EntityNotFoundException("Analysis with tag: " + analysisTag + " has not been performed yet.");
+    }
+
+    auto modalAnalysis = std::dynamic_pointer_cast<opensees::ModalAnalysis>(analysis);
+    if (modalAnalysis == nullptr) {
+        throw EntityNotFoundException("Modal analysis with tag: " + analysisTag + " does not exists.");
+    }
+
+    auto modalOutput = std::dynamic_pointer_cast<opensees::ModalOutput>(analysis->getOutput());
+    auto modeShapeX = modalOutput->getModeShapeX();
+
+    if (modeShapeX.empty()) {
+        throw InvalidOperationException("TInvalid mode shape, empty!.");
+    }
+
+    return modeShapeX;
+}
+
+std::vector<std::vector<double>> BuildingModelerAPI::getModeShapeY(std::string analysisTag)
+{
+    if (!loadCaseExists(analysisTag)) {
+        throw EntityNotFoundException("Load case: " + analysisTag + " does not exists.");
+    }
+
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    if (analysis == nullptr) {
+        throw EntityNotFoundException("Analysis with tag: " + analysisTag + " has not been performed yet.");
+    }
+
+    auto modalAnalysis = std::dynamic_pointer_cast<opensees::ModalAnalysis>(analysis);
+    if (modalAnalysis == nullptr) {
+        throw EntityNotFoundException("Modal analysis with tag: " + analysisTag + " does not exists.");
+    }
+
+    auto modalOutput = std::dynamic_pointer_cast<opensees::ModalOutput>(analysis->getOutput());
+    auto modeShapeY = modalOutput->getModeShapeY();
+
+    if (modeShapeY.empty()) {
+        throw InvalidOperationException("TInvalid mode shape, empty!.");
+    }
+
+    return modeShapeY;
+}
+
+std::vector<std::vector<double>> BuildingModelerAPI::getModeShapeXY(std::string analysisTag)
+{
+    if (!loadCaseExists(analysisTag)) {
+        throw EntityNotFoundException("Load case: " + analysisTag + " does not exists.");
+    }
+
+    auto analysis = opensees::OpenseesModel::getInstance().getAnalysis(analysisTag);
+    if (analysis == nullptr) {
+        throw EntityNotFoundException("Analysis with tag: " + analysisTag + " has not been performed yet.");
+    }
+
+    auto modalAnalysis = std::dynamic_pointer_cast<opensees::ModalAnalysis>(analysis);
+    if (modalAnalysis == nullptr) {
+        throw EntityNotFoundException("Modal analysis with tag: " + analysisTag + " does not exists.");
+    }
+
+    auto modalOutput = std::dynamic_pointer_cast<opensees::ModalOutput>(analysis->getOutput());
+    auto modeShapeXY = modalOutput->getModeShapeXY();
+
+    if (modeShapeXY.empty()) {
+        throw InvalidOperationException("TInvalid mode shape, empty!.");
+    }
+
+    return modeShapeXY;
 }
 
 void BuildingModelerAPI::createAnalyticalModel()

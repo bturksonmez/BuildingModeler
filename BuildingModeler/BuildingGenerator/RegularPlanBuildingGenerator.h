@@ -39,7 +39,9 @@ namespace buildingGenerator
 		void fetchMomentInXDirDistribution(std::string analysisName, json& buildingInfo);
 		void fetchBeamDisplacementDistribution(std::string analysisName, int floorNumber, json& buildingInfo);
 		void fetchDriftRatioDistribution(std::string analysisName, json& buildingInfo);
+		void fetchPeriods(std::string analysisName, json& buildingInfo);
 		void fetchFundamentalPeriodInGivenDirection(std::string analysisName, json& buildingInfo);
+		void fetchMassParticipationRatioInXDir(std::string analysisName, json& buildingInfo);
 
 		std::vector<std::vector<std::vector<double>>> getShearWallArrangement(int numOfBaysLongDir, int numOfBaysPerpDir, std::vector<double> bayWidthsLongDir, std::vector<double> bayWidthsPerpDir, double thickness, double& shearWallRatioX, double& shearWallRatioY);
 		std::vector<std::vector<double>> getPerimeterShearWallLocations(int numOfBays, std::vector<double> bayWidths, double thickness, double buildingArea);
