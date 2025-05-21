@@ -3,6 +3,8 @@
 
 using namespace opensees;
 
+int OpenseesModel::processID = 0;
+
 OpenseesModel::OpenseesModel()
 {
     m_geometricTransformation[0] = std::make_shared<LinearGeometricTransformation>(0, std::vector<int>{0, 1, 0}); // for columns
@@ -145,6 +147,7 @@ void OpenseesModel::addOutputElement(int elementTag, opensees::ElementType eleme
 void OpenseesModel::toTclFile()
 {
     std::stringstream modelTcl;
+    std::string processId = std::to_string(processID);
 
     modelTcl << "model BasicBuilder -ndm 3 -ndf 6\n";
 
@@ -194,7 +197,7 @@ void OpenseesModel::toTclFile()
         }
     }
 
-    std::ofstream outFile(m_modelName + ".tcl");
+    std::ofstream outFile(m_modelName + processId + ".tcl");
     if (outFile.is_open()) {
         outFile << modelTcl.str();
         outFile.close();
@@ -208,10 +211,12 @@ void OpenseesModel::toTclFile()
 
 void OpenseesModel::createLoadingTclFiles()
 {
+    std::string processId = std::to_string(processID);
+
     for (const auto analysis : m_analyses) {
         auto analysisTcl = analysis.second->getOpenseesCommand();
 
-        std::ofstream outFile(analysis.first + ".tcl");
+        std::ofstream outFile(analysis.first + processId + ".tcl");
         if (outFile.is_open()) {
             outFile << analysisTcl;
             outFile.close();

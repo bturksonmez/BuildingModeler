@@ -81,6 +81,8 @@ namespace opensees
 		void toTclFile();
 		std::unordered_map<std::string, bool> analyze();
 
+		static int processID;
+
 		friend class buildingModeler::OpenseesConverter;
 	};
 }

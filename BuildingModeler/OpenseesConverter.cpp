@@ -506,13 +506,26 @@ std::vector<int> OpenseesConverter::createNodesBetweenTwoJoints(int jointTagA, i
     auto currentCoord = startCoord;
     for (int i = 0; i < numberOfIntervals - 1; ++i) {
 
-        auto nodeTag = opensees::utilities::TagGenerator::getInstance().getNextNodeTag();
+        int nodeTag;
+        if (numberOfIntervals % 2 == 0 && i == numberOfIntervals / 2 - 1 && (physicalModel::Building::getInstance().jointHint.count({ jointTagA, jointTagB }) || physicalModel::Building::getInstance().jointHint.count({ jointTagB, jointTagA }))) {
+            if (physicalModel::Building::getInstance().jointHint.count({ jointTagA, jointTagB })) {
+                nodeTag = physicalModel::Building::getInstance().jointHint[{ jointTagA, jointTagB }];
+            }
+            else {
+                nodeTag = physicalModel::Building::getInstance().jointHint[{ jointTagB, jointTagA }];
+            }
+            currentCoord = currentCoord + increment;
+        }
+        else {
+            nodeTag = opensees::utilities::TagGenerator::getInstance().getNextNodeTag();
+            currentCoord = currentCoord + increment;
+            opensees::OpenseesModel::getInstance().m_nodes[nodeTag] = std::make_unique<opensees::Node>(nodeTag, currentCoord);
+        }
+
         if (nodeExists(nodeTag)) {
             // To do: exception
         }
-
-        currentCoord = currentCoord + increment;
-        opensees::OpenseesModel::getInstance().m_nodes[nodeTag] = std::make_unique<opensees::Node>(nodeTag, currentCoord);
+   
         nodes.push_back(nodeTag);
 
         if (assignConstraint) {

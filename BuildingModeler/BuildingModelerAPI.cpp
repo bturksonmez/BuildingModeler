@@ -2068,3 +2068,20 @@ std::unordered_map<std::string, bool> BuildingModelerAPI::analyze()
 {
     return opensees::OpenseesModel::getInstance().analyze();
 }
+
+void BuildingModelerAPI::setProcessID(int processID)
+{
+    opensees::OpenseesModel::getInstance().processID = processID;
+}
+
+void BuildingModelerAPI::giveJointHint(const std::unordered_map<int, std::pair<int, int>>& shearWallJointMap)
+{
+    std::map<std::pair<int, int>, int> jointHint;
+
+    for (auto it = shearWallJointMap.begin(); it != shearWallJointMap.end(); it++) {
+
+        jointHint[it->second] = it->first;
+    }
+
+    physicalModel::Building::getInstance().jointHint = jointHint;
+}

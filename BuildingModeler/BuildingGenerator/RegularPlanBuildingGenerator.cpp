@@ -20,18 +20,20 @@ RegularPlanBuildingGenerator::RegularPlanBuildingGenerator(const Parameters& par
 	void validateInput();
 }
 
-json RegularPlanBuildingGenerator::generateAndAnalyze(std::optional<long long> seed)
+json RegularPlanBuildingGenerator::generateAndAnalyze(std::optional<long long> seed, int processID)
 {
 	if (seed == std::nullopt) {
 		m_seed = std::chrono::system_clock::now().time_since_epoch().count() + counter++;
 		m_generator.seed(m_seed);
 	}
 	else {
-		m_seed = seed.value();
+		m_seed = std::chrono::system_clock::now().time_since_epoch().count() + seed.value() + counter++;
 		m_generator.seed(m_seed);
 	}
 
 	api::clear();
+
+	api::setProcessID(processID);
 
 	json buildingInfo;
 
@@ -89,6 +91,8 @@ json RegularPlanBuildingGenerator::generateAndAnalyze(std::optional<long long> s
 
 	// Generate joints
 	generateJoints(buildingInfo, shearWallArrangement, shearWallJointMap);
+
+	api::giveJointHint(shearWallJointMap);
 
 	// Generate shear walls
 	generateShearWalls(shearWallArrangement, shearWallJointMap, tShearWall, buildingInfo);
@@ -192,22 +196,20 @@ json RegularPlanBuildingGenerator::generateAndAnalyze(std::optional<long long> s
 	
 	// Mesh area elements
 	meshAreaElements();
-	
-	// Apply model preferences
+
+	// Apply model preferences and generate slabv masses
 	std::uniform_real_distribution<double> liveLoadDist(m_parameters.modelingPreferences.minLiveLoadPerArea, m_parameters.modelingPreferences.maxLiveLoadPerArea);
 	std::uniform_real_distribution<double> liveLoadMassContributionDist(m_parameters.modelingPreferences.minLiveLoadMassContribution, m_parameters.modelingPreferences.maxLiveLoadMassContribution);
 	double liveLoad = liveLoadDist(m_generator);
 	double liveLoadMassContributionFactor = liveLoadMassContributionDist(m_generator);
 	buildingInfo["loading"]["liveLoad"]["liveLoadPerArea"] = liveLoad;
 	buildingInfo["loading"]["liveLoad"]["liveLoadMassParticipationFactor"] = liveLoadMassContributionFactor;
-	applyModelingPreferences(buildingInfo);
-
-	// Generate slab masses
 	std::uniform_real_distribution<double> slabThicknessDist(m_parameters.slabParameters.minSlabThickness, m_parameters.slabParameters.maxSlabThickness);
 	double tSlab = slabThicknessDist(m_generator);
 	buildingInfo["slab"]["thickness"] = tSlab;
 	generateSlabMasses(tSlab, shearWallJointMap, buildingInfo);
-	
+	applyModelingPreferences(buildingInfo);
+
 	// Load the building
 	if (dynamic_cast<loadingGenerator::GravityLoadingGenerator*>(m_loading.get())) {
 		int coreX = buildingInfo["shearWall"]["coreLocationX"];
@@ -562,6 +564,9 @@ void RegularPlanBuildingGenerator::generateJoints(json& buildingInfo, const std:
 						api::setConstraintVector(20000 + jointTag, { 1, 1, 1, 1, 1, 1 });
 						api::setConstraintVector(30000 + jointTag, { 1, 1, 1, 1, 1, 1 });
 					}
+					
+					api::addJoint(jointTag, { coordX, coordY, coordZ });
+					api::setFloorNo(jointTag, i);
 				}
 
 				if (k < numOfBaysX) {
@@ -688,15 +693,8 @@ void RegularPlanBuildingGenerator::generateSlabMasses(double thickness, std::uno
 	auto assignMass {
 		[&] (int jointTag, double mass) -> void {
 			
-			if (shearWallJointMap.count(jointTag)) {
-				utility::Vector3 transMass(mass / 2.0, mass / 2.0, 0.0);
-				api::addTranslationalMass(shearWallJointMap[jointTag].first, transMass);
-				api::addTranslationalMass(shearWallJointMap[jointTag].second, transMass);
-			}
-			else {
-				utility::Vector3 transMass(mass, mass, 0.0);
-				api::addTranslationalMass(jointTag, transMass);
-			}
+			utility::Vector3 transMass(mass, mass, 0.0);
+			api::addTranslationalMass(jointTag, transMass);
 		}
 	};
 
@@ -838,7 +836,7 @@ void RegularPlanBuildingGenerator::generateBeams(double width, double minDepth, 
 
 	double totalBeamIndex = 0.0;
 
-	std::vector<int> sectionTagsX((numOfBaysX + 1) / 2, 0);
+	std::vector<std::vector<int>> sectionTagsX(numOfBaysY + 1, std::vector<int>(numOfBaysX, 0.0));
 	int numOfJointsPerFloor = (numOfBaysX + 1) * (numOfBaysY + 1);
 	int sectionTag = 201;
 	int currentSectionTag;
@@ -852,11 +850,11 @@ void RegularPlanBuildingGenerator::generateBeams(double width, double minDepth, 
 				int jointITag = (i + 1) * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
 				int jointJTag = (i + 1) * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k + 1;
 
-				if (shearWallJointMap.count(jointITag)) {
+				if (shearWallJointMap.count(jointITag) && k != 0) {
 					jointITag = shearWallJointMap[jointITag].second;
 				}
 
-				if (shearWallJointMap.count(jointJTag)) {
+				if (shearWallJointMap.count(jointJTag) && k != numOfBaysX - 1) {
 					jointJTag = shearWallJointMap[jointJTag].first;
 				}
 
@@ -865,21 +863,14 @@ void RegularPlanBuildingGenerator::generateBeams(double width, double minDepth, 
 				double length = (coordJ - coordI).norm2();
 				double depth = getDepth(length);
 				
-				if (k > (numOfBaysX - 1) / 2) {
+				if (sectionTagsX[j][k] == 0) {
 
-					currentSectionTag = sectionTagsX[numOfBaysX - 1 - k];
+					api::addElasticSection1D(sectionTag, 1, new physicalModel::Rectangle(width, depth));
+					sectionTagsX[j][k] = sectionTag;
+					currentSectionTag = sectionTag++;
 				}
 				else {
-
-					if (sectionTagsX[k] == 0) {
-
-						api::addElasticSection1D(sectionTag, 1, new physicalModel::Rectangle(width, depth));
-						sectionTagsX[k] = sectionTag;
-						currentSectionTag = sectionTag++;
-					}
-					else {
-						currentSectionTag = sectionTagsX[k];
-					}
+					currentSectionTag = sectionTagsX[j][k];
 				}
 
 				api::addBeam(elementTag, { jointITag, jointJTag }, currentSectionTag, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
@@ -897,8 +888,8 @@ void RegularPlanBuildingGenerator::generateBeams(double width, double minDepth, 
 
 	buildingInfo["beam"]["totalBeamIndexX"] = totalBeamIndex;
 
-	std::vector<int> sectionTagsY((numOfBaysY + 1) / 2, 0);
-	sectionTag = 251;
+	std::vector<std::vector<int>> sectionTagsY(numOfBaysY, std::vector<int>(numOfBaysX + 1, 0.0));
+	sectionTag = 401;
 	for (int i = 0; i < ns; ++i) {
 
 		int elementTag = 25100 + 100 * i + 1;
@@ -909,11 +900,11 @@ void RegularPlanBuildingGenerator::generateBeams(double width, double minDepth, 
 				int jointITag = (i + 1) * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * j + k;
 				int jointJTag = (i + 1) * numOfJointsPerFloor + 1 + (numOfBaysX + 1) * (j + 1) + k;
 
-				if (shearWallJointMap.count(jointITag)) {
+				if (shearWallJointMap.count(jointITag) && j != 0) {
 					jointITag = shearWallJointMap[jointITag].second;
 				}
 
-				if (shearWallJointMap.count(jointJTag)) {
+				if (shearWallJointMap.count(jointJTag) && j != numOfBaysY - 1) {
 					jointJTag = shearWallJointMap[jointJTag].first;
 				}
 
@@ -922,21 +913,14 @@ void RegularPlanBuildingGenerator::generateBeams(double width, double minDepth, 
 				double length = (coordJ - coordI).norm2();
 				double depth = getDepth(length);
 
-				if (j > (numOfBaysY - 1) / 2) {
+				if (sectionTagsY[j][k] == 0) {
 
-					currentSectionTag = sectionTagsY[numOfBaysY - 1 - j];
+					api::addElasticSection1D(sectionTag, 1, new physicalModel::Rectangle(width, depth));
+					sectionTagsY[j][k] = sectionTag;
+					currentSectionTag = sectionTag++;
 				}
 				else {
-
-					if (sectionTagsY[j] == 0) {
-
-						api::addElasticSection1D(sectionTag, 1, new physicalModel::Rectangle(width, depth));
-						sectionTagsY[j] = sectionTag;
-						currentSectionTag = sectionTag++;
-					}
-					else {
-						currentSectionTag = sectionTagsY[j];
-					}
+					currentSectionTag = sectionTagsY[j][k];
 				}
 
 				api::addBeam(elementTag, { jointITag, jointJTag }, currentSectionTag, physicalModel::LineElementFormulation::LINEAR_EULER_BERNOULLI);
@@ -1395,7 +1379,7 @@ std::vector<std::vector<double>> RegularPlanBuildingGenerator::getPerimeterShear
 			std::optional<double> midLength;
 
 			if (perimeterLocationPool[i].size() & 1) {
-				maxLength = std::min(maxLength, bayWidths[numOfBays / 2]);
+				maxLength = std::min(maxLength, 0.7 * bayWidths[numOfBays / 2]);
 				std::uniform_real_distribution<double> midShearWallLength(std::min(1.6001, maxLength), std::max(1.6001, maxLength));
 
 				midLength = 0.2 * std::round(midShearWallLength(m_generator) / 0.2);
@@ -1409,7 +1393,7 @@ std::vector<std::vector<double>> RegularPlanBuildingGenerator::getPerimeterShear
 				}
 
 				int index = perimeterLocationPool[i][0];
-				maxLength = std::min(maxLength, std::min(bayWidths[index - 1], bayWidths[index]));
+				maxLength = std::min(maxLength, 0.7 * std::min(bayWidths[index - 1], bayWidths[index]));
 
 				std::uniform_real_distribution<double> edgeShearWallLength(std::min(1.6001, maxLength), std::max(1.6001, maxLength));
 				auto edgeLength = 0.2 * std::round(edgeShearWallLength(m_generator) / 0.2);

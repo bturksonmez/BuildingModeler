@@ -172,5 +172,9 @@ namespace buildingModeler
         static void createAnalyticalModel();
         static void createModelAndLoadingFiles();
         static std::unordered_map<std::string, bool> analyze();
+
+        //Dummy
+        static void setProcessID(int processID);
+        static void giveJointHint(const std::unordered_map<int, std::pair<int, int>>& shearWallJointMap);
     };
 }

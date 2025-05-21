@@ -96,7 +96,7 @@ namespace buildingGenerator
 		typedef buildingModeler::BuildingModelerAPI api;
 
 	public:
-		virtual json generateAndAnalyze(std::optional<long long> seed) = 0;
+		virtual json generateAndAnalyze(std::optional<long long> seed, int processID) = 0;
 		virtual bool createModelFromJsonAndAnalyze(json& buildingInfo) = 0;
 		virtual ~IBuildingGenerator() = default;
 

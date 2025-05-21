@@ -50,7 +50,7 @@ namespace buildingGenerator
 		RegularPlanBuildingGenerator() = delete;
 		~RegularPlanBuildingGenerator() = default;
 
-		json generateAndAnalyze(std::optional<long long> seed) override;
+		json generateAndAnalyze(std::optional<long long> seed, int processID) override;
 		bool createModelFromJsonAndAnalyze(json& buildingInfo) override;
 	};
 }

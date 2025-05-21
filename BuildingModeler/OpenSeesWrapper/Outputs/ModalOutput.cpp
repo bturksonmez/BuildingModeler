@@ -1,4 +1,5 @@
 #include "ModalOutput.h"
+#include "../OpenseesModel.h"
 
 #include <cmath>
 
@@ -59,7 +60,9 @@ bool ModalOutput::retrieveOutput()
 
 bool ModalOutput::retrievePeriods()
 {
-	std::string outputFile = "lambda.out";
+	std::string processID = std::to_string(OpenseesModel::getInstance().processID);
+
+	std::string outputFile = "lambda_" + processID + ".out";
 	auto lambdas = utilities::DataReader::readContinuosLine<double>(outputFile);
 
 	if (lambdas.empty()) {
@@ -78,6 +81,8 @@ bool ModalOutput::retrievePeriods()
 
 void ModalOutput::retrieveModeShapes()
 {
+	std::string processID = std::to_string(OpenseesModel::getInstance().processID);
+
 	auto numOfModes = m_periods.size();
 	
 	m_modeShapeX.resize(numOfModes);
@@ -86,9 +91,9 @@ void ModalOutput::retrieveModeShapes()
 
 	for (int i = 0; i < numOfModes; i++)
 	{
-		auto vecX = utilities::DataReader::readContinuosLine<double>("mode1" + std::to_string(i + 1) + ".out");
-		auto vecY = utilities::DataReader::readContinuosLine<double>("mode2" + std::to_string(i + 1) + ".out");
-		auto vecXY = utilities::DataReader::readContinuosLine<double>("mode6" + std::to_string(i + 1) + ".out");
+		auto vecX = utilities::DataReader::readContinuosLine<double>("mode1" + std::to_string(i + 1) + "_" + processID + ".out");
+		auto vecY = utilities::DataReader::readContinuosLine<double>("mode2" + std::to_string(i + 1) + "_" + processID + ".out");
+		auto vecXY = utilities::DataReader::readContinuosLine<double>("mode6" + std::to_string(i + 1) + "_" + processID + ".out");
 
 		m_modeShapeX[i] = vecX;
 		m_modeShapeY[i] = vecY;
@@ -98,6 +103,8 @@ void ModalOutput::retrieveModeShapes()
 
 void ModalOutput::retrieveModeShapesAsDisplacements()
 {
+	std::string processID = std::to_string(OpenseesModel::getInstance().processID);
+
 	auto numOfModes = m_periods.size();
 
 	for (const auto tag : m_masterNodeTags) {
@@ -106,9 +113,9 @@ void ModalOutput::retrieveModeShapesAsDisplacements()
 
 	for (int i = 0; i < numOfModes; i++)
 	{
-		auto vecX = utilities::DataReader::readContinuosLine<double>("mode1" + std::to_string(i + 1) + ".out");
-		auto vecY = utilities::DataReader::readContinuosLine<double>("mode2" + std::to_string(i + 1) + ".out");
-		auto vecXY = utilities::DataReader::readContinuosLine<double>("mode6" + std::to_string(i + 1) + ".out");
+		auto vecX = utilities::DataReader::readContinuosLine<double>("mode1" + std::to_string(i + 1) + "_" + processID + ".out");
+		auto vecY = utilities::DataReader::readContinuosLine<double>("mode2" + std::to_string(i + 1) + "_" + processID + ".out");
+		auto vecXY = utilities::DataReader::readContinuosLine<double>("mode6" + std::to_string(i + 1) + "_" + processID + ".out");
 
 		for (int j = 0; j < vecX.size(); ++j) {
 			m_nodeDispOutput[m_masterNodeTags[j]][i].push_back(vecX[j]);

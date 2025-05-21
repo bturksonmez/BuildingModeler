@@ -92,6 +92,8 @@ namespace physicalModel
         void updateSurroundingLineElements(); // for area elements
         void toAnalyticalModel();
 
+        std::map<std::pair<int, int>, int> jointHint;
+
         friend class buildingModeler::BuildingModelerAPI;
         friend class opensees::OpenseesModel;
     };

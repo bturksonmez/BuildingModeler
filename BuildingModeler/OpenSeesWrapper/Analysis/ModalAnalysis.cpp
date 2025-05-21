@@ -1,4 +1,5 @@
 #include "ModalAnalysis.h"
+#include "../OpenseesModel.h"
 
 using namespace opensees;
 
@@ -23,15 +24,19 @@ std::string ModalAnalysis::getOpenseesCommand() const
 {
 	std::string command;
 
-	command = "source " + m_sourceModelName + ".tcl\n";
+	std::string processID = std::to_string(OpenseesModel::getInstance().processID);
+
+	command = "source " + m_sourceModelName + processID + ".tcl\n";
 	command += "\n";
 
 	command += "remove recorders\n";
 	command += "\n";
 
+	command += "set processID " + processID;
+
 	command += "#Eigenvector recorder for dof 1\n";	
 	command += "for { set k 1 } { $k <= " + std::to_string(m_numberOfModes) + " } { incr k } {\n";
-	command += "\trecorder Node -file [format \"mode1%i.out\" $k] -node ";
+	command += "\trecorder Node -file [format \"mode1%i_%i.out\" $k $processID] -node ";
 	for (const auto& nodeTag : m_masterNodeTags) {
 		command += (std::to_string(nodeTag) + " ");
 	}
@@ -41,7 +46,7 @@ std::string ModalAnalysis::getOpenseesCommand() const
 
 	command += "#Eigenvector recorder for dof 2\n";
 	command += "for { set k 1 } { $k <= " + std::to_string(m_numberOfModes) + " } { incr k } {\n";
-	command += "\trecorder Node -file [format \"mode2%i.out\" $k] -node ";
+	command += "\trecorder Node -file [format \"mode2%i_%i.out\" $k $processID] -node ";
 	for (const auto& nodeTag : m_masterNodeTags) {
 		command += (std::to_string(nodeTag) + " ");
 	}
@@ -51,7 +56,7 @@ std::string ModalAnalysis::getOpenseesCommand() const
 
 	command += "#Eigenvector recorder for dof 6\n";
 	command += "for { set k 1 } { $k <= " + std::to_string(m_numberOfModes) + " } { incr k } {\n";
-	command += "\trecorder Node -file [format \"mode6%i.out\" $k] -node ";
+	command += "\trecorder Node -file [format \"mode6%i_%i.out\" $k $processID] -node ";
 	for (const auto& nodeTag : m_masterNodeTags) {
 		command += (std::to_string(nodeTag) + " ");
 	}
@@ -64,7 +69,7 @@ std::string ModalAnalysis::getOpenseesCommand() const
 	command += "\n";
 
 	command += "#Storing Lambda Values\n";
-	command += "set lambda \"lambda.out\"\n";
+	command += "set lambda [format \"lambda_%i.out\" $processID]\n";
 	command += "set lambdaFile [open $lambda \"w\"]\n";
 	command += "foreach l $lambdaVal {\n";
 	command += "\tputs $lambdaFile \"$l\"\n";

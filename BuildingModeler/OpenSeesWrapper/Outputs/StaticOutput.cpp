@@ -24,7 +24,9 @@ bool StaticOutput::retrieveOutput()
 
 bool StaticOutput::retrieveNodeDisplacements()
 {
-	std::string outputFile = "nodeDisp.out";
+	std::string processID = std::to_string(OpenseesModel::getInstance().processID);
+
+	std::string outputFile = "nodeDisp" + processID + ".out";
 	auto displacements = utilities::DataReader::readContinuosLine<double>(outputFile);
 
 	if (displacements.empty()) {
@@ -48,7 +50,9 @@ bool StaticOutput::retrieveNodeDisplacements()
 
 bool StaticOutput::retrieveElementForces()
 {
-	std::string outputFile = "eleForce.out";
+	std::string processID = std::to_string(OpenseesModel::getInstance().processID);
+
+	std::string outputFile = "eleForce" + processID + ".out";
 	auto forces = utilities::DataReader::readContinuosLine<double>(outputFile);
 
 	if (forces.empty()) {

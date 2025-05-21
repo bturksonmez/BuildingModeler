@@ -13,13 +13,15 @@ using namespace loadingGenerator;
 int main(int argc, char* argv[])
 {
 	int minModelTag = 1;
-	int maxModelTag = 5;
+	int maxModelTag = 500;
+	int processTag = 1;
 	std::optional<long long> seed;
 	if (argc > 1)
 	{
 		minModelTag = std::atoi(argv[1]);
 		maxModelTag = std::atoi(argv[2]);
-		seed = std::atoll(argv[3]);
+		processTag = std::atoi(argv[3]);
+		seed = std::atoll(argv[4]);
 	}
 
 	Parameters params;
@@ -87,10 +89,10 @@ int main(int argc, char* argv[])
 
 	for (int i = minModelTag; i <= maxModelTag; ++i) {
 	
-		auto answer = generator->generateAndAnalyze(seed);
+		auto answer = generator->generateAndAnalyze(seed, processTag);
 
 		if (!answer.empty()) {
-			std::ofstream file(workingDir + "/data/building_info" + std::to_string(i) + ".json");
+			std::ofstream file(workingDir + "/data" + std::to_string(processTag)  + "/building_info" + std::to_string(i) + ".json");
 			file << answer.dump(4);  // The argument 4 specifies indentation for pretty-printing
 			file.close();
 		}
